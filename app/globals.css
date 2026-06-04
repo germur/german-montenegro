@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #FFFFFF;
+  color: #0A0A0A;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ---- Theme: dark mode via root filter (preserves brand gold through hue-rotate) ---- */
+html { transition: filter 0.4s ease; }
+html[data-theme="dark"] {
+  filter: invert(1) hue-rotate(180deg);
+  background: #0A0A0A;
+}
+/* re-invert real media so photos/logos keep their true colors */
+html[data-theme="dark"] img,
+html[data-theme="dark"] image-slot,
+html[data-theme="dark"] video,
+html[data-theme="dark"] [data-keep-color] {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+#__next, main {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+}
