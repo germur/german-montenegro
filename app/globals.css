@@ -35,6 +35,24 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 100vh;
 }
 
+/* ---- Fixed-header safe area ----
+   The nav is position:fixed (~66px tall, taller when wrapped on mobile).
+   Reserve space so in-page scrolling / anchors never hide content behind it. */
+:root { --gm-nav-h: 72px; }
+html { scroll-padding-top: var(--gm-nav-h); }
+* { scroll-margin-top: var(--gm-nav-h); }
+
+/* Full-viewport heroes center their content; on short/mobile screens the top
+   of that content can tuck under the fixed nav. Reserve the nav height on the
+   first section of each page so the hero shifts down clear of the header. */
+main section:first-of-type {
+  padding-top: max(var(--gm-nav-h), env(safe-area-inset-top));
+}
+
+@media (max-width: 768px) {
+  :root { --gm-nav-h: 84px; }
+}
+
 .container {
   max-width: 1400px;
   margin: 0 auto;

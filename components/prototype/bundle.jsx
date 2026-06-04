@@ -735,10 +735,17 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       return { x: e.clientX, y: e.clientY };
     }
 
+    let pointerIsTouch = false;
+    let gestureLocked = false;
+    let gestureIsScroll = false;
+
     function onPointerDown(e) {
       pointerDown = true;
       isDragging = false;
       dragMoveDist = 0;
+      pointerIsTouch = e.pointerType === 'touch' || (e.changedTouches && e.changedTouches.length);
+      gestureLocked = false;
+      gestureIsScroll = false;
       const p = getPointer(e);
       dragStartX = p.x;
       dragStartY = p.y;
@@ -756,12 +763,19 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
         const dx = p.x - dragStartX;
         const dy = p.y - dragStartY;
         const dist = Math.sqrt(dx * dx + dy * dy);
+        if (pointerIsTouch && !gestureLocked && dist > 6) {
+          gestureIsScroll = Math.abs(dy) > Math.abs(dx);
+          gestureLocked = true;
+        }
+        if (pointerIsTouch && gestureIsScroll) return;
         if (dist > 4) {
           isDragging = true;
           onDragChange(true);
           targetRotY += dx * 0.008;
-          targetRotX -= dy * 0.005;
-          targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX));
+          if (!pointerIsTouch) {
+            targetRotX -= dy * 0.005;
+            targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX));
+          }
           dragStartX = p.x;
           dragStartY = p.y;
           lastInteractionTime = performance.now();
@@ -918,7 +932,7 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
         inset: 0,
         width: '100%',
         height: '100%',
-        touchAction: 'none',
+        touchAction: 'pan-y',
       }}
     />
   );
