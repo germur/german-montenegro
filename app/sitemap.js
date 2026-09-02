@@ -1,6 +1,6 @@
 import { PAGE_TO_PATH } from "@/lib/routes";
 
-const SITE_URL = "https://germanmontenegro.com";
+const SITE_URL = "https://germanmontenegro.fit";
 
 export default function sitemap() {
   const now = new Date();

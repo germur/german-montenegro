@@ -1,4 +1,4 @@
-const SITE_URL = "https://germanmontenegro.com";
+const SITE_URL = "https://germanmontenegro.fit";
 
 export default function robots() {
   return {
