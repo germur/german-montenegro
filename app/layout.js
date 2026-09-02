@@ -35,6 +35,9 @@ export const metadata = {
       "Fisioterapia deportiva en Bogotá para atletas. Diagnóstico preciso y readaptación basada en evidencia.",
   },
   robots: { index: true, follow: true },
+  verification: {
+    google: "xyptqAjEss_aO6dTu81bKRRgfubvYQDeBGPj0cSrLM4",
+  },
 };
 
 const themeBootstrap = `(function(){try{var t=localStorage.getItem('gm-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();`;
