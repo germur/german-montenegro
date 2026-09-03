@@ -68,18 +68,19 @@ function Sport3DIcon({ kind, size = 200 }) {
       // Cuff strap band
       add(new THREE.TorusGeometry(0.74, 0.1, 8, 24), -0.15, -0.62, 0, [HALF, 0, 0.12], true);
     } else if (kind === 'bjj') {
-      // Flat belt straps crossing at center (thin = fabric)
-      add(new THREE.BoxGeometry(1.7, 0.46, 0.16), -0.55, 0.45, 0, [0, 0, 0.16], false);
-      add(new THREE.BoxGeometry(1.7, 0.46, 0.16), 0.55, 0.45, 0, [0, 0, -0.16], false);
-      // Central knot — small overlapping squares, raised in front
-      add(new THREE.BoxGeometry(0.6, 0.6, 0.34), 0, 0.42, 0.3, [0, 0, 0.4], false);
-      add(new THREE.BoxGeometry(0.6, 0.6, 0.3), 0, 0.42, 0.34, [0, 0, -0.4], false);
-      // Two tails hanging from the knot (thin, flat)
-      add(new THREE.BoxGeometry(0.4, 1.45, 0.14), -0.22, -0.7, 0.28, [0, 0, 0.05], false);
-      add(new THREE.BoxGeometry(0.4, 1.45, 0.14), 0.24, -0.78, 0.28, [0, 0, -0.04], false);
-      // Rank stripes near tail ends
-      add(new THREE.BoxGeometry(0.44, 0.14, 0.18), -0.22, -1.25, 0.3, null, true);
-      add(new THREE.BoxGeometry(0.44, 0.14, 0.18), 0.24, -1.33, 0.3, null, true);
+      // Banda que envuelve la cintura, casi de canto respecto a la camara:
+      // asi lee como cinturon y no como platillo. (Antes eran dos tiras
+      // sueltas formando una T, que es justo lo que no parecia.)
+      add(new THREE.TorusGeometry(0.95, 0.15, 10, 44), 0, 0, 0, [1.42, 0, 0], false);
+      // Nudo central al frente — dos lazos cruzados sobre la banda
+      add(new THREE.BoxGeometry(0.46, 0.46, 0.24), 0, 0, 0.93, [0, 0, 0.28], false);
+      add(new THREE.BoxGeometry(0.46, 0.46, 0.2), 0, 0, 0.98, [0, 0, -0.28], false);
+      // Puntas colgando del nudo
+      add(new THREE.BoxGeometry(0.3, 1.55, 0.13), -0.2, -1.0, 0.95, [0, 0, 0.04], false);
+      add(new THREE.BoxGeometry(0.3, 1.55, 0.13), 0.22, -1.08, 0.95, [0, 0, -0.03], false);
+      // Barra de grado cerca de las puntas
+      add(new THREE.BoxGeometry(0.34, 0.12, 0.17), -0.2, -1.68, 0.97, null, true);
+      add(new THREE.BoxGeometry(0.34, 0.12, 0.17), 0.22, -1.76, 0.97, null, true);
     } else if (kind === 'weightlifting') {
       // Bar
       add(new THREE.CylinderGeometry(0.1, 0.1, 4.0, 12), 0, 0, 0, [0, 0, HALF], false);
@@ -103,7 +104,10 @@ function Sport3DIcon({ kind, size = 200 }) {
     }
 
     // Center vertically a touch
-    group.position.y = kind === 'weightlifting' ? 0 : -0.1;
+    group.position.y = kind === 'weightlifting' ? 0 : kind === 'bjj' ? 0.6 : -0.1;
+    // El cinturon es mas estrecho que el resto: lo subimos de tamano para que
+    // pese lo mismo en la retina que la pesa o el guante.
+    if (kind === 'bjj') group.scale.setScalar(1.15);
 
     let raf;
     let t = 0;
@@ -150,6 +154,20 @@ function BodyMapSection({ onNavigate }) {
   const [activeZone, setActiveZone] = React.useState(null);
   const [hoveredZone, setHoveredZone] = React.useState(null);
   const [isDragging, setIsDragging] = React.useState(false);
+  const infoRef = React.useRef(null);
+  const activeRef = React.useRef(null);
+
+  // Identidad estable: el canvas 3D captura esta funcion una sola vez.
+  const handleSelect = React.useCallback((id) => {
+    const next = activeRef.current === id ? null : id;
+    activeRef.current = next;
+    setActiveZone(next);
+    if (next && typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches) {
+      window.setTimeout(() => {
+        if (infoRef.current) infoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 90);
+    }
+  }, []);
 
   // Unified zone data (no front/back tabs in 3D, rotate instead)
   const zones = [
@@ -339,7 +357,7 @@ function BodyMapSection({ onNavigate }) {
             <BodyMap3DCanvas
               zones={zones}
               activeZone={activeZone}
-              onSelectZone={(id) => setActiveZone(prev => prev === id ? null : id)}
+              onSelectZone={handleSelect}
               onHoverZone={setHoveredZone}
               onDragChange={setIsDragging}
             />
@@ -459,7 +477,7 @@ function BodyMapSection({ onNavigate }) {
               ) : (
                 <>
                   <span>⊕</span>
-                  <span>Arrastra para rotar · Click en punto dorado</span>
+                  <span className="bm-hint-text">Arrastra para rotar · Toca un punto dorado</span>
                 </>
               )}
             </div>
@@ -471,7 +489,7 @@ function BodyMapSection({ onNavigate }) {
             display: 'flex',
             flexDirection: 'column',
             minHeight: '720px',
-          }} className="bm-info">
+          }} className="bm-info" ref={infoRef}>
             {!activeZoneData ? (
               <BodyMapEmpty />
             ) : (
@@ -479,9 +497,32 @@ function BodyMapSection({ onNavigate }) {
                 zone={activeZoneData}
                 onNavigate={onNavigate}
                 sevColor={sevColor}
-                onClose={() => setActiveZone(null)}
+                onClose={() => { activeRef.current = null; setActiveZone(null); }}
               />
             )}
+          </div>
+        </div>
+
+        {/* Selector de zonas por nombre — accesible, indexable y a prueba de dedos */}
+        <div className="bm-zones">
+          <div className="bm-zones-label">O elige la zona directamente</div>
+          <div className="bm-zones-list">
+            {zones.map(z => {
+              const on = activeZone === z.id;
+              return (
+                <button
+                  key={z.id}
+                  type="button"
+                  onClick={() => handleSelect(z.id)}
+                  onMouseEnter={() => setHoveredZone(z.id)}
+                  onMouseLeave={() => setHoveredZone(null)}
+                  aria-pressed={on}
+                  className={'bm-zone-chip' + (on ? ' is-on' : '')}
+                >
+                  {z.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -505,11 +546,39 @@ function BodyMapSection({ onNavigate }) {
           from { opacity: 0; transform: translateX(-50%) translateY(4px); }
           to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+        .bm-zones { margin-top: 1.75rem; }
+        .bm-zones-label {
+          font-size: 0.6875rem; letter-spacing: 0.25em; text-transform: uppercase;
+          font-weight: 700; color: rgba(255,255,255,0.4); margin-bottom: 0.875rem;
+        }
+        .bm-zones-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .bm-zone-chip {
+          appearance: none;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.12);
+          color: rgba(255,255,255,0.75);
+          font-family: 'Space Grotesk', sans-serif;
+          font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em;
+          padding: 0.75rem 1rem;
+          min-height: 44px;
+          cursor: pointer;
+          transition: border-color 0.2s, color 0.2s, background 0.2s;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .bm-zone-chip:hover, .bm-zone-chip:focus-visible {
+          border-color: #C9A55A; color: #C9A55A; outline: none;
+        }
+        .bm-zone-chip.is-on {
+          border-color: #C9A55A; background: #C9A55A; color: #0A0A0A;
+        }
         @media (max-width: 900px) {
           .bm-header { grid-template-columns: 1fr !important; }
           .bm-grid { grid-template-columns: 1fr !important; }
-          .bm-canvas-wrap { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); min-height: 560px !important; }
-          .bm-info { min-height: auto !important; padding: 2rem !important; }
+          .bm-canvas-wrap { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); min-height: 440px !important; }
+          .bm-info { min-height: auto !important; padding: 2rem !important; scroll-margin-top: 5rem; }
+          .bm-hint-text { font-size: 0.625rem; letter-spacing: 0.15em; }
+          .bm-zones-list { gap: 0.4375rem; }
+          .bm-zone-chip { font-size: 0.75rem; padding: 0.6875rem 0.875rem; }
         }
       `}</style>
     </section>
@@ -537,8 +606,10 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
     const THREE = window.THREE;
 
     // ---- Scene setup ----
-    const w = mount.clientWidth;
-    const h = mount.clientHeight;
+    const w = mount.clientWidth || 480;
+    const h = mount.clientHeight || 560;
+    const isTouch = typeof window !== 'undefined' &&
+      (window.matchMedia('(hover: none)').matches || 'ontouchstart' in window);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
@@ -550,7 +621,7 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch (err) { console.warn('WebGL not available for body map:', err); return; }
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouch ? 1.5 : 2));
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.cursor = 'grab';
@@ -571,12 +642,15 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       opacity: 0.85,
     });
 
+    const bodyMeshes = [];
+
     function addPart(geo, x, y, z, ry) {
       // Fill mesh (silhouette)
       const fill = new THREE.Mesh(geo, fillMat);
       fill.position.set(x, y, z);
       if (ry) fill.rotation.y = ry;
       figureGroup.add(fill);
+      bodyMeshes.push(fill);
 
       // Edges
       const edges = new THREE.EdgesGeometry(geo, 18);
@@ -672,13 +746,14 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
 
     // ---- Hotspots ----
     const hotspotMeshes = [];
+    const hitMeshes = [];
     const ringMeshes = [];
     const labelGroup = new THREE.Group();
     scene.add(labelGroup);
 
     zones.forEach((zone, i) => {
       // Core sphere
-      const coreGeo = new THREE.SphereGeometry(0.07, 14, 10);
+      const coreGeo = new THREE.SphereGeometry(0.085, 14, 10);
       const coreMat = new THREE.MeshBasicMaterial({
         color: 0xC9A55A,
         transparent: true,
@@ -690,8 +765,19 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       figureGroup.add(core);
       hotspotMeshes.push(core);
 
+      // Hit proxy invisible — area de toque ~44px, no se puede tocar un punto de 8px
+      const hitGeo = new THREE.SphereGeometry(0.30, 10, 8);
+      const hitMat = new THREE.MeshBasicMaterial({
+        transparent: true, opacity: 0, depthWrite: false, colorWrite: false,
+      });
+      const hit = new THREE.Mesh(hitGeo, hitMat);
+      hit.position.set(...zone.pos);
+      hit.userData = { id: zone.id, kind: 'hit' };
+      figureGroup.add(hit);
+      hitMeshes.push(hit);
+
       // Outer glow sphere
-      const glowGeo = new THREE.SphereGeometry(0.11, 12, 8);
+      const glowGeo = new THREE.SphereGeometry(0.14, 12, 8);
       const glowMat = new THREE.MeshBasicMaterial({
         color: 0xC9A55A,
         transparent: true,
@@ -745,6 +831,35 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
     let gestureLocked = false;
     let gestureIsScroll = false;
 
+    const tmpVec = new THREE.Vector3();
+
+    // Normaliza la posicion del puntero a coordenadas de clip (-1..1)
+    function setMouseFrom(e) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const p = getPointer(e);
+      mouse.x = ((p.x - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((p.y - rect.top) / rect.height) * 2 + 1;
+    }
+
+    // Devuelve el id de zona bajo el puntero, descartando hotspots
+    // que quedan detras del cuerpo (antes se podia clickear a traves del torso)
+    function pickZone() {
+      if (mouse.x < -1 || mouse.x > 1 || mouse.y < -1 || mouse.y > 1) return null;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(hitMeshes, false);
+      if (!hits.length) return null;
+      const bodyHits = raycaster.intersectObjects(bodyMeshes, false);
+      const nearBody = bodyHits.length ? bodyHits[0].distance : Infinity;
+      for (let i = 0; i < hits.length; i++) {
+        const obj = hits[i].object;
+        obj.getWorldPosition(tmpVec);
+        const centerDist = tmpVec.distanceTo(camera.position);
+        if (centerDist - 0.10 <= nearBody) return obj.userData.id;
+      }
+      return null;
+    }
+
     function onPointerDown(e) {
       pointerDown = true;
       isDragging = false;
@@ -755,15 +870,16 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       const p = getPointer(e);
       dragStartX = p.x;
       dragStartY = p.y;
+      // Clave en movil: un tap dispara pointerdown/pointerup sin pointermove,
+      // asi que sin esto el raycast se lanzaba contra la posicion inicial (-100,-100).
+      setMouseFrom(e);
       lastInteractionTime = performance.now();
       renderer.domElement.style.cursor = 'grabbing';
     }
 
     function onPointerMove(e) {
-      const rect = renderer.domElement.getBoundingClientRect();
+      setMouseFrom(e);
       const p = getPointer(e);
-      mouse.x = ((p.x - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((p.y - rect.top) / rect.height) * 2 + 1;
 
       if (pointerDown) {
         const dx = p.x - dragStartX;
@@ -791,11 +907,10 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
 
     function onPointerUp(e) {
       if (pointerDown && !isDragging) {
-        // It was a click — raycast for hotspot
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(hotspotMeshes, false);
-        if (intersects.length > 0) {
-          const id = intersects[0].object.userData.id;
+        // Fue un tap/click — recalculamos desde el propio evento por seguridad
+        setMouseFrom(e);
+        const id = pickZone();
+        if (id) {
           onSelectZone(id);
           lastInteractionTime = performance.now();
         }
@@ -803,7 +918,17 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       pointerDown = false;
       if (isDragging) onDragChange(false);
       isDragging = false;
+      // En tactil no hay hover: soltamos el puntero para que no quede pegado
+      if (pointerIsTouch) { mouse.x = -100; mouse.y = -100; }
       renderer.domElement.style.cursor = 'grab';
+    }
+
+    function onPointerCancel() {
+      pointerDown = false;
+      if (isDragging) onDragChange(false);
+      isDragging = false;
+      mouse.x = -100;
+      mouse.y = -100;
     }
 
     function onPointerLeave() {
@@ -822,17 +947,37 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
     dom.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     dom.addEventListener('pointerleave', onPointerLeave);
+    dom.addEventListener('pointercancel', onPointerCancel);
     window.addEventListener('bm3d:reset', onReset);
 
     // ---- Resize ----
     function onResize() {
       const nw = mount.clientWidth;
       const nh = mount.clientHeight;
+      if (!nw || !nh) return;
       camera.aspect = nw / nh;
       camera.updateProjectionMatrix();
       renderer.setSize(nw, nh);
     }
     window.addEventListener('resize', onResize);
+
+    // El canvas cambia de alto en movil (barra del navegador, rotacion):
+    // window.resize no siempre dispara, ResizeObserver si.
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(onResize);
+      ro.observe(mount);
+    }
+
+    // No quemar bateria renderizando fuera de pantalla
+    let inView = true;
+    let io = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver((entries) => {
+        inView = entries[0] ? entries[0].isIntersecting : true;
+      }, { rootMargin: '120px' });
+      io.observe(mount);
+    }
 
     // ---- Animation loop ----
     let frameId;
@@ -842,6 +987,10 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
     const activeColor = new THREE.Color(0xFFFFFF);
 
     function animate() {
+      if (!inView) {
+        frameId = requestAnimationFrame(animate);
+        return;
+      }
       elapsed += 0.016;
       const now = performance.now();
       const idleMs = now - lastInteractionTime;
@@ -857,15 +1006,8 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       figureGroup.rotation.y = currentRotY;
       figureGroup.rotation.x = currentRotX;
 
-      // Raycast (only when mouse is on canvas)
-      let newHoverId = null;
-      if (mouse.x > -1 && mouse.x < 1 && mouse.y > -1 && mouse.y < 1) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(hotspotMeshes, false);
-        if (intersects.length > 0) {
-          newHoverId = intersects[0].object.userData.id;
-        }
-      }
+      // Raycast (solo cuando el puntero esta sobre el canvas)
+      const newHoverId = pointerIsTouch && !pointerDown ? null : pickZone();
       if (newHoverId !== hoveredId) {
         hoveredId = newHoverId;
         onHoverZone(newHoverId);
@@ -915,7 +1057,10 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
       dom.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       dom.removeEventListener('pointerleave', onPointerLeave);
+      dom.removeEventListener('pointercancel', onPointerCancel);
       window.removeEventListener('resize', onResize);
+      if (ro) ro.disconnect();
+      if (io) io.disconnect();
       window.removeEventListener('bm3d:reset', onReset);
       // Dispose
       scene.traverse(obj => {
@@ -1657,7 +1802,7 @@ function Hero({ onNavigate }) {
 function TrustBar() {
   const metrics = [
     { value: '500+', label: 'Atletas tratados' },
-    { value: '8 años', label: 'Experiencia deportiva' },
+    { value: '15 años', label: 'Experiencia deportiva' },
     { value: '4.9/5', label: 'Valoración promedio' },
     { value: '3 días', label: 'Respuesta promedio' },
   ];
@@ -12603,7 +12748,7 @@ const WEIGHTLIFTING_DATA = {
   heroDesc: 'Fisioterapia para weightlifting por un levantador activo: lesiones de la sentadilla, el snatch y el clean & jerk. Entiendo la recepción profunda porque la entreno.',
   stats: [
     { value: '90+', suffix: 'atletas', label: 'Levantadores', desc: 'Halterofilia y powerlifting' },
-    { value: '6', suffix: 'años', label: 'Entrenando', desc: 'Atleta activo de la barra' },
+    { value: '10', suffix: 'años', label: 'Entrenando', desc: 'Atleta activo de la barra' },
     { value: '5', suffix: '', label: 'Lesiones top', desc: 'Cubren la mayoría' },
     { value: '4—10', suffix: 'sem', label: 'Recuperación', desc: 'Promedio típico' },
   ],
@@ -12660,7 +12805,7 @@ const CROSSFIT_DATA = {
     { value: '120+', suffix: 'atletas', label: 'CrossFitters', desc: 'Recreacionales y RX' },
     { value: '8', suffix: 'boxes', label: 'Partners', desc: 'Acuerdos activos' },
     { value: '6', suffix: '', label: 'Lesiones top', desc: 'Cubren el 90%' },
-    { value: '7', suffix: 'años', label: 'Entrenando CF', desc: 'Atleta activo' },
+    { value: '15', suffix: 'años', label: 'Entrenando CF', desc: 'Atleta activo' },
   ],
   whyKicker: 'Por qué yo', whyTitle: 'Un fisio que', whySub: 'falla cleans.',
   whyIntro: 'La diferencia entre un fisio que leyó sobre CrossFit y uno que entrena cada semana se nota en el primer minuto de la consulta.',
@@ -12712,17 +12857,17 @@ const CROSSFIT_DATA = {
 const BJJ_DATA = {
   name: 'BJJ', bigWord: 'BJJ.', kicker: 'Grapplers · Bogotá', iconKind: 'bjj',
   heroTitle: 'Vuelve al mat.', heroSub: 'Sin dejar tu juego.',
-  heroDesc: 'Fisioterapia para BJJ por un grappler activo: codo, hombro, cuello y rodilla. Entiendo el mat porque ruedo.',
+  heroDesc: 'Fisioterapia para BJJ por un grappler que compite: cinturón azul, dos veces campeón nacional. Codo, hombro, cuello y rodilla. Entiendo el mat porque ruedo.',
   stats: [
     { value: '60+', suffix: 'grapplers', label: 'Tratados', desc: 'Gi y no-gi' },
     { value: '3', suffix: 'academias', label: 'Partners', desc: 'Acuerdos activos' },
     { value: '7', suffix: '', label: 'Lesiones top', desc: 'Las más comunes' },
-    { value: '5', suffix: 'años', label: 'Entrenando BJJ', desc: 'Practicante activo' },
+    { value: 'Azul', suffix: 'cinturón', label: 'Grado propio', desc: '2× campeón nacional' },
   ],
   whyKicker: 'Por qué yo', whyTitle: 'Un fisio que', whySub: 'rueda.',
   whyIntro: 'El jiu-jitsu castiga cuello, hombro y rodilla de formas muy específicas que solo entiendes si has pasado horas en el mat.',
   whyParas: [
-    'Conozco la tensión de <strong>defender una llave de rodilla</strong>, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. He sentido el codo después de defender armbars toda una clase.',
+    'Compito. Cinturón azul y dos títulos nacionales. Conozco la tensión de <strong>defender una llave de rodilla</strong>, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. He sentido el codo después de defender armbars toda una clase.',
     'Esa experiencia cambia cómo trato a un grappler. No te digo "deja el BJJ". Entiendo que el mat es parte de tu vida. Y sé que las lesiones del grappling tienen patrones — la guardia que tensa la rodilla, el agarre que castiga el codo.',
     'Mi enfoque: tratar la lesión, corregir el patrón de movimiento o la mecánica defensiva que la causó, y devolverte a rodar. Con longevidad — para que entrenes 10 años más, no 10 meses.',
   ],
@@ -12775,7 +12920,7 @@ const BOXEO_DATA = {
     { value: '70+', suffix: 'boxeadores', label: 'Tratados', desc: 'Amateur y competitivos' },
     { value: '4', suffix: 'gimnasios', label: 'Partners', desc: 'Acuerdos activos' },
     { value: '5', suffix: '', label: 'Lesiones top', desc: 'Las más comunes' },
-    { value: '4—10', suffix: 'sem', label: 'Recuperación', desc: 'Promedio típico' },
+    { value: '2', suffix: 'años', label: 'Entrenando boxeo', desc: 'Practicante activo' },
   ],
   whyKicker: 'Por qué yo', whyTitle: 'Un fisio que', whySub: 'entiende el golpeo.',
   whyIntro: 'El boxeo castiga manos, muñecas y hombros de formas muy específicas. La lesión del boxeador necesita un fisio que entienda el gesto del golpe.',
@@ -17562,7 +17707,7 @@ function SobreHero({ onNavigate }) {
               maxWidth: '620px',
               marginBottom: '2.5rem',
             }}>
-              Germán Montenegro. CrossFit, BJJ y weightlifting son parte de mi semana, no de mis libros.
+              Germán Montenegro. CrossFit, weightlifting, BJJ y boxeo son parte de mi semana, no de mis libros.
               <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Por eso entiendo tu lesión desde adentro — la he vivido.</span>
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -17759,7 +17904,7 @@ function SobreCredenciales() {
     { value: '2017', label: 'Ejerciendo desde', desc: '8 años de práctica clínica' },
     { value: '500+', label: 'Atletas tratados', desc: 'Recreacionales y competitivos' },
     { value: '4.9', label: 'Rating promedio', desc: '+200 reseñas verificadas' },
-    { value: '3', label: 'Deportes que practico', desc: 'CrossFit · BJJ · Weightlifting' },
+    { value: '4', label: 'Deportes que practico', desc: 'CrossFit · Weightlifting · BJJ · Boxeo' },
   ];
 
   const formacion = [
@@ -17875,9 +18020,10 @@ function SobrePractica() {
   const [active, setActive] = React.useState(0);
 
   const deportes = [
-    { name: 'CrossFit', level: 'Atleta activo', years: '7 años', desc: 'WODs, levantamientos olímpicos, gimnásticos. Conozco el snatch, el muscle-up y el kipping desde adentro porque los entreno cada semana.', detail: 'Sé lo que es fallar un clean al 90%, el dolor de hombro tras 100 kipping pull-ups, la tirantez de cadera después de 150 wall balls. Esa experiencia cambia cómo trato a un crossfittero.' },
-    { name: 'BJJ', level: 'Practicante', years: '5 años', desc: 'Grappling, guardia, sumisiones. El jiu-jitsu castiga cuello, hombro y rodilla de formas muy específicas que solo entiendes si ruedas.', detail: 'Conozco la tensión de defender una llave de rodilla, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. Trato grapplers como grappler.' },
-    { name: 'Weightlifting', level: 'Atleta', years: '6 años', desc: 'Sentadilla, peso muerto, levantamientos olímpicos. La barra exige técnica perfecta — y castiga el error con lesión.', detail: 'Entiendo la bisagra de cadera, la recepción profunda del clean, la posición overhead del jerk. Cuando un levantador me describe su dolor, sé exactamente qué gesto lo provoca.' },
+    { name: 'CrossFit', level: 'Atleta activo', years: '15 años', desc: 'WODs, levantamientos olímpicos, gimnásticos. Conozco el snatch, el muscle-up y el kipping desde adentro porque los entreno cada semana.', detail: 'Sé lo que es fallar un clean al 90%, el dolor de hombro tras 100 kipping pull-ups, la tirantez de cadera después de 150 wall balls. Esa experiencia cambia cómo trato a un crossfittero.' },
+    { name: 'BJJ', level: 'Cinturón azul · 2× campeón nacional', years: '1 año', desc: 'Grappling, guardia, sumisiones. El jiu-jitsu castiga cuello, hombro y rodilla de formas muy específicas que solo entiendes si ruedas.', detail: 'Conozco la tensión de defender una llave de rodilla, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. Trato grapplers como grappler.' },
+    { name: 'Boxeo', level: 'Practicante', years: '2 años', desc: 'Golpeo, guardia y trabajo de saco. El boxeo castiga mano, muñeca, hombro y cuello con un patrón propio que no se parece a ningún otro deporte.', detail: 'Conozco el cierre del puño al impacto, la rotación del hombro en el cross y la tensión cervical de la defensa. Cuando un boxeador me describe el dolor, sé qué parte del golpeo lo provoca.' },
+    { name: 'Weightlifting', level: 'Atleta', years: '10 años', desc: 'Sentadilla, peso muerto, levantamientos olímpicos. La barra exige técnica perfecta — y castiga el error con lesión.', detail: 'Entiendo la bisagra de cadera, la recepción profunda del clean, la posición overhead del jerk. Cuando un levantador me describe su dolor, sé exactamente qué gesto lo provoca.' },
     { name: 'Otros', level: 'Trato profundamente', years: '8 años', desc: 'Running, danza y otros deportes que no practico pero trato a fondo con atletas de élite — análisis de pisada, demandas del ballet, gestión de cargas.', detail: 'No corro maratones ni bailo, pero he tratado a suficientes runners y bailarinas para entender sus gestos críticos. Cuando no vivo el deporte, lo estudio obsesivamente.' },
   ];
 
@@ -19697,7 +19843,7 @@ function SportsSection({ onNavigate }) {
       description: 'Sentadilla, snatch, clean & jerk. Recepción profunda, bisagra de cadera y posición overhead — desde adentro porque las entreno.',
       stats: [
         { value: '90+', label: 'Levantadores' },
-        { value: '6 años', label: 'En la barra' },
+        { value: '10 años', label: 'En la barra' },
       ],
       injuries: ['Lumbar', 'Hombro', 'Muñeca', 'Rodilla'],
     },

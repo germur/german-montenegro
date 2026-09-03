@@ -1,3 +1,4 @@
+import Script from "next/script";
 import "./globals.css";
 
 const SITE_URL = "https://germanmontenegro.fit";
@@ -42,10 +43,13 @@ export const metadata = {
 
 const themeBootstrap = `(function(){try{var t=localStorage.getItem('gm-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();`;
 
+const GA_ID = "G-E0CL52FNCX";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -60,6 +64,18 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <main>{children}</main>
+
+        {/* Google Analytics 4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`}
+        </Script>
       </body>
     </html>
   );
