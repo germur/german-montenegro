@@ -4,3 +4,6 @@ out/
 *.log
 .DS_Store
 .env*.local
+
+# Carpeta que crea Cowork al entregar archivos en el chat
+Claude outputs/
