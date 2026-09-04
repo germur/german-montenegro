@@ -3,7 +3,23 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect, Fragment } from "react";
 import * as THREE from "three";
-if (typeof window !== "undefined") { window.React = React; window.THREE = THREE; }
+import { pageToPath, pathToPage } from "@/lib/routes";
+
+// Enlaces reales: <a href> que Google puede rastrear, pero que siguen
+// navegando como SPA. Sin esto la navegacion era solo onClick y el sitio
+// no tenia un solo enlace interno rastreable.
+function navProps(page, onNavigate, after) {
+  return {
+    href: pageToPath(page),
+    onClick: (e) => {
+      // Respetar abrir en pestana nueva / clic central
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+      e.preventDefault();
+      if (typeof onNavigate === 'function') onNavigate(page);
+      if (typeof after === 'function') after();
+    },
+  };
+}
 
 /* ==================== sport-icons-3d.jsx ==================== */
 // SPORT 3D ICONS - Low-poly gold wireframe icons per deporte (Three.js)
@@ -14,8 +30,7 @@ function Sport3DIcon({ kind, size = 200 }) {
 
   React.useEffect(() => {
     const mount = mountRef.current;
-    if (!mount || !window.THREE) return;
-    const THREE = window.THREE;
+    if (!mount) return;
 
     const w = size, h = size;
     const scene = new THREE.Scene();
@@ -71,7 +86,7 @@ function Sport3DIcon({ kind, size = 200 }) {
       // Banda que envuelve la cintura, casi de canto respecto a la camara:
       // asi lee como cinturon y no como platillo. (Antes eran dos tiras
       // sueltas formando una T, que es justo lo que no parecia.)
-      add(new THREE.TorusGeometry(0.95, 0.15, 10, 44), 0, 0, 0, [1.42, 0, 0], false);
+      add(new THREE.TorusGeometry(0.95, 0.15, 10, 44), 0, 0, 0, [1.57, 0, 0], false);
       // Nudo central al frente — dos lazos cruzados sobre la banda
       add(new THREE.BoxGeometry(0.46, 0.46, 0.24), 0, 0, 0.93, [0, 0, 0.28], false);
       add(new THREE.BoxGeometry(0.46, 0.46, 0.2), 0, 0, 0.98, [0, 0, -0.28], false);
@@ -104,10 +119,7 @@ function Sport3DIcon({ kind, size = 200 }) {
     }
 
     // Center vertically a touch
-    group.position.y = kind === 'weightlifting' ? 0 : kind === 'bjj' ? 0.6 : -0.1;
-    // El cinturon es mas estrecho que el resto: lo subimos de tamano para que
-    // pese lo mismo en la retina que la pesa o el guante.
-    if (kind === 'bjj') group.scale.setScalar(1.15);
+    group.position.y = kind === 'weightlifting' ? 0 : kind === 'bjj' ? 0.7 : -0.1;
 
     let raf;
     let t = 0;
@@ -142,7 +154,6 @@ function Sport3DIcon({ kind, size = 200 }) {
   );
 }
 
-if (typeof window !== "undefined") window.Sport3DIcon = Sport3DIcon;
 /* ==================== body-map.jsx ==================== */
 // BODY MAP 3D - Interactive wireframe humanoid with Three.js
 // Drag to rotate, click on gold hotspots to see related injuries.
@@ -541,7 +552,7 @@ function BodyMapSection({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes bmLabelIn {
           from { opacity: 0; transform: translateX(-50%) translateY(4px); }
           to { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -557,7 +568,7 @@ function BodyMapSection({ onNavigate }) {
           background: rgba(255,255,255,0.03);
           border: 1px solid rgba(255,255,255,0.12);
           color: rgba(255,255,255,0.75);
-          font-family: 'Space Grotesk', sans-serif;
+          font-family: Space Grotesk, sans-serif;
           font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em;
           padding: 0.75rem 1rem;
           min-height: 44px;
@@ -580,7 +591,7 @@ function BodyMapSection({ onNavigate }) {
           .bm-zones-list { gap: 0.4375rem; }
           .bm-zone-chip { font-size: 0.75rem; padding: 0.6875rem 0.875rem; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -599,11 +610,7 @@ function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragC
 
   React.useEffect(() => {
     const mount = mountRef.current;
-    if (!mount || !window.THREE) {
-      console.warn('THREE.js not loaded');
-      return;
-    }
-    const THREE = window.THREE;
+    if (!mount) return;
 
     // ---- Scene setup ----
     const w = mount.clientWidth || 480;
@@ -1258,7 +1265,7 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
             return (
               <button
                 key={i}
-                onClick={() => clickable && onNavigate(inj.page)}
+                
                 disabled={!clickable}
                 style={{
                   display: 'grid',
@@ -1400,17 +1407,16 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
         </button>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes bmFadeIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
 
-if (typeof window !== "undefined") window.BodyMapSection = BodyMapSection;
 /* ==================== components.jsx ==================== */
 
 // ============================================================================
@@ -2120,9 +2126,9 @@ function FAQAccordion({ items }) {
 
 function InjuryCard({ injury, onNavigate }) {
   return (
-    <div
+    <a
       style={cardStyles.card}
-      onClick={() => onNavigate(injury.url)}
+      {...navProps(injury.url, onNavigate)}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
@@ -2135,7 +2141,7 @@ function InjuryCard({ injury, onNavigate }) {
       <div style={cardStyles.icon}>{injury.icon}</div>
       <h3 style={cardStyles.title}>{injury.name}</h3>
       <p style={cardStyles.description}>{injury.description}</p>
-    </div>
+    </a>
   );
 }
 
@@ -2145,9 +2151,9 @@ function InjuryCard({ injury, onNavigate }) {
 
 function SportCard({ sport, onNavigate }) {
   return (
-    <div
+    <a
       style={cardStyles.card}
-      onClick={() => onNavigate(sport.url)}
+      {...navProps(sport.url, onNavigate)}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
@@ -2160,7 +2166,7 @@ function SportCard({ sport, onNavigate }) {
       <div style={cardStyles.icon}>{sport.icon}</div>
       <h3 style={cardStyles.title}>{sport.name}</h3>
       <p style={cardStyles.description}>{sport.description}</p>
-    </div>
+    </a>
   );
 }
 
@@ -2313,23 +2319,6 @@ function StickyMobileCTA({ onNavigate }) {
   );
 }
 
-// Export all components to window
-Object.assign(window, {
-  Header,
-  Footer,
-  CTAButton,
-  Hero,
-  TrustBar,
-  TreatmentTimeline,
-  RedFlagsBox,
-  SymptomChecklist,
-  FAQAccordion,
-  InjuryCard,
-  SportCard,
-  CTACard,
-  DiagnosticTable,
-  StickyMobileCTA,
-});
 /* ==================== footer.jsx ==================== */
 // FOOTER - Pie de página global rico en enlaces
 
@@ -2442,7 +2431,7 @@ function SiteFooter({ onNavigate }) {
         }} className="ft-grid">
           {/* Brand block */}
           <div className="ft-brand">
-            <div onClick={() => onNavigate('home')} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', marginBottom: '1.5rem' }}>
+            <a {...navProps('home', onNavigate)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', marginBottom: '1.5rem', textDecoration: 'none', color: 'inherit' }}>
               <div style={{
                 width: '38px', height: '38px', border: '1.5px solid rgba(255,255,255,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -2453,7 +2442,7 @@ function SiteFooter({ onNavigate }) {
                 <div style={{ fontSize: '1rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.01em' }}>Germán Montenegro</div>
                 <div style={{ fontSize: '0.5625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600, color: '#C9A55A', marginTop: '0.25rem' }}>Fisioterapia Deportiva</div>
               </div>
-            </div>
+            </a>
             <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.55)', maxWidth: '300px', marginBottom: '1.5rem' }}>
               Atleta y fisioterapeuta. Diagnóstico preciso, tratamiento integrado y vuelta a competir. Sin atajos.
             </p>
@@ -2494,7 +2483,7 @@ function SiteFooter({ onNavigate }) {
                 {col.links.map(l => (
                   <a
                     key={l.label}
-                    onClick={() => onNavigate(l.page)}
+                    {...navProps(l.page, onNavigate)}
                     style={linkStyle(l.accent)}
                     onMouseEnter={(e) => { e.currentTarget.style.color = '#C9A55A'; e.currentTarget.style.paddingLeft = '0.375rem'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = l.accent ? '#C9A55A' : 'rgba(255,255,255,0.6)'; e.currentTarget.style.paddingLeft = '0'; }}
@@ -2529,7 +2518,7 @@ function SiteFooter({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ft-cta { grid-template-columns: 1fr !important; gap: 2rem !important; }
           .ft-cta-btns { justify-content: flex-start !important; }
@@ -2540,12 +2529,11 @@ function SiteFooter({ onNavigate }) {
         @media (max-width: 560px) {
           .ft-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </footer>
   );
 }
 
-if (typeof window !== "undefined") window.SiteFooter = SiteFooter;
 /* ==================== pubalgia.jsx ==================== */
 // PUBALGIA - PARTE 1 - Hero, WhatIs, Checklist
 // Las demás secciones están en pubalgia-2.jsx
@@ -2589,7 +2577,7 @@ function PubalgiaHero({ onNavigate }) {
           textTransform: 'uppercase',
           fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('lesiones')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
+          <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>Pubalgia</span>
         </div>
@@ -2793,11 +2781,11 @@ function PubalgiaHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .pub-hero-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -2938,11 +2926,11 @@ function PubalgiaWhatIs() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .wi-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -3394,7 +3382,7 @@ function PubalgiaChecklist({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes ckFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -3404,14 +3392,11 @@ function PubalgiaChecklist({ onNavigate }) {
           .ck-layout { grid-template-columns: 1fr !important; }
           .ck-questions { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.PubalgiaHero = PubalgiaHero;
-if (typeof window !== "undefined") window.PubalgiaWhatIs = PubalgiaWhatIs;
-if (typeof window !== "undefined") window.PubalgiaChecklist = PubalgiaChecklist;
 /* ==================== pubalgia-2.jsx ==================== */
 // PUBALGIA - PARTE 2 - Resto de secciones + PubalgiaPage shell
 // Síntomas · Causas · BySport · Differential · Treatment · Exercises · Recovery · CTA · FAQ · Related
@@ -3424,9 +3409,9 @@ function PubalgiaPage({ onNavigate }) {
   const [activeSport, setActiveSport] = React.useState(0);
   const [activePhase, setActivePhase] = React.useState(0);
 
-  const Hero = window.PubalgiaHero;
-  const WhatIs = window.PubalgiaWhatIs;
-  const Checklist = window.PubalgiaChecklist;
+  const Hero = PubalgiaHero;
+  const WhatIs = PubalgiaWhatIs;
+  const Checklist = PubalgiaChecklist;
 
   return (
     <main>
@@ -3496,7 +3481,7 @@ function SectionHeader({ kicker, title, subtitle, intro, dark }) {
           maxWidth: '460px',
         }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -3651,12 +3636,12 @@ function PubalgiaSymptoms() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .sym-grid { grid-template-columns: 1fr !important; }
           .sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -3777,11 +3762,11 @@ function PubalgiaCauses() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .cau-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -3996,7 +3981,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -4004,7 +3989,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
         @media (max-width: 900px) {
           .sp-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -4353,7 +4338,7 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes txFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -4361,7 +4346,7 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
         @media (max-width: 900px) {
           .tx-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -4494,7 +4479,7 @@ function PubalgiaExercises() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ex-head { display: none !important; }
           .ex-row { grid-template-columns: 40px 1fr !important; gap: 0.75rem; padding: 1rem !important; }
@@ -4503,7 +4488,7 @@ function PubalgiaExercises() {
           .ex-row > div:nth-child(5),
           .ex-row > div:nth-child(6) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -4691,11 +4676,11 @@ function PubalgiaRecovery() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .rec-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -4832,11 +4817,11 @@ function PubalgiaCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -5106,16 +5091,15 @@ function PubalgiaRelated({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .rel-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.PubalgiaPage = PubalgiaPage;
 /* ==================== ciatica.jsx ==================== */
 // CIÁTICA - PARTE 1 - Hero, WhatIs, Test Lasègue interactivo
 // Las demás secciones están en ciatica-2.jsx
@@ -5158,7 +5142,7 @@ function CiaticaHero({ onNavigate }) {
           textTransform: 'uppercase',
           fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('lesiones')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
+          <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>Ciática</span>
         </div>
@@ -5329,11 +5313,11 @@ function CiaticaHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ci-hero-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -5473,11 +5457,11 @@ function CiaticaWhatIs() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ci-wi-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -6098,7 +6082,7 @@ function CiaticaLasegue({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes lasFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -6108,14 +6092,11 @@ function CiaticaLasegue({ onNavigate }) {
           .las-layout { grid-template-columns: 1fr !important; }
           .las-viz { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.CiaticaHero = CiaticaHero;
-if (typeof window !== "undefined") window.CiaticaWhatIs = CiaticaWhatIs;
-if (typeof window !== "undefined") window.CiaticaLasegue = CiaticaLasegue;
 /* ==================== ciatica-2.jsx ==================== */
 // CIÁTICA - PARTE 2 - Resto de secciones + CiaticaPage shell
 
@@ -6127,9 +6108,9 @@ function CiaticaPage({ onNavigate }) {
   const [activeContext, setActiveContext] = React.useState(0);
   const [activePhase, setActivePhase] = React.useState(0);
 
-  const Hero = window.CiaticaHero;
-  const WhatIs = window.CiaticaWhatIs;
-  const Lasegue = window.CiaticaLasegue;
+  const Hero = CiaticaHero;
+  const WhatIs = CiaticaWhatIs;
+  const Lasegue = CiaticaLasegue;
 
   return (
     <main>
@@ -6199,7 +6180,7 @@ function CiSectionHeader({ kicker, title, subtitle, intro, dark }) {
           maxWidth: '460px',
         }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .ci-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .ci-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -6349,12 +6330,12 @@ function CiaticaSymptoms() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ci-sym-grid { grid-template-columns: 1fr !important; }
           .ci-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -6496,11 +6477,11 @@ function CiaticaCauses() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ci-cau-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -6715,7 +6696,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes ciCtxFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -6723,7 +6704,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
         @media (max-width: 900px) {
           .ci-ctx-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -7055,7 +7036,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes ciTxFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -7063,7 +7044,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
         @media (max-width: 900px) {
           .ci-tx-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -7183,7 +7164,7 @@ function CiaticaExercises() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ci-ex-head { display: none !important; }
           .ci-ex-row { grid-template-columns: 40px 1fr !important; gap: 0.75rem; padding: 1rem !important; }
@@ -7192,7 +7173,7 @@ function CiaticaExercises() {
           .ci-ex-row > div:nth-child(5),
           .ci-ex-row > div:nth-child(6) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -7363,11 +7344,11 @@ function CiaticaRecovery() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ci-rec-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -7496,11 +7477,11 @@ function CiaticaCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ci-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -7748,16 +7729,15 @@ function CiaticaRelated({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ci-rel-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.CiaticaPage = CiaticaPage;
 /* ==================== tendinitis.jsx ==================== */
 // TENDINITIS ROTULIANA - PARTE 1 - Hero, WhatIs, Clasificación Blazina interactiva
 
@@ -7799,7 +7779,7 @@ function TendinitisHero({ onNavigate }) {
           textTransform: 'uppercase',
           fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('lesiones')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
+          <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>Tendinitis Rotuliana</span>
         </div>
@@ -7970,11 +7950,11 @@ function TendinitisHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .te-hero-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -8114,11 +8094,11 @@ function TendinitisWhatIs() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .te-wi-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -8708,7 +8688,7 @@ function TendinitisBlazina({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes blFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -8721,14 +8701,11 @@ function TendinitisBlazina({ onNavigate }) {
           .bl-anatomy { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
           .bl-actions { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.TendinitisHero = TendinitisHero;
-if (typeof window !== "undefined") window.TendinitisWhatIs = TendinitisWhatIs;
-if (typeof window !== "undefined") window.TendinitisBlazina = TendinitisBlazina;
 /* ==================== tendinitis-2.jsx ==================== */
 // TENDINITIS ROTULIANA - PARTE 2 - Resto + TendinitisPage shell
 
@@ -8737,9 +8714,9 @@ function TendinitisPage({ onNavigate }) {
   const [activeSport, setActiveSport] = React.useState(0);
   const [activePhase, setActivePhase] = React.useState(0);
 
-  const Hero = window.TendinitisHero;
-  const WhatIs = window.TendinitisWhatIs;
-  const Blazina = window.TendinitisBlazina;
+  const Hero = TendinitisHero;
+  const WhatIs = TendinitisWhatIs;
+  const Blazina = TendinitisBlazina;
 
   return (
     <main>
@@ -8805,7 +8782,7 @@ function TeSectionHeader({ kicker, title, subtitle, intro, dark }) {
           maxWidth: '460px',
         }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .te-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .te-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -8927,12 +8904,12 @@ function TendinitisSymptoms() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .te-sym-grid { grid-template-columns: 1fr !important; }
           .te-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9021,11 +8998,11 @@ function TendinitisCauses() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .te-cau-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9206,7 +9183,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes teFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -9214,7 +9191,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
         @media (max-width: 900px) {
           .te-sp-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9482,7 +9459,7 @@ function TendinitisTreatment({ activePhase, setActivePhase }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes teTxFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -9490,7 +9467,7 @@ function TendinitisTreatment({ activePhase, setActivePhase }) {
         @media (max-width: 900px) {
           .te-tx-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9595,7 +9572,7 @@ function TendinitisExercises() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .te-ex-head { display: none !important; }
           .te-ex-row { grid-template-columns: 40px 1fr !important; gap: 0.75rem; padding: 1rem !important; }
@@ -9604,7 +9581,7 @@ function TendinitisExercises() {
           .te-ex-row > div:nth-child(5),
           .te-ex-row > div:nth-child(6) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9751,11 +9728,11 @@ function TendinitisRecovery() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .te-rec-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -9868,11 +9845,11 @@ function TendinitisCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .te-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -10113,16 +10090,15 @@ function TendinitisRelated({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .te-rel-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.TendinitisPage = TendinitisPage;
 /* ==================== hombro.jsx ==================== */
 // HOMBRO CONGELADO - PARTE 1 - Hero, WhatIs, Auto-test de rango de movimiento (ROM)
 
@@ -10164,7 +10140,7 @@ function HombroHero({ onNavigate }) {
           textTransform: 'uppercase',
           fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('lesiones')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
+          <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>Hombro Congelado</span>
         </div>
@@ -10328,11 +10304,11 @@ function HombroHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ho-hero-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -10472,11 +10448,11 @@ function HombroWhatIs() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ho-wi-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11053,7 +11029,7 @@ function HombroROMTest({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes romFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -11063,7 +11039,7 @@ function HombroROMTest({ onNavigate }) {
           .rom-layout { grid-template-columns: 1fr !important; }
           .rom-viz { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11167,9 +11143,6 @@ function HombroROMSvg({ movement, visDeg, submitted, answers, movements }) {
   );
 }
 
-if (typeof window !== "undefined") window.HombroHero = HombroHero;
-if (typeof window !== "undefined") window.HombroWhatIs = HombroWhatIs;
-if (typeof window !== "undefined") window.HombroROMTest = HombroROMTest;
 /* ==================== hombro-2.jsx ==================== */
 // HOMBRO CONGELADO - PARTE 2 - Resto + HombroPage shell
 
@@ -11178,9 +11151,9 @@ function HombroPage({ onNavigate }) {
   const [activePhaseNat, setActivePhaseNat] = React.useState(0);
   const [activePhase, setActivePhase] = React.useState(0);
 
-  const Hero = window.HombroHero;
-  const WhatIs = window.HombroWhatIs;
-  const ROMTest = window.HombroROMTest;
+  const Hero = HombroHero;
+  const WhatIs = HombroWhatIs;
+  const ROMTest = HombroROMTest;
 
   return (
     <main>
@@ -11228,7 +11201,7 @@ function HoSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .ho-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .ho-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -11479,14 +11452,14 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes hpFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) {
           .hp-selector { grid-template-columns: 1fr !important; }
           .hp-selector > button { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
           .hp-detail { grid-template-columns: 1fr !important; gap: 2rem !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11589,12 +11562,12 @@ function HombroSymptoms() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ho-sym-grid { grid-template-columns: 1fr !important; }
           .ho-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11681,11 +11654,11 @@ function HombroCauses() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ho-cau-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11840,10 +11813,10 @@ function HombroTreatment({ activePhase, setActivePhase }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes hoTxFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 900px) { .ho-tx-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -11920,7 +11893,7 @@ function HombroExercises() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .ho-ex-head { display: none !important; }
           .ho-ex-row { grid-template-columns: 40px 1fr !important; gap: 0.75rem; padding: 1rem !important; }
@@ -11929,7 +11902,7 @@ function HombroExercises() {
           .ho-ex-row > div:nth-child(5),
           .ho-ex-row > div:nth-child(6) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -12020,9 +11993,9 @@ function HombroRecovery() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) { .ho-rec-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -12101,9 +12074,9 @@ function HombroCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) { .ho-cta-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -12265,14 +12238,13 @@ function HombroRelated({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) { .ho-rel-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.HombroPage = HombroPage;
 /* ==================== deporte-hub.jsx ==================== */
 // DEPORTE HUB - Componente reutilizable para hubs deportivos
 // Parametrizado por datos. Genera: Running, CrossFit, BJJ, Danza
@@ -12306,7 +12278,7 @@ function DhSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .dh-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .dh-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -12361,7 +12333,7 @@ function DhHero({ data, onNavigate }) {
           textTransform: 'uppercase',
           fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('deportes')} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Deportes</a>
+          <a {...navProps('deportes', onNavigate)} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Deportes</a>
           <span style={{ color: 'rgba(255,255,255,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>{data.name}</span>
         </div>
@@ -12445,9 +12417,9 @@ function DhHero({ data, onNavigate }) {
             borderLeft: '1px solid rgba(255,255,255,0.1)',
             paddingLeft: '2.5rem',
           }} className="dh-hero-stats">
-            {data.iconKind && window.Sport3DIcon && (
+            {data.iconKind && (
               <div style={{ marginBottom: '0.5rem' }}>
-                <window.Sport3DIcon kind={data.iconKind} size={180} />
+                <Sport3DIcon kind={data.iconKind} size={180} />
               </div>
             )}
             {data.stats.map((s, i) => (
@@ -12464,12 +12436,12 @@ function DhHero({ data, onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .dh-hero-grid { grid-template-columns: 1fr !important; }
           .dh-hero-stats { border-left: none !important; padding-left: 0 !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -12508,7 +12480,7 @@ function DhWhyMe({ data }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .dh-why-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .dh-why-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -12546,12 +12518,12 @@ function DhInjuries({ data, onNavigate }) {
             const isHovered = hovered === i;
             const clickable = !!inj.page;
             return (
-              <div
+              <a
                 key={i}
-                onClick={() => clickable && onNavigate(inj.page)}
+                {...navProps(inj.page, onNavigate)}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
-                style={{
+                style={{ textDecoration: 'none', color: 'inherit',
                   display: 'grid',
                   gridTemplateColumns: '60px 2fr 1.6fr 1fr 60px',
                   padding: '1.625rem 2rem',
@@ -12579,18 +12551,18 @@ function DhInjuries({ data, onNavigate }) {
                   <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{inj.freq}</span>
                 </div>
                 <div style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', color: clickable ? (isHovered ? '#C9A55A' : 'rgba(10,10,10,0.2)') : 'rgba(10,10,10,0.15)', transform: isHovered && clickable ? 'translateX(6px)' : 'translateX(0)', transition: 'all 0.4s', textAlign: 'right' }}>{clickable ? '→' : '·'}</div>
-              </div>
+              </a>
             );
           })}
         </div>
       </div>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .dh-inj-head { display: none !important; }
           .dh-inj-row { grid-template-columns: 40px 1fr !important; gap: 1rem; padding: 1.25rem !important; }
           .dh-inj-row > div:nth-child(3), .dh-inj-row > div:nth-child(4), .dh-inj-row > div:nth-child(5) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -12615,7 +12587,7 @@ function DhCauses({ data }) {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .dh-cau-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .dh-cau-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -12715,7 +12687,7 @@ function DhCTA({ data, onNavigate }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .dh-cta-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .dh-cta-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -12738,7 +12710,6 @@ function DeporteHubPage({ data, onNavigate }) {
   );
 }
 
-if (typeof window !== "undefined") window.DeporteHubPage = DeporteHubPage;
 /* ==================== deporte-hub-data.jsx ==================== */
 // DEPORTE HUB DATA - Datos de los 4 hubs deportivos
 
@@ -12967,15 +12938,11 @@ const BOXEO_DATA = {
   ctaDesc: 'Primera sesión: evaluación de tu golpeo + diagnóstico + plan de retorno al ring. 60 min. Fisioterapia que entiende las demandas del boxeo.',
 };
 
-function WeightliftingPage({ onNavigate }) { return <window.DeporteHubPage data={WEIGHTLIFTING_DATA} onNavigate={onNavigate} />; }
-function CrossFitPage({ onNavigate }) { return <window.DeporteHubPage data={CROSSFIT_DATA} onNavigate={onNavigate} />; }
-function BJJPage({ onNavigate }) { return <window.DeporteHubPage data={BJJ_DATA} onNavigate={onNavigate} />; }
-function BoxeoPage({ onNavigate }) { return <window.DeporteHubPage data={BOXEO_DATA} onNavigate={onNavigate} />; }
+function WeightliftingPage({ onNavigate }) { return <DeporteHubPage data={WEIGHTLIFTING_DATA} onNavigate={onNavigate} />; }
+function CrossFitPage({ onNavigate }) { return <DeporteHubPage data={CROSSFIT_DATA} onNavigate={onNavigate} />; }
+function BJJPage({ onNavigate }) { return <DeporteHubPage data={BJJ_DATA} onNavigate={onNavigate} />; }
+function BoxeoPage({ onNavigate }) { return <DeporteHubPage data={BOXEO_DATA} onNavigate={onNavigate} />; }
 
-if (typeof window !== "undefined") window.WeightliftingPage = WeightliftingPage;
-if (typeof window !== "undefined") window.CrossFitPage = CrossFitPage;
-if (typeof window !== "undefined") window.BJJPage = BJJPage;
-if (typeof window !== "undefined") window.BoxeoPage = BoxeoPage;
 /* ==================== lesion-pillar.jsx ==================== */
 // LESIÓN PILLAR - Componente reutilizable para pillars de lesión secundarios
 // Genera: Bursitis, Condromalacia, Contractura, Periostitis, Epitrocleítis
@@ -12999,7 +12966,7 @@ function LpSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .lp-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -13016,7 +12983,7 @@ function LpHero({ data, onNavigate }) {
 
       <div className="container" style={{ position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem', fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600 }}>
-          <a onClick={() => onNavigate('lesiones')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
+          <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>{data.name}</span>
         </div>
@@ -13059,7 +13026,7 @@ function LpHero({ data, onNavigate }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .lp-hero-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-hero-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13093,7 +13060,7 @@ function LpWhatIs({ data }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .lp-wi-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-wi-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13127,7 +13094,7 @@ function LpSymptoms({ data }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .lp-sym-grid { grid-template-columns: 1fr !important; } .lp-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .lp-sym-grid { grid-template-columns: 1fr !important; } .lp-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); } }` }} />
     </section>
   );
 }
@@ -13150,7 +13117,7 @@ function LpCauses({ data }) {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .lp-cau-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .lp-cau-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13221,7 +13188,7 @@ function LpTreatment({ data, activePhase, setActivePhase }) {
           </div>
         </div>
       </div>
-      <style>{`@keyframes lpTxFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @media (max-width: 900px) { .lp-tx-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes lpTxFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @media (max-width: 900px) { .lp-tx-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13281,7 +13248,7 @@ function LpCTA({ data, onNavigate }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .lp-cta-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-cta-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13311,7 +13278,7 @@ function LpRelated({ data, onNavigate }) {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .lp-rel-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-rel-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13335,7 +13302,6 @@ function LesionPillarPage({ data, onNavigate }) {
   );
 }
 
-if (typeof window !== "undefined") window.LesionPillarPage = LesionPillarPage;
 /* ==================== lesion-pillar-data.jsx ==================== */
 // LESIÓN PILLAR DATA - Datos de los 5 pillars de lesión secundarios
 
@@ -13719,17 +13685,12 @@ const EPITROCLEITIS_DATA = {
   ],
 };
 
-function BursitisPage({ onNavigate }) { return <window.LesionPillarPage data={BURSITIS_DATA} onNavigate={onNavigate} />; }
-function CondromalaciaPage({ onNavigate }) { return <window.LesionPillarPage data={CONDROMALACIA_DATA} onNavigate={onNavigate} />; }
-function ContracturaPage({ onNavigate }) { return <window.LesionPillarPage data={CONTRACTURA_DATA} onNavigate={onNavigate} />; }
-function PeriostitisPage({ onNavigate }) { return <window.LesionPillarPage data={PERIOSTITIS_DATA} onNavigate={onNavigate} />; }
-function EpitrocleitisPage({ onNavigate }) { return <window.LesionPillarPage data={EPITROCLEITIS_DATA} onNavigate={onNavigate} />; }
+function BursitisPage({ onNavigate }) { return <LesionPillarPage data={BURSITIS_DATA} onNavigate={onNavigate} />; }
+function CondromalaciaPage({ onNavigate }) { return <LesionPillarPage data={CONDROMALACIA_DATA} onNavigate={onNavigate} />; }
+function ContracturaPage({ onNavigate }) { return <LesionPillarPage data={CONTRACTURA_DATA} onNavigate={onNavigate} />; }
+function PeriostitisPage({ onNavigate }) { return <LesionPillarPage data={PERIOSTITIS_DATA} onNavigate={onNavigate} />; }
+function EpitrocleitisPage({ onNavigate }) { return <LesionPillarPage data={EPITROCLEITIS_DATA} onNavigate={onNavigate} />; }
 
-if (typeof window !== "undefined") window.BursitisPage = BursitisPage;
-if (typeof window !== "undefined") window.CondromalaciaPage = CondromalaciaPage;
-if (typeof window !== "undefined") window.ContracturaPage = ContracturaPage;
-if (typeof window !== "undefined") window.PeriostitisPage = PeriostitisPage;
-if (typeof window !== "undefined") window.EpitrocleitisPage = EpitrocleitisPage;
 /* ==================== servicio.jsx ==================== */
 // SERVICIO - Componente reutilizable para páginas de servicio técnico
 // Genera: Quiropraxia, Punción Seca, Masajes Deportivos, Readaptación
@@ -13753,7 +13714,7 @@ function SvSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .sv-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sv-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -13773,7 +13734,7 @@ function SvHero({ data, onNavigate }) {
           display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem',
           fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600,
         }}>
-          <a onClick={() => onNavigate('fisioterapia')} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Servicios</a>
+          <a {...navProps('fisioterapia', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Servicios</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
           <span style={{ color: '#C9A55A' }}>{data.name}</span>
         </div>
@@ -13821,7 +13782,7 @@ function SvHero({ data, onNavigate }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .sv-hero-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sv-hero-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13857,7 +13818,7 @@ function SvQueEs({ data }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .sv-que-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sv-que-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -13933,7 +13894,7 @@ function SvCasos({ data }) {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .sv-casos-grid { grid-template-columns: 1fr !important; } .sv-casos-cell { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .sv-casos-grid { grid-template-columns: 1fr !important; } .sv-casos-cell { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); } }` }} />
     </section>
   );
 }
@@ -13958,7 +13919,7 @@ function SvContraindicaciones({ data }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .sv-contra-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; } .sv-contra-list { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .sv-contra-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; } .sv-contra-list { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -14018,7 +13979,7 @@ function SvCTA({ data, onNavigate }) {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 900px) { .sv-cta-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sv-cta-grid { grid-template-columns: 1fr !important; } }` }} />
     </section>
   );
 }
@@ -14039,7 +14000,6 @@ function ServicioPage({ data, onNavigate }) {
   );
 }
 
-if (typeof window !== "undefined") window.ServicioPage = ServicioPage;
 /* ==================== servicio-data.jsx ==================== */
 // SERVICIO DATA - Datos de los 4 servicios técnicos
 
@@ -14282,15 +14242,11 @@ const READAPTACION_DATA = {
   ctaDesc: 'Primera sesión: evaluación de tu nivel actual vs pre-lesión + plan de readaptación con criterios objetivos de retorno. 60 min. La fase que todos olvidan.',
 };
 
-function QuiropraxiaPage({ onNavigate }) { return <window.ServicioPage data={QUIROPRAXIA_DATA} onNavigate={onNavigate} />; }
-function PuncionSecaPage({ onNavigate }) { return <window.ServicioPage data={PUNCION_DATA} onNavigate={onNavigate} />; }
-function MasajesPage({ onNavigate }) { return <window.ServicioPage data={MASAJES_DATA} onNavigate={onNavigate} />; }
-function ReadaptacionPage({ onNavigate }) { return <window.ServicioPage data={READAPTACION_DATA} onNavigate={onNavigate} />; }
+function QuiropraxiaPage({ onNavigate }) { return <ServicioPage data={QUIROPRAXIA_DATA} onNavigate={onNavigate} />; }
+function PuncionSecaPage({ onNavigate }) { return <ServicioPage data={PUNCION_DATA} onNavigate={onNavigate} />; }
+function MasajesPage({ onNavigate }) { return <ServicioPage data={MASAJES_DATA} onNavigate={onNavigate} />; }
+function ReadaptacionPage({ onNavigate }) { return <ServicioPage data={READAPTACION_DATA} onNavigate={onNavigate} />; }
 
-if (typeof window !== "undefined") window.QuiropraxiaPage = QuiropraxiaPage;
-if (typeof window !== "undefined") window.PuncionSecaPage = PuncionSecaPage;
-if (typeof window !== "undefined") window.MasajesPage = MasajesPage;
-if (typeof window !== "undefined") window.ReadaptacionPage = ReadaptacionPage;
 /* ==================== lesiones.jsx ==================== */
 // LESIONES - Página padre / hub editorial
 // Catálogo completo con filtros (zona, deporte, complejidad), matriz por deporte, y CTA.
@@ -14558,12 +14514,12 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .les-hero-grid { grid-template-columns: 1fr !important; }
           .les-hero-stats { border-left: none !important; padding-left: 0 !important; border-top: 1px solid rgba(10,10,10,0.08); padding-top: 2rem; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -14767,12 +14723,12 @@ function LesionesCatalog({
             const isHovered = hoveredIdx === i;
             const clickable = !!les.page;
             return (
-              <div
+              <a
                 key={`${les.name}-${i}`}
-                onClick={() => clickable && onNavigate(les.page)}
+                {...navProps(les.page, onNavigate)}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{
+                style={{ textDecoration: 'none', color: 'inherit',
                   display: 'grid',
                   gridTemplateColumns: '60px 2fr 1.2fr 1fr 1fr 1fr 60px',
                   padding: '1.75rem 2rem',
@@ -14908,13 +14864,13 @@ function LesionesCatalog({
                 }}>
                   {clickable ? '→' : '·'}
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .cat-header { grid-template-columns: 1fr !important; }
           .cat-filters { grid-template-columns: 1fr !important; gap: 1.5rem !important; padding: 1.5rem !important; }
@@ -14926,7 +14882,7 @@ function LesionesCatalog({
           .cat-row > div:nth-child(6),
           .cat-row > div:nth-child(7) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -15135,9 +15091,9 @@ function LesionesSportMatrix({ lesiones, sports, onNavigate }) {
                 onMouseEnter={(e) => { if (clickable) e.currentTarget.style.background = 'rgba(201,165,90,0.04)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
-                <div
-                  onClick={() => clickable && onNavigate(les.page)}
-                  style={{
+                <a
+                  {...navProps(les.page, onNavigate)}
+                  style={{ textDecoration: 'none', color: 'inherit',
                     padding: '1.5rem 2rem',
                     borderRight: '1px solid rgba(255,255,255,0.06)',
                     cursor: clickable ? 'pointer' : 'default',
@@ -15164,7 +15120,7 @@ function LesionesSportMatrix({ lesiones, sports, onNavigate }) {
                   }}>
                     {clickable ? 'Ver protocolo →' : 'Sin artículo'}
                   </div>
-                </div>
+                </a>
                 {sports.map(sport => {
                   const hit = les.sports.includes(sport);
                   return (
@@ -15219,11 +15175,11 @@ function LesionesSportMatrix({ lesiones, sports, onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .mtx-header { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -15370,11 +15326,11 @@ function LesionesMethodStrip({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ms-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -15526,16 +15482,15 @@ function LesionesCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .les-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.LesionesPage = LesionesPage;
 /* ==================== deportes.jsx ==================== */
 // DEPORTES - Página padre / hub editorial
 // Catálogo de deportes que trato, experiencia personal por deporte, CTA.
@@ -15833,12 +15788,12 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .dep-hero-grid { grid-template-columns: 1fr !important; }
           .dep-hero-stats { border-left: none !important; padding-left: 0 !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -15916,12 +15871,12 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
             const isHovered = hoveredIdx === i;
             const clickable = !!d.page;
             return (
-              <div
+              <a
                 key={d.name}
-                onClick={() => clickable && onNavigate(d.page)}
+                {...navProps(d.page, onNavigate)}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{
+                style={{ textDecoration: 'none', color: 'inherit',
                   display: 'grid',
                   gridTemplateColumns: '80px 1.4fr 1.2fr 1fr 60px',
                   borderBottom: i < deportes.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
@@ -16158,7 +16113,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
                     </div>
                   )}
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
@@ -16173,7 +16128,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 1100px) {
           .dcat-row { grid-template-columns: 60px 1fr 1fr !important; }
           .dcat-row > div:last-child { display: none !important; }
@@ -16184,7 +16139,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
           .dcat-row > div { border-right: none !important; padding: 1.5rem !important; }
           .dcat-row > div:first-child > div:last-child { writing-mode: horizontal-tb !important; transform: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -16362,7 +16317,7 @@ function DeportesExperience({ deportes }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .exp-header { grid-template-columns: 1fr !important; }
           .exp-typical { grid-template-columns: repeat(2, 1fr) !important; }
@@ -16371,7 +16326,7 @@ function DeportesExperience({ deportes }) {
         @media (max-width: 600px) {
           .exp-typical { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -16646,7 +16601,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes procFade {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -16655,7 +16610,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
           .proc-header { grid-template-columns: 1fr !important; }
           .proc-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -16805,16 +16760,15 @@ function DeportesCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .dep-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.DeportesPage = DeportesPage;
 /* ==================== metodologia.jsx ==================== */
 // METODOLOGÍA - El Método Indestructible
 // Manifesto · 4 fases expandidas · Caso ejemplo · Para quién aplica/no · FAQ · CTA
@@ -16862,7 +16816,7 @@ function MetSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .met-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .met-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -16947,12 +16901,12 @@ function MetHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .met-hero-chips { flex-direction: column; }
           .met-hero-chip { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -17040,11 +16994,11 @@ function MetManifesto() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .met-man-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -17222,7 +17176,7 @@ function MetFases({ activePhase, setActivePhase }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes metFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) {
           .met-fase-sel { grid-template-columns: repeat(2, 1fr) !important; }
@@ -17230,7 +17184,7 @@ function MetFases({ activePhase, setActivePhase }) {
           .met-fase-detail { grid-template-columns: 1fr !important; }
           .met-fase-left { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -17400,12 +17354,12 @@ function MetParaQuien() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .met-pq-grid { grid-template-columns: 1fr !important; }
           .met-pq-yes { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -17571,16 +17525,15 @@ function MetCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .met-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.MetodologiaPage = MetodologiaPage;
 /* ==================== sobre-german.jsx ==================== */
 // SOBRE GERMÁN - Página de autoridad E-E-A-T
 // Historia · Credenciales · Práctica deportiva · Mis lesiones · Filosofía · Comparativa · Testimonios · CTA
@@ -17628,7 +17581,7 @@ function SgSectionHeader({ kicker, title, subtitle, intro, dark }) {
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
       )}
-      <style>{`@media (max-width: 900px) { .sg-sh-header { grid-template-columns: 1fr !important; } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .sg-sh-header { grid-template-columns: 1fr !important; } }` }} />
     </div>
   );
 }
@@ -17802,12 +17755,12 @@ function SobreHero({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sg-hero-grid { grid-template-columns: 1fr !important; }
           .sg-portrait { max-width: 360px; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -17887,11 +17840,11 @@ function SobreHistoria() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sg-hist-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18001,14 +17954,14 @@ function SobreCredenciales() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sg-stats { grid-template-columns: repeat(2, 1fr) !important; }
           .sg-stat-cell:nth-child(2) { border-right: none !important; }
           .sg-stat-cell { border-bottom: 1px solid rgba(10,10,10,0.06); }
           .sg-form-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18167,13 +18120,13 @@ function SobrePractica() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes sgFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) {
           .sg-prac-grid { grid-template-columns: 1fr !important; }
           .sg-prac-photo { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); aspect-ratio: 16/10 !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18255,12 +18208,12 @@ function SobreMisLesiones() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .sg-les-grid { grid-template-columns: 1fr !important; }
           .sg-les-cell { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18316,11 +18269,11 @@ function SobreFilosofia() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .sg-fil-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18412,12 +18365,12 @@ function SobreComparativa() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .sg-comp-row { grid-template-columns: 1fr !important; }
           .sg-comp-row > div { border-right: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18488,11 +18441,11 @@ function SobreTestimonios() {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sg-test-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -18598,16 +18551,15 @@ function SobreCTA({ onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sg-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
 
-if (typeof window !== "undefined") window.SobreGermanPage = SobreGermanPage;
 /* ==================== app.jsx ==================== */
 
 function App({ initialPage = 'home', onRouteChange } = {}) {
@@ -18615,6 +18567,13 @@ function App({ initialPage = 'home', onRouteChange } = {}) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => { setCurrentPage(initialPage); }, [initialPage]);
+
+  // Atras/adelante del navegador: sin esto la URL cambiaba pero la pagina no.
+  useEffect(() => {
+    const onPop = () => setCurrentPage(pathToPage(window.location.pathname));
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -18690,9 +18649,10 @@ const DARK_HERO_PAGES = ['home', 'deportes', 'crossfit', 'weightlifting', 'bjj',
 
 function Nav({ currentPage, onNavigate }) {
   const [isVisible, setIsVisible] = useState(true);
-  const [scrolled, setScrolled] = useState(typeof window !== 'undefined' && window.scrollY > 40);
+  // Arranca igual que en el servidor; el valor real se aplica en el efecto.
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const lastYRef = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
+  const lastYRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18749,9 +18709,9 @@ function Nav({ currentPage, onNavigate }) {
         transition: 'padding 0.35s ease',
       }}>
         {/* Logo */}
-        <div
-          onClick={() => onNavigate('home')}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+        <a
+          {...navProps('home', onNavigate)}
+          style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
         >
           <div style={{
             width: '34px', height: '34px',
@@ -18775,7 +18735,7 @@ function Nav({ currentPage, onNavigate }) {
               Fisioterapia Deportiva
             </div>
           </div>
-        </div>
+        </a>
 
         {/* Desktop links */}
         <div className="nav-desktop" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
@@ -18784,7 +18744,8 @@ function Nav({ currentPage, onNavigate }) {
               key={l.page}
               active={l.match.includes(currentPage)}
               lightText={lightText}
-              onClick={() => onNavigate(l.page)}
+              page={l.page}
+              onNavigate={onNavigate}
             >
               {l.label}
             </NavLink>
@@ -18841,7 +18802,7 @@ function Nav({ currentPage, onNavigate }) {
           {links.map(l => (
             <a
               key={l.page}
-              onClick={() => { onNavigate(l.page); setMenuOpen(false); }}
+              {...navProps(l.page, onNavigate, () => setMenuOpen(false))}
               style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: '1.125rem 0', borderBottom: '1px solid rgba(255,255,255,0.08)',
@@ -18867,22 +18828,23 @@ function Nav({ currentPage, onNavigate }) {
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 920px) {
           .nav-desktop { display: none !important; }
           .nav-burger { display: flex !important; }
           .nav-mobile-panel { display: block !important; }
         }
-      `}</style>
+      ` }} />
     </nav>
   );
 }
 
-function NavLink({ children, active, onClick, lightText }) {
+function NavLink({ children, active, onClick, lightText, page, onNavigate }) {
   const base = active ? '#C9A55A' : (lightText ? 'rgba(255,255,255,0.78)' : 'rgba(10,10,10,0.62)');
+  const link = page ? navProps(page, onNavigate) : { onClick };
   return (
     <a
-      onClick={onClick}
+      {...link}
       style={{
         color: base,
         fontSize: '0.875rem',
@@ -18903,9 +18865,13 @@ function NavLink({ children, active, onClick, lightText }) {
 }
 
 function ThemeToggle({ lightText }) {
-  const [dark, setDark] = useState(() =>
-    typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark'
-  );
+  // El script de arranque puede haber puesto data-theme="dark" antes de que
+  // React hidrate. Si leyeramos eso en el estado inicial, servidor y cliente
+  // renderizarian iconos distintos y React tiraria el HTML del servidor.
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    setDark(document.documentElement.getAttribute('data-theme') === 'dark');
+  }, []);
   const toggle = () => {
     const next = !dark;
     document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
@@ -19275,12 +19241,12 @@ function HeroSection({ onNavigate }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes slide {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(200%); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -19597,11 +19563,11 @@ function MethodologySection() {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .method-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -19702,12 +19668,12 @@ function InjuriesSection({ onNavigate }) {
             const isFeatured = i === 0; // Pubalgia featured
             
             return (
-              <div
+              <a
                 key={i}
-                onClick={() => onNavigate(injury.page)}
+                {...navProps(injury.page, onNavigate)}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                style={{
+                style={{ textDecoration: 'none', color: 'inherit',
                   padding: '2.5rem',
                   background: isHovered ? '#0A0A0A' : '#FFFFFF',
                   cursor: 'pointer',
@@ -19800,13 +19766,13 @@ function InjuriesSection({ onNavigate }) {
                     </span>
                   </div>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 1024px) {
           .bento-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
@@ -19814,7 +19780,7 @@ function InjuriesSection({ onNavigate }) {
           .bento-grid { grid-template-columns: 1fr !important; }
           .injuries-header { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -20111,11 +20077,11 @@ function SportsSection({ onNavigate }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .sport-showcase { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -20461,12 +20427,12 @@ function ContactSection() {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .contact-grid { grid-template-columns: 1fr !important; }
           .contact-footer { justify-content: center !important; text-align: center; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -20849,11 +20815,11 @@ function FisioAQuienAyudo({ onNavigate }) {
           gap: '2rem',
         }}>
           {athletes.map((athlete, i) => (
-            <div
+            <a
               key={i}
               data-index={i}
-              onClick={() => onNavigate(athlete.page)}
-              style={{
+              {...navProps(athlete.page, onNavigate)}
+              style={{ textDecoration: 'none', color: 'inherit',
                 padding: '2.5rem',
                 background: '#FFFFFF',
                 cursor: 'pointer',
@@ -20953,16 +20919,16 @@ function FisioAQuienAyudo({ onNavigate }) {
                   →
                 </span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .aquien-header { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -21225,7 +21191,7 @@ function FisioMetodo() {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes metodoFade {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -21233,7 +21199,7 @@ function FisioMetodo() {
         @media (max-width: 900px) {
           .metodo-grid { grid-template-columns: 1fr !important; gap: 3rem !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -21530,7 +21496,7 @@ function FisioTecnicas({ onNavigate }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes tecFade {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
@@ -21539,7 +21505,7 @@ function FisioTecnicas({ onNavigate }) {
           .tec-header { grid-template-columns: 1fr !important; }
           .tec-body { grid-template-columns: 1fr !important; gap: 2rem !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -21831,13 +21797,13 @@ function FisioPorQueDiferente() {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 768px) {
           .diff-header { grid-template-columns: 1fr !important; }
           .diff-row { grid-template-columns: 1fr !important; }
           .diff-row > div { border-right: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -21976,12 +21942,12 @@ function FisioLesiones({ onNavigate }) {
             const clickable = !!les.page;
             
             return (
-              <div
+              <a
                 key={i}
-                onClick={() => clickable && onNavigate(les.page)}
+                {...navProps(les.page, onNavigate)}
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                style={{
+                style={{ textDecoration: 'none', color: 'inherit',
                   display: 'grid',
                   gridTemplateColumns: '60px 2fr 1.2fr 1fr 1fr 60px',
                   padding: '1.75rem 2rem',
@@ -22078,7 +22044,7 @@ function FisioLesiones({ onNavigate }) {
                 }}>
                   {clickable ? '→' : '·'}
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
@@ -22094,7 +22060,7 @@ function FisioLesiones({ onNavigate }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .les-header { grid-template-columns: 1fr !important; }
           .les-row-head { display: none !important; }
@@ -22104,7 +22070,7 @@ function FisioLesiones({ onNavigate }) {
           .les-row > div:nth-child(5),
           .les-row > div:nth-child(6) { display: none !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -22384,7 +22350,7 @@ function FisioUbicacion() {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes mapPulse {
           0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
           100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
@@ -22393,7 +22359,7 @@ function FisioUbicacion() {
           .ubic-grid { grid-template-columns: 1fr !important; }
           .ubic-map { min-height: 320px !important; border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -22801,7 +22767,7 @@ function FisioAgendar({ onNavigate }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .ag-header { grid-template-columns: 1fr !important; }
           .ag-steps { grid-template-columns: 1fr !important; }
@@ -22809,7 +22775,7 @@ function FisioAgendar({ onNavigate }) {
           .ag-arrow { display: none !important; }
           .ag-cta-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
@@ -23193,13 +23159,13 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
         </div>
       </div>
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .faq-header { grid-template-columns: 1fr !important; }
           .faq-layout { grid-template-columns: 1fr !important; gap: 2.5rem !important; }
           .faq-sidebar { position: static !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }
