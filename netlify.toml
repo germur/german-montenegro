@@ -4,3 +4,12 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# El sitio respondia igual en el apex y en www, sin redirigir, asi que Google
+# veia dos sitios completos duplicados. El apex es el host canonico: es el que
+# usan las etiquetas canonical y las 23 URLs del sitemap.
+[[redirects]]
+  from = "https://www.germanmontenegro.fit/*"
+  to = "https://germanmontenegro.fit/:splat"
+  status = 301
+  force = true
