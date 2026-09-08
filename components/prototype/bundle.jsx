@@ -184,7 +184,7 @@ function BodyMapSection({ onNavigate }) {
   const zones = [
     { id: 'cuello',    label: 'Cuello / Cervical',   pos: [0,    2.30, -0.18],
       injuries: [
-        { name: 'Contractura cervical', page: 'home',    severity: 'Baja' },
+        { name: 'Contractura cervical', page: 'contractura', severity: 'Baja' },
         { name: 'Latigazo',             page: 'home',    severity: 'Media' },
       ]
     },
@@ -202,13 +202,13 @@ function BodyMapSection({ onNavigate }) {
     },
     { id: 'codo-d',    label: 'Codo derecho',        pos: [-0.55, 1.30, 0.10],
       injuries: [
-        { name: 'Epitrocleítis',        page: 'home',    severity: 'Media' },
+        { name: 'Epitrocleítis',        page: 'epitrocleitis', severity: 'Media' },
         { name: 'Codo de tenista',      page: 'home',    severity: 'Media' },
       ]
     },
     { id: 'codo-i',    label: 'Codo izquierdo',      pos: [0.55,  1.30, 0.10],
       injuries: [
-        { name: 'Epitrocleítis',        page: 'home',    severity: 'Media' },
+        { name: 'Epitrocleítis',        page: 'epitrocleitis', severity: 'Media' },
         { name: 'Codo de tenista',      page: 'home',    severity: 'Media' },
       ]
     },
@@ -252,18 +252,18 @@ function BodyMapSection({ onNavigate }) {
     { id: 'rodilla-d', label: 'Rodilla derecha',     pos: [-0.22, -0.40, 0.20],
       injuries: [
         { name: 'Tendinitis Rotuliana', page: 'tendinitis', severity: 'Media' },
-        { name: 'Condromalacia',         page: 'home',      severity: 'Media' },
+        { name: 'Condromalacia',         page: 'condromalacia', severity: 'Media' },
       ]
     },
     { id: 'rodilla-i', label: 'Rodilla izquierda',   pos: [0.22,  -0.40, 0.20],
       injuries: [
         { name: 'Tendinitis Rotuliana', page: 'tendinitis', severity: 'Media' },
-        { name: 'Condromalacia',         page: 'home',      severity: 'Media' },
+        { name: 'Condromalacia',         page: 'condromalacia', severity: 'Media' },
       ]
     },
     { id: 'tibia',     label: 'Tibia / Espinilla',   pos: [0,     -0.90, 0.27],
       injuries: [
-        { name: 'Periostitis Tibial',   page: 'home',    severity: 'Baja' },
+        { name: 'Periostitis Tibial',   page: 'periostitis', severity: 'Baja' },
       ]
     },
   ];
@@ -12796,7 +12796,7 @@ const CROSSFIT_DATA = {
     { name: 'Tendinitis del manguito', gesture: 'Snatch, muscle-up, HSPU', freq: 'Alta', page: 'hombro' },
     { name: 'Dolor lumbar', gesture: 'Deadlift, kettlebell swing', freq: 'Alta', page: 'ciatica' },
     { name: 'Dolor de muñeca', gesture: 'Front squat, HSPU', freq: 'Media', page: null },
-    { name: 'Epitrocleítis (codo)', gesture: 'Toes-to-bar, muscle-up', freq: 'Media', page: null },
+    { name: 'Epitrocleítis (codo)', gesture: 'Toes-to-bar, muscle-up', freq: 'Media', page: 'epitrocleitis' },
     { name: 'Tendinitis rotuliana', gesture: 'Box jumps, wall balls', freq: 'Media', page: 'tendinitis' },
     { name: 'Pubalgia', gesture: 'Sentadilla profunda, sprint', freq: 'Media', page: 'pubalgia' },
   ],
@@ -12850,7 +12850,7 @@ const BJJ_DATA = {
   injTitle: 'Las del', injSub: 'mat.',
   injIntro: 'Siete lesiones concentran lo que veo en grapplers. Cada una ligada a una posición o técnica específica.',
   injuries: [
-    { name: 'Epitrocleítis (codo de armbar)', gesture: 'Defender armbars, agarres', freq: 'Alta', page: null },
+    { name: 'Epitrocleítis (codo de armbar)', gesture: 'Defender armbars, agarres', freq: 'Alta', page: 'epitrocleitis' },
     { name: 'Lesiones de hombro', gesture: 'Kimura, americana, postear', freq: 'Alta', page: 'hombro' },
     { name: 'Cuello y trapecio', gesture: 'Presiones, guardias, mata-león', freq: 'Alta', page: null },
     { name: 'Lesión de menisco', gesture: 'Rodilla en guardia, reaping', freq: 'Media', page: null },
@@ -12911,7 +12911,7 @@ const BOXEO_DATA = {
     { name: 'Lesiones de mano y muñeca', gesture: 'Impacto del golpe, mal vendaje', freq: 'Alta', page: null },
     { name: 'Tendinitis del manguito', gesture: 'Jab y cross repetidos', freq: 'Alta', page: 'hombro' },
     { name: 'Cervicalgia', gesture: 'Encajar golpes, defensa', freq: 'Media', page: 'ciatica' },
-    { name: 'Epitrocleítis (codo)', gesture: 'Golpeo repetido, saco pesado', freq: 'Media', page: null },
+    { name: 'Epitrocleítis (codo)', gesture: 'Golpeo repetido, saco pesado', freq: 'Media', page: 'epitrocleitis' },
     { name: 'Dolor lumbar', gesture: 'Rotación de tronco en el golpeo', freq: 'Media', page: 'ciatica' },
   ],
   causesTitle: 'No es', causesSub: 'solo pegar duro.',
@@ -19583,11 +19583,11 @@ function InjuriesSection({ onNavigate }) {
     { name: 'Pubalgia', page: 'pubalgia', zone: 'Cadera / Aductor', icon: '🦴', complexity: 'Alta' },
     { name: 'Ciática', page: 'ciatica', zone: 'Lumbar / Pierna', icon: '⚡', complexity: 'Media' },
     { name: 'Tendinitis Rotuliana', page: 'tendinitis', zone: 'Rodilla', icon: '🦵', complexity: 'Media' },
-    { name: 'Contractura', page: 'home', zone: 'Muscular', icon: '💪', complexity: 'Baja' },
-    { name: 'Bursitis', page: 'home', zone: 'Articular', icon: '🔥', complexity: 'Media' },
-    { name: 'Condromalacia', page: 'home', zone: 'Rodilla', icon: '⚙️', complexity: 'Media' },
-    { name: 'Periostitis Tibial', page: 'home', zone: 'Tibia', icon: '🦴', complexity: 'Baja' },
-    { name: 'Epitrocleítis', page: 'home', zone: 'Codo', icon: '💪', complexity: 'Media' },
+    { name: 'Contractura', page: 'contractura', zone: 'Muscular', icon: '💪', complexity: 'Baja' },
+    { name: 'Bursitis', page: 'bursitis', zone: 'Articular', icon: '🔥', complexity: 'Media' },
+    { name: 'Condromalacia', page: 'condromalacia', zone: 'Rodilla', icon: '⚙️', complexity: 'Media' },
+    { name: 'Periostitis Tibial', page: 'periostitis', zone: 'Tibia', icon: '🦴', complexity: 'Baja' },
+    { name: 'Epitrocleítis', page: 'epitrocleitis', zone: 'Codo', icon: '💪', complexity: 'Media' },
     { name: 'Hombro Congelado', page: 'hombro', zone: 'Hombro', icon: '🤲', complexity: 'Alta' },
   ];
   
@@ -20722,7 +20722,7 @@ function FisioAQuienAyudo({ onNavigate }) {
       sport: 'BJJ / Grappling',
       desc: 'Longevidad en el tatami',
       injuries: ['Epitrocleítis', 'Contracturas', 'Cervicales'],
-      page: 'home',
+      page: 'bjj',
       stat: '60+ grapplers',
     },
     {
@@ -21821,11 +21821,11 @@ function FisioLesiones({ onNavigate }) {
     { name: 'Ciática', zone: 'Lumbar / Pierna', complexity: 'Media', recovery: '3–8 sem', page: 'ciatica', active: true },
     { name: 'Tendinitis Rotuliana', zone: 'Rodilla', complexity: 'Media', recovery: '4–10 sem', page: 'tendinitis', active: true },
     { name: 'Hombro Congelado', zone: 'Hombro', complexity: 'Alta', recovery: '8–24 sem', page: 'hombro', active: true },
-    { name: 'Contractura Muscular', zone: 'Muscular', complexity: 'Baja', recovery: '1–3 sem', page: null },
-    { name: 'Bursitis', zone: 'Articular', complexity: 'Media', recovery: '3–6 sem', page: null },
-    { name: 'Condromalacia', zone: 'Rodilla', complexity: 'Media', recovery: '6–12 sem', page: null },
-    { name: 'Periostitis Tibial', zone: 'Tibia', complexity: 'Baja', recovery: '2–6 sem', page: null },
-    { name: 'Epitrocleítis', zone: 'Codo', complexity: 'Media', recovery: '4–8 sem', page: null },
+    { name: 'Contractura Muscular', zone: 'Muscular', complexity: 'Baja', recovery: '1–3 sem', page: 'contractura' },
+    { name: 'Bursitis', zone: 'Articular', complexity: 'Media', recovery: '3–6 sem', page: 'bursitis' },
+    { name: 'Condromalacia', zone: 'Rodilla', complexity: 'Media', recovery: '6–12 sem', page: 'condromalacia' },
+    { name: 'Periostitis Tibial', zone: 'Tibia', complexity: 'Baja', recovery: '2–6 sem', page: 'periostitis' },
+    { name: 'Epitrocleítis', zone: 'Codo', complexity: 'Media', recovery: '4–8 sem', page: 'epitrocleitis' },
   ];
   
   const complexityColor = (c) => c === 'Alta' ? '#DC2626' : c === 'Media' ? '#C9A55A' : '#16A34A';
