@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/lesiones/ciatica" },
   title: "Ciática: Síntomas y Tratamiento",
   description: "Ciática y dolor lumbar irradiado: diagnóstico, test de Lasègue y tratamiento fisioterapéutico en Bogotá.",
 };

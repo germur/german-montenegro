@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/deportes/boxeo" },
   title: "Fisioterapia para Boxeo",
   description: "Lesiones de boxeo: manos, hombros y más. Fisioterapia deportiva para boxeadores en Bogotá.",
 };

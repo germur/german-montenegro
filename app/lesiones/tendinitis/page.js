@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/lesiones/tendinitis" },
   title: "Tendinitis: Síntomas y Tratamiento",
   description: "Tendinitis y tendinopatías en deportistas: causas, fases y tratamiento basado en evidencia en Bogotá.",
 };

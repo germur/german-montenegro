@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/deportes/bjj" },
   title: "Fisioterapia para BJJ",
   description: "Lesiones en Brazilian Jiu-Jitsu: diagnóstico, tratamiento y prevención para grapplers en Bogotá.",
 };

@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/lesiones/bursitis" },
   title: "Bursitis: Síntomas y Tratamiento",
   description: "Bursitis en deportistas: causas, síntomas y tratamiento de fisioterapia en Bogotá.",
 };

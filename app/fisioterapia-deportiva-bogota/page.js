@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/fisioterapia-deportiva-bogota" },
   title: "Fisioterapia Deportiva en Bogotá",
   description: "Consulta de fisioterapia deportiva en Bogotá: valoración, tratamiento manual, punción seca y readaptación para atletas. Agenda tu cita.",
 };

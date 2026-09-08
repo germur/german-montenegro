@@ -1,6 +1,7 @@
 import SiteApp from "@/components/SiteApp";
 
 export const metadata = {
+  alternates: { canonical: "/lesiones/contractura" },
   title: "Contractura Muscular: Tratamiento",
   description: "Contracturas musculares en deportistas: causas, tratamiento manual y prevención en Bogotá.",
 };
