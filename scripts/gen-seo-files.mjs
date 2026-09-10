@@ -33,7 +33,7 @@ const lastmod = new Date().toISOString();
 
 const urls = paths
   .map((p) => {
-    const loc = `${SITE_URL}${p === "/" ? "" : p}`;
+    const loc = `${SITE_URL}${p}`;  // el home va como .../ con barra, la forma estandar
     const home = p === "/";
     return [
       "  <url>",
@@ -59,5 +59,9 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `;
 
 await writeFile(join(RAIZ, "public", "sitemap.xml"), sitemap, "utf8");
+// Copia identica bajo otro nombre. Search Console aplica backoff a una entrada
+// que le fallo y puede tardar dias en reintentar; una URL que nunca ha visto
+// entra sin ese historial, asi que sirve para forzar un intento limpio.
+await writeFile(join(RAIZ, "public", "sitemap-1.xml"), sitemap, "utf8");
 await writeFile(join(RAIZ, "public", "robots.txt"), robots, "utf8");
-console.log(`[seo-files] public/sitemap.xml con ${paths.length} URLs y public/robots.txt generados`);
+console.log(`[seo-files] sitemap.xml y sitemap-1.xml con ${paths.length} URLs, y robots.txt`);
