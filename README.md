@@ -13,9 +13,10 @@ npm start        # servir el build
 
 ## Estructura
 
-- `app/` — rutas (una carpeta = una URL) con su `metadata` SEO por página, más `layout.js`, `sitemap.js`, `robots.js` y `globals.css`.
-- `components/SiteApp.jsx` — carga la app cliente (sin SSR del árbol pesado).
-- `components/ClientApp.jsx` — conecta el prototipo con el router de Next (sincroniza la URL al navegar).
+- `app/` — rutas (una carpeta = una URL) con su `metadata` SEO por página, más `layout.js` y `globals.css`.
+- `components/SiteApp.jsx` — carga la app cliente con prerenderizado en servidor (`ssr: true`).
+- `components/ClientApp.jsx` — navega con el App Router de Next.js para actualizar contenido, título y canonical juntos. La página activa procede de la ruta, también al usar Atrás/Adelante.
+- `scripts/gen-seo-files.mjs` — genera los sitemaps y robots.txt como archivos estáticos en `public/` antes del build.
 - `components/prototype/bundle.jsx` — el prototipo completo (todos los componentes) en un módulo. **Generado** a partir de los archivos originales del diseño.
 - `lib/routes.js` — mapa único entre las claves internas de página y las URLs (slugs en español para SEO local).
 
@@ -31,8 +32,9 @@ El diseño se entregó como múltiples archivos `.jsx` con scope global. `bundle
 
 - Meta `title`/`description` por ruta + Open Graph y Twitter Cards en el layout.
 - `sitemap.xml` y `robots.txt` automáticos.
-- `lang="es"`, URLs en español. Ajusta `SITE_URL` en `app/layout.js`, `app/sitemap.js` y `app/robots.js` cuando tengas el dominio final.
+- `lang="es"`, URLs en español. El dominio se configura en `app/layout.js` y `scripts/gen-seo-files.mjs`.
 
 ## Pendiente / mejora
 
-- El árbol se renderiza en cliente (`ssr:false`) porque el prototipo usa `window`/Three.js. El HTML inicial ya trae los meta tags correctos (suficiente para indexación). Si quieres contenido textual también en el HTML servido, conviene migrar los componentes de cada pillar a Server Components con contenido estático.
+- El contenido textual se prerenderiza y React lo hidrata en el navegador. Three.js se inicializa en efectos del cliente. Comprueba con `npm run build` qué rutas se generan estáticamente; los metadatos y el contenido deben coincidir tanto al abrir una URL directamente como al navegar desde otra página.
+- Completar teléfonos, imágenes de ejemplo y enlaces sociales/legales antes de dar por terminada la publicación. Un sitemap válido permite descubrir URLs, pero no garantiza su indexación.

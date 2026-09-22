@@ -3,7 +3,7 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect, Fragment } from "react";
 import * as THREE from "three";
-import { pageToPath, pathToPage } from "@/lib/routes";
+import { pageToPath } from "@/lib/routes";
 
 // Enlaces reales: <a href> que Google puede rastrear, pero que siguen
 // navegando como SPA. Sin esto la navegacion era solo onClick y el sitio
@@ -18567,17 +18567,9 @@ function SobreCTA({ onNavigate }) {
 /* ==================== app.jsx ==================== */
 
 function App({ initialPage = 'home', onRouteChange } = {}) {
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  // Next.js owns the route. Do not render another page before its metadata loads.
+  const currentPage = initialPage;
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => { setCurrentPage(initialPage); }, [initialPage]);
-
-  // Atras/adelante del navegador: sin esto la URL cambiaba pero la pagina no.
-  useEffect(() => {
-    const onPop = () => setCurrentPage(pathToPage(window.location.pathname));
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
-  }, []);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -18593,9 +18585,7 @@ function App({ initialPage = 'home', onRouteChange } = {}) {
   }, []);
   
   const navigate = (page) => {
-    setCurrentPage(page);
     if (typeof onRouteChange === 'function') onRouteChange(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   return (
