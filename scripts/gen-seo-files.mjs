@@ -1,4 +1,4 @@
-// Genera public/sitemap.xml y public/robots.txt en tiempo de build.
+// Genera los sitemaps XML/texto y robots.txt en tiempo de build.
 //
 // Por que archivos y no app/sitemap.js: con @netlify/plugin-nextjs toda ruta,
 // incluidas /sitemap.xml y /robots.txt, pasa por la funcion serverless. En un
@@ -56,12 +56,15 @@ const robots = `User-agent: *
 Allow: /
 
 Sitemap: ${SITE_URL}/sitemap.xml
+Sitemap: ${SITE_URL}/sitemap.txt
 `;
 
 await writeFile(join(RAIZ, "public", "sitemap.xml"), sitemap, "utf8");
-// Copia identica bajo otro nombre. Search Console aplica backoff a una entrada
-// que le fallo y puede tardar dias en reintentar; una URL que nunca ha visto
-// entra sin ese historial, asi que sirve para forzar un intento limpio.
+// Se conserva la URL alternativa ya enviada a los buscadores.
 await writeFile(join(RAIZ, "public", "sitemap-1.xml"), sitemap, "utf8");
+// Formato de texto admitido por Google: una URL absoluta por linea, en UTF-8.
+// Permite comparar su procesamiento con el de los XML usando las mismas rutas.
+const sitemapTexto = paths.map((p) => `${SITE_URL}${p}`).join("\n") + "\n";
+await writeFile(join(RAIZ, "public", "sitemap.txt"), sitemapTexto, "utf8");
 await writeFile(join(RAIZ, "public", "robots.txt"), robots, "utf8");
-console.log(`[seo-files] sitemap.xml y sitemap-1.xml con ${paths.length} URLs, y robots.txt`);
+console.log(`[seo-files] sitemap.xml, sitemap-1.xml y sitemap.txt con ${paths.length} URLs, y robots.txt`);
