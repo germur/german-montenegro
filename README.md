@@ -31,7 +31,7 @@ El diseño se entregó como múltiples archivos `.jsx` con scope global. `bundle
 ## SEO incluido
 
 - Meta `title`/`description` por ruta + Open Graph y Twitter Cards en el layout.
-- `sitemap.xml` y `robots.txt` automáticos.
+- `sitemap.xml`, su copia `sitemap-1.xml`, `sitemap.txt` y `robots.txt` automáticos. Los tres sitemaps usan las mismas rutas; el de texto permite contrastar el resultado de un nuevo envío en Search Console con los XML existentes. Publicarlo no confirma que Google lo haya procesado.
 - `lang="es"`, URLs en español. El dominio se configura en `app/layout.js` y `scripts/gen-seo-files.mjs`.
 
 ## Pendiente / mejora

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://germanmontenegro.fit/sitemap.xml
+Sitemap: https://germanmontenegro.fit/sitemap.txt
