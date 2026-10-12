@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect, Fragment } from "react";
 import * as THREE from "three";
 import { pageToPath } from "@/lib/routes";
+import { PHONE_DISPLAY, PHONE_HREF, WHATSAPP_URL } from "@/lib/contact";
 
 // Native links load each static document, including its own metadata.
 function navProps(page, onNavigate, after) {
@@ -1710,7 +1711,7 @@ function Footer({ onNavigate }) {
           <div style={footerStyles.column}>
             <div style={footerStyles.title}>Contacto</div>
             <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '15px'}}>Bogotá, Colombia</p>
-            <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '15px'}}>WhatsApp: +57 XXX XXX XXXX</p>
+            <p style={{color: 'rgba(255,255,255,0.7)', fontSize: '15px'}}>WhatsApp: <a href={WHATSAPP_URL} style={{ color: 'inherit' }}>{PHONE_DISPLAY}</a></p>
           </div>
         </div>
         <div style={footerStyles.bottom}>
@@ -1744,12 +1745,15 @@ function CTAButton({ children, variant = 'primary', size = 'normal', onClick, hr
   
   const handleClick = () => {
     if (onClick) onClick();
-    if (href) window.location.href = href;
   };
+
+  const destination = href || (variant === 'whatsapp' ? WHATSAPP_URL : undefined);
+  const Tag = destination ? 'a' : 'button';
   
   return (
-    <button
-      style={style}
+    <Tag
+      href={destination}
+      style={destination ? { ...style, textDecoration: 'none', display: 'inline-block', textAlign: 'center' } : style}
       onClick={handleClick}
       onMouseEnter={(e) => {
         if (variant === 'primary') e.target.style.background = 'var(--primary-dark)';
@@ -1763,7 +1767,7 @@ function CTAButton({ children, variant = 'primary', size = 'normal', onClick, hr
       }}
     >
       {children}
-    </button>
+    </Tag>
   );
 }
 
@@ -2408,17 +2412,17 @@ function SiteFooter({ onNavigate }) {
             >
               Agendar valoración<span>→</span>
             </a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.25)',
                 padding: '1.25rem 2rem', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em',
                 textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C9A55A'; e.currentTarget.style.color = '#C9A55A'; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#FFFFFF'; }}
             >
               WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -2458,12 +2462,12 @@ function SiteFooter({ onNavigate }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {[
                 { k: 'Ubicación', v: 'Bogotá, Colombia' },
-                { k: 'WhatsApp', v: '+57 XXX XXX XXXX' },
+                { k: 'WhatsApp', v: PHONE_DISPLAY },
                 { k: 'Horario', v: 'Lun–Vie 7–19 · Sáb 8–14' },
               ].map(c => (
                 <div key={c.k} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8125rem' }}>
                   <span style={{ color: '#C9A55A', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.625rem', minWidth: '62px', paddingTop: '0.1rem' }}>{c.k}</span>
-                  <span style={{ color: 'rgba(255,255,255,0.75)' }}>{c.v}</span>
+                  {c.k === 'WhatsApp' ? <a href={WHATSAPP_URL} style={{ color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>{c.v}</a> : <span style={{ color: 'rgba(255,255,255,0.75)' }}>{c.v}</span>}
                 </div>
               ))}
             </div>
@@ -4787,7 +4791,7 @@ function PubalgiaCTA({ onNavigate }) {
               Agendar valoración
               <span>→</span>
             </a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -4800,7 +4804,7 @@ function PubalgiaCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#0A0A0A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -4811,7 +4815,7 @@ function PubalgiaCTA({ onNavigate }) {
               }}
             >
               WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -7447,7 +7451,7 @@ function CiaticaCTA({ onNavigate }) {
               Agendar valoración
               <span>→</span>
             </a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -7460,7 +7464,7 @@ function CiaticaCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#0A0A0A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -7471,7 +7475,7 @@ function CiaticaCTA({ onNavigate }) {
               }}
             >
               WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -9817,7 +9821,7 @@ function TendinitisCTA({ onNavigate }) {
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >Agendar valoración<span>→</span></a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -9830,7 +9834,7 @@ function TendinitisCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#0A0A0A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -9839,7 +9843,7 @@ function TendinitisCTA({ onNavigate }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.color = '#0A0A0A';
               }}
-            >WhatsApp</button>
+            >WhatsApp</a>
           </div>
         </div>
       </div>
@@ -12052,7 +12056,7 @@ function HombroCTA({ onNavigate }) {
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >Agendar valoración<span>→</span></a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -12065,10 +12069,10 @@ function HombroCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}
-            >WhatsApp</button>
+            >WhatsApp</a>
           </div>
         </div>
       </div>
@@ -12682,7 +12686,7 @@ function DhCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -13243,7 +13247,7 @@ function LpCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -13974,7 +13978,7 @@ function SvCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -15444,7 +15448,7 @@ function LesionesCTA({ onNavigate }) {
               Agendar valoración
               <span style={{ fontSize: '1rem' }}>→</span>
             </a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#FFFFFF',
@@ -15457,7 +15461,7 @@ function LesionesCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#C9A55A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -15468,7 +15472,7 @@ function LesionesCTA({ onNavigate }) {
               }}
             >
               WhatsApp
-            </button>
+            </a>
             <div style={{
               fontSize: '0.75rem',
               color: 'rgba(255,255,255,0.4)',
@@ -16720,7 +16724,7 @@ function DeportesCTA({ onNavigate }) {
               Agendar valoración
               <span style={{ fontSize: '1rem' }}>→</span>
             </a>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -16733,7 +16737,7 @@ function DeportesCTA({ onNavigate }) {
                 cursor: 'pointer',
                 fontFamily: 'Space Grotesk',
                 transition: 'all 0.3s',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#0A0A0A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -16746,7 +16750,7 @@ function DeportesCTA({ onNavigate }) {
               }}
             >
               WhatsApp
-            </button>
+            </a>
             <div style={{
               fontSize: '0.75rem',
               color: 'rgba(10,10,10,0.6)',
@@ -19201,7 +19205,7 @@ function HeroSection({ onNavigate }) {
       }}>
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           <span>📍 Bogotá, Colombia</span>
-          <span>📞 +57 XXX XXX XXXX</span>
+          <a href={PHONE_HREF} style={{ color: 'inherit', textDecoration: 'none' }}>📞 {PHONE_DISPLAY}</a>
           <span>⏰ Lun-Sáb</span>
         </div>
         <div style={{
@@ -20200,7 +20204,7 @@ function ContactSection() {
             </p>
             
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
+              <a href={WHATSAPP_URL}
                 style={{
                   background: '#C9A55A',
                   color: '#0A0A0A',
@@ -20214,7 +20218,7 @@ function ContactSection() {
                   transition: 'all 0.3s',
                   fontFamily: 'Space Grotesk',
                   boxShadow: '0 8px 32px rgba(201,165,90,0.25)',
-                }}
+                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)';
                   e.currentTarget.style.boxShadow = '0 16px 48px rgba(201,165,90,0.4)';
@@ -20227,9 +20231,9 @@ function ContactSection() {
                 }}
               >
                 Agendar valoración →
-              </button>
+              </a>
               
-              <button
+              <a href={WHATSAPP_URL}
                 style={{
                   background: 'transparent',
                   color: '#FFFFFF',
@@ -20242,7 +20246,7 @@ function ContactSection() {
                   cursor: 'pointer',
                   transition: 'all 0.3s',
                   fontFamily: 'Space Grotesk',
-                }}
+                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#C9A55A';
                   e.currentTarget.style.color = '#C9A55A';
@@ -20253,7 +20257,7 @@ function ContactSection() {
                 }}
               >
                 WhatsApp
-              </button>
+              </a>
             </div>
             
             {/* Quick info */}
@@ -20412,7 +20416,7 @@ function ContactSection() {
         }} className="contact-footer">
           <div>📍 Bogotá, Colombia · Inside CrossFit box</div>
           <div>🕐 Lun-Vie 7am-7pm · Sáb 8am-2pm</div>
-          <div>📱 WhatsApp: +57 XXX XXX XXXX</div>
+          <div>📱 WhatsApp: <a href={WHATSAPP_URL} style={{ color: 'inherit', textDecoration: 'none' }}>{PHONE_DISPLAY}</a></div>
         </div>
       </div>
       
@@ -20574,7 +20578,7 @@ function FisioHero({ onNavigate }) {
           </p>
           
           <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '4rem' }}>
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: '#0A0A0A',
                 color: '#FFFFFF',
@@ -20587,7 +20591,7 @@ function FisioHero({ onNavigate }) {
                 transition: 'all 0.3s',
                 fontFamily: 'Space Grotesk',
                 textTransform: 'uppercase',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
                 e.currentTarget.style.boxShadow = '0 12px 32px rgba(10,10,10,0.25)';
@@ -20598,9 +20602,9 @@ function FisioHero({ onNavigate }) {
               }}
             >
               Agendar valoración →
-            </button>
+            </a>
             
-            <button
+            <a href={WHATSAPP_URL}
               style={{
                 background: 'transparent',
                 color: '#0A0A0A',
@@ -20613,7 +20617,7 @@ function FisioHero({ onNavigate }) {
                 cursor: 'pointer',
                 transition: 'all 0.3s',
                 fontFamily: 'Space Grotesk',
-              }}
+               textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#C9A55A';
                 e.currentTarget.style.color = '#C9A55A';
@@ -20624,7 +20628,7 @@ function FisioHero({ onNavigate }) {
               }}
             >
               WhatsApp
-            </button>
+            </a>
           </div>
           
           <div style={{
@@ -22074,7 +22078,7 @@ function FisioUbicacion() {
     },
     {
       label: 'Contacto',
-      lines: ['+57 XXX XXX XXXX', 'hola@germanmontenegro.co'],
+      lines: [PHONE_DISPLAY, 'hola@germanmontenegro.co'],
       meta: 'WhatsApp + correo',
     },
     {
@@ -22322,7 +22326,7 @@ function FisioUbicacion() {
                     lineHeight: 1.45,
                     letterSpacing: '-0.01em',
                   }}>
-                    {line}
+                    {line === PHONE_DISPLAY ? <a href={PHONE_HREF} style={{ color: 'inherit', textDecoration: 'none' }}>{line}</a> : line}
                   </div>
                 ))}
                 <div style={{
@@ -22629,7 +22633,7 @@ function FisioAgendar({ onNavigate }) {
               flexWrap: 'wrap',
               position: 'relative',
             }}>
-              <button
+              <a href={WHATSAPP_URL}
                 style={{
                   background: '#0A0A0A',
                   color: '#FFFFFF',
@@ -22645,7 +22649,7 @@ function FisioAgendar({ onNavigate }) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.75rem',
-                }}
+                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-3px)';
                   e.currentTarget.style.boxShadow = '0 12px 32px rgba(10,10,10,0.3)';
@@ -22657,9 +22661,9 @@ function FisioAgendar({ onNavigate }) {
               >
                 Agendar valoración
                 <span style={{ fontSize: '1rem' }}>→</span>
-              </button>
+              </a>
               
-              <button
+              <a href={WHATSAPP_URL}
                 style={{
                   background: 'transparent',
                   color: '#0A0A0A',
@@ -22672,7 +22676,7 @@ function FisioAgendar({ onNavigate }) {
                   cursor: 'pointer',
                   transition: 'all 0.3s',
                   fontFamily: 'Space Grotesk',
-                }}
+                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#0A0A0A';
                   e.currentTarget.style.background = '#0A0A0A';
@@ -22685,7 +22689,7 @@ function FisioAgendar({ onNavigate }) {
                 }}
               >
                 WhatsApp
-              </button>
+              </a>
             </div>
           </div>
           
@@ -23014,7 +23018,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
               }}>
                 Pregúntame directo. Respondo en menos de 24h.
               </div>
-              <button
+              <a href={WHATSAPP_URL}
                 style={{
                   width: '100%',
                   padding: '0.75rem',
@@ -23028,12 +23032,12 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
                   cursor: 'pointer',
                   fontFamily: 'Space Grotesk',
                   transition: 'background 0.3s',
-                }}
+                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
                 onMouseEnter={(e) => e.currentTarget.style.background = '#FFFFFF'}
                 onMouseLeave={(e) => e.currentTarget.style.background = '#C9A55A'}
               >
                 WhatsApp →
-              </button>
+              </a>
             </div>
           </div>
           
