@@ -11,7 +11,7 @@ assert.equal(routes.length, 23, 'Keep all 23 published URLs');
 const homeLinks = new Set();
 
 for (const [page, path] of routes) {
-  const html = await read(path === '/' ? 'index.html' : `${path.slice(1)}/index.html`);
+  const html = await read(path === '/' ? 'index.html' : `${path.slice(1)}.html`);
   assert.ok(!html.includes('\u0000') && !html.includes('\uFFFD'), `${path}: intact UTF-8 content`);
   const seo = PAGE_SEO[page];
   const title = seo.title ? `${seo.title} | Germán Montenegro Fisioterapia Deportiva` : HOME_TITLE;
