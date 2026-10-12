@@ -1,40 +1,36 @@
 # Germán Montenegro — Fisioterapia Deportiva Bogotá
 
-Sitio web implementado en **Next.js 14 (App Router)** a partir del prototipo de Claude Design. Elegido por ser el mejor stack para **SEO** (renderizado en servidor, meta tags reales por página, sitemap/robots) y buena **UX**.
+Sitio construido con **Astro estático** y React para los menús, las animaciones y los gráficos interactivos del diseño original. Las 23 páginas se generan como HTML completo durante el build. Netlify sirve `dist/` desde su CDN, sin Next.js ni funciones para renderizar páginas.
 
-## Cómo ejecutarlo
+## Desarrollo y verificación
 
-```bash
-npm install
-npm run dev      # desarrollo en http://localhost:3000
-npm run build    # build de producción
-npm start        # servir el build
+Usar Node 24 (ver `.nvmrc`).
+
+```sh
+npm ci
+npm run dev
+npm run build
+npm test
+npm start
 ```
+
+`npm start` permite revisar el build en el puerto 4321, salvo que esté ocupado. Las comprobaciones verifican los metadatos, el contenido HTML, los enlaces internos y los archivos SEO de las 23 páginas. También se ejecutan antes de publicar en Netlify.
 
 ## Estructura
 
-- `app/` — rutas (una carpeta = una URL) con su `metadata` SEO por página, más `layout.js` y `globals.css`.
-- `components/SiteApp.jsx` — carga la app cliente con prerenderizado en servidor (`ssr: true`).
-- `components/ClientApp.jsx` — navega con el App Router de Next.js para actualizar contenido, título y canonical juntos. La página activa procede de la ruta, también al usar Atrás/Adelante.
-- `scripts/gen-seo-files.mjs` — genera los sitemaps y robots.txt como archivos estáticos en `public/` antes del build.
-- `components/prototype/bundle.jsx` — el prototipo completo (todos los componentes) en un módulo. **Generado** a partir de los archivos originales del diseño.
-- `lib/routes.js` — mapa único entre las claves internas de página y las URLs (slugs en español para SEO local).
+- `src/pages/[...path].astro`: genera las 23 rutas de `lib/routes.js`.
+- `src/layouts/SiteLayout.astro`: documento HTML, canonical, metadatos sociales, verificación de Search Console, Analytics y fuentes.
+- `src/styles/globals.css`: estilos globales y tema oscuro.
+- `lib/seo.js`: títulos y descripciones de las páginas, conservados en la migración.
+- `components/ClientApp.jsx`: componente React prerenderizado por Astro y posteriormente hidratado para las funciones interactivas.
+- `components/prototype/bundle.jsx`: componentes del diseño original. Los enlaces cargan documentos estáticos con sus propios metadatos.
+- `scripts/gen-seo-files.mjs`: genera `sitemap.xml`, `sitemap-1.xml`, `sitemap.txt` y `robots.txt` en `public/`, que Astro copia a `dist/`.
+- `src/pages/404.astro`: página de error sin indexación.
 
-## Rutas
+Las URLs y el dominio canónico `https://germanmontenegro.fit` se conservan. `www` redirige al dominio principal según `netlify.toml`. La migración conserva la clave de IndexNow y los recursos de `public/`.
 
-Home `/`, `/fisioterapia-deportiva-bogota`, `/lesiones` (+ pubalgia, ciatica, tendinitis, hombro, bursitis, condromalacia, contractura, periostitis, epitrocleitis), `/deportes` (+ crossfit, weightlifting, bjj, boxeo), `/servicios/*` (quiropraxia, puncion-seca, masajes-deportivos, readaptacion-deportiva), `/metodologia`, `/sobre-german-montenegro`.
+## Despliegue
 
-## Cómo regenerar el bundle
+Netlify usa `npm run build && npm test`, Node 24 y la carpeta `dist`. No requiere el plugin de Next ni un adaptador de servidor de Astro. Las pruebas de navegación y diseño en escritorio y móvil complementan las comprobaciones del build.
 
-El diseño se entregó como múltiples archivos `.jsx` con scope global. `bundle.jsx` los concatena en orden de dependencias, inyecta los hooks de React y `THREE`, y protege los accesos a `window` para que el build de servidor no falle. Si editas los `.jsx` originales, vuelve a generar el bundle con el mismo orden.
-
-## SEO incluido
-
-- Meta `title`/`description` por ruta + Open Graph y Twitter Cards en el layout.
-- `sitemap.xml`, su copia `sitemap-1.xml`, `sitemap.txt` y `robots.txt` automáticos. Los tres sitemaps usan las mismas rutas; el de texto permite contrastar el resultado de un nuevo envío en Search Console con los XML existentes. Publicarlo no confirma que Google lo haya procesado.
-- `lang="es"`, URLs en español. El dominio se configura en `app/layout.js` y `scripts/gen-seo-files.mjs`.
-
-## Pendiente / mejora
-
-- El contenido textual se prerenderiza y React lo hidrata en el navegador. Three.js se inicializa en efectos del cliente. Comprueba con `npm run build` qué rutas se generan estáticamente; los metadatos y el contenido deben coincidir tanto al abrir una URL directamente como al navegar desde otra página.
-- Completar teléfonos, imágenes de ejemplo y enlaces sociales/legales antes de dar por terminada la publicación. Un sitemap válido permite descubrir URLs, pero no garantiza su indexación.
+La migración cambia la infraestructura de entrega. La lectura del sitemap en Search Console debe comprobarse después de publicar; un build correcto no demuestra que Google haya aceptado el sitemap.

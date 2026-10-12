@@ -2,17 +2,23 @@
   "name": "german-montenegro",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "astro dev",
+    "build": "astro build",
+    "start": "astro preview",
+    "test": "node scripts/verify-static-site.mjs",
     "prebuild": "node scripts/gen-seo-files.mjs"
   },
   "dependencies": {
-    "next": "14.2.15",
+    "@astrojs/react": "7.0.1",
+    "astro": "7.3.8",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "three": "0.149.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7"
   }
 }

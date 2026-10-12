@@ -1,10 +1,7 @@
 // Genera los sitemaps XML/texto y robots.txt en tiempo de build.
 //
-// Por que archivos y no app/sitemap.js: con @netlify/plugin-nextjs toda ruta,
-// incluidas /sitemap.xml y /robots.txt, pasa por la funcion serverless. En un
-// edge sin cache eso despierta una Lambda fria y arranca Next entero para
-// devolver 4 KB de XML. Googlebot rastrea desde muchos PoP y cada uno es un
-// miss. Un archivo en public/ lo sirve el CDN directo, sin funcion.
+// Astro copia public/ al build: estos archivos se sirven desde el CDN,
+// igual que las páginas HTML, sin runtime ni funciones serverless.
 //
 // La lista de rutas sale de lib/routes.js, la misma fuente que usa el sitio,
 // asi que no hay dos listas que mantener.

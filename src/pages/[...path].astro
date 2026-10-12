@@ -1,0 +1,21 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import SiteApp from '../../components/ClientApp.jsx';
+import { PAGE_TO_PATH } from '../../lib/routes.js';
+import { PAGE_SEO, HOME_TITLE, DEFAULT_DESCRIPTION } from '../../lib/seo.js';
+
+export function getStaticPaths() {
+  return Object.entries(PAGE_TO_PATH).map(([page, path]) => ({
+    params: { path: path === '/' ? undefined : path.slice(1) },
+    props: { page, path },
+  }));
+}
+
+const { page, path } = Astro.props;
+const seo = PAGE_SEO[page];
+const title = seo.title ? `${seo.title} | Germán Montenegro Fisioterapia Deportiva` : HOME_TITLE;
+const description = seo.description || DEFAULT_DESCRIPTION;
+---
+<SiteLayout title={title} description={description} path={path}>
+  <SiteApp page={page} client:load />
+</SiteLayout>

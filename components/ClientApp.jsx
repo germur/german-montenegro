@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { useRouter } from "next/navigation";
 import { App } from "./prototype/bundle.jsx";
 import { pageToPath } from "@/lib/routes";
 
@@ -35,11 +32,8 @@ class ErrorBoundary extends React.Component {
 }
 
 export default function ClientApp({ page = "home" }) {
-  const router = useRouter();
-
   const handleRouteChange = (nextPage) => {
-    // Load the route's server tree and metadata together with its content.
-    router.push(pageToPath(nextPage));
+    window.location.assign(pageToPath(nextPage));
   };
 
   return (
