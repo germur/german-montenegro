@@ -1,0 +1,49 @@
+---
+import '../styles/globals.css';
+import { SITE_URL, HOME_TITLE, DEFAULT_DESCRIPTION } from '../../lib/seo.js';
+
+const { title = HOME_TITLE, description = DEFAULT_DESCRIPTION, path = '/', noindex = false } = Astro.props;
+const canonical = path === '/' ? SITE_URL : new URL(path, SITE_URL).href;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content="fisioterapia deportiva Bogotá, fisioterapeuta deportivo Bogotá, lesiones deportivas, pubalgia, ciática, tendinitis, readaptación deportiva" />
+    <meta name="author" content="Germán Montenegro" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <meta name="google-site-verification" content="xyptqAjEss_aO6dTu81bKRRgfubvYQDeBGPj0cSrLM4" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content="Germán Montenegro Fisioterapia Deportiva" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('gm-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (_) {}
+    </script>
+  </head>
+  <body>
+    <main><slot /></main>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-E0CL52FNCX"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-E0CL52FNCX');
+    </script>
+  </body>
+</html>

@@ -1,21 +1,16 @@
-"use client";
 /* AUTO-GENERATED from Claude Design prototype. eslint-disable */
 /* eslint-disable */
 import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect, Fragment } from "react";
 import * as THREE from "three";
 import { pageToPath } from "@/lib/routes";
 
-// Enlaces reales: <a href> que Google puede rastrear, pero que siguen
-// navegando como SPA. Sin esto la navegacion era solo onClick y el sitio
-// no tenia un solo enlace interno rastreable.
+// Native links load each static document, including its own metadata.
 function navProps(page, onNavigate, after) {
   return {
     href: pageToPath(page),
     onClick: (e) => {
       // Respetar abrir en pestana nueva / clic central
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
-      e.preventDefault();
-      if (typeof onNavigate === 'function') onNavigate(page);
       if (typeof after === 'function') after();
     },
   };
@@ -1377,9 +1372,9 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
         }}>
           Diagnóstico preciso solo en valoración.
         </div>
-        <button
-          onClick={() => onNavigate('fisioterapia')}
-          style={{
+        <a
+          {...navProps('fisioterapia')}
+          style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
             background: '#0A0A0A',
             color: '#FFFFFF',
             border: 'none',
@@ -1404,7 +1399,7 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
         >
           Agendar valoración
           <span>→</span>
-        </button>
+        </a>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
@@ -2400,9 +2395,9 @@ function SiteFooter({ onNavigate }) {
             </h2>
           </div>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'flex-end' }} className="ft-cta-btns">
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#C9A55A', color: '#0A0A0A', border: 'none', padding: '1.25rem 2rem',
                 fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s',
@@ -2412,7 +2407,7 @@ function SiteFooter({ onNavigate }) {
               onMouseLeave={(e) => { e.currentTarget.style.background = '#C9A55A'; }}
             >
               Agendar valoración<span>→</span>
-            </button>
+            </a>
             <button
               style={{
                 background: 'transparent', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.25)',
@@ -2638,9 +2633,9 @@ function PubalgiaHero({ onNavigate }) {
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#0A0A0A',
                   color: '#FFFFFF',
                   border: 'none',
@@ -2667,7 +2662,7 @@ function PubalgiaHero({ onNavigate }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#checklist"
                 style={{
@@ -3329,9 +3324,9 @@ function PubalgiaChecklist({ onNavigate }) {
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <button
-                    onClick={() => onNavigate('fisioterapia')}
-                    style={{
+                  <a
+                    {...navProps('fisioterapia')}
+                    style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                       padding: '1.125rem 1.25rem',
                       background: hasRedFlag ? '#DC2626' : '#C9A55A',
                       color: hasRedFlag ? '#FFFFFF' : '#0A0A0A',
@@ -3352,7 +3347,7 @@ function PubalgiaChecklist({ onNavigate }) {
                     }}
                   >
                     {result.ctaLabel} →
-                  </button>
+                  </a>
                   <button
                     onClick={reset}
                     style={{
@@ -4763,9 +4758,9 @@ function PubalgiaCTA({ onNavigate }) {
             flexDirection: 'column',
             gap: '1rem',
           }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -4791,7 +4786,7 @@ function PubalgiaCTA({ onNavigate }) {
             >
               Agendar valoración
               <span>→</span>
-            </button>
+            </a>
             <button
               style={{
                 background: 'transparent',
@@ -4999,10 +4994,10 @@ function PubalgiaRelated({ onNavigate }) {
           border: '1px solid rgba(10,10,10,0.08)',
         }} className="rel-grid">
           {related.map((r, i) => (
-            <button
+            <a
               key={r.page}
-              onClick={() => onNavigate(r.page)}
-              style={{
+              {...navProps(r.page)}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 padding: '2rem',
                 background: '#FFFFFF',
                 border: 'none',
@@ -5090,7 +5085,7 @@ function PubalgiaRelated({ onNavigate }) {
                   →
                 </span>
               </div>
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -5203,9 +5198,9 @@ function CiaticaHero({ onNavigate }) {
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#0A0A0A',
                   color: '#FFFFFF',
                   border: 'none',
@@ -5232,7 +5227,7 @@ function CiaticaHero({ onNavigate }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#lasegue"
                 style={{
@@ -6032,9 +6027,9 @@ function CiaticaLasegue({ onNavigate }) {
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    onClick={() => onNavigate('fisioterapia')}
-                    style={{
+                  <a
+                    {...navProps('fisioterapia')}
+                    style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                       flex: 1,
                       padding: '1rem 1.25rem',
                       background: result.color === '#DC2626' ? '#DC2626' : '#C9A55A',
@@ -6052,7 +6047,7 @@ function CiaticaLasegue({ onNavigate }) {
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                   >
                     Agendar valoración →
-                  </button>
+                  </a>
                   <button
                     onClick={reset}
                     style={{
@@ -7427,9 +7422,9 @@ function CiaticaCTA({ onNavigate }) {
             flexDirection: 'column',
             gap: '1rem',
           }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -7451,7 +7446,7 @@ function CiaticaCTA({ onNavigate }) {
             >
               Agendar valoración
               <span>→</span>
-            </button>
+            </a>
             <button
               style={{
                 background: 'transparent',
@@ -7647,10 +7642,10 @@ function CiaticaRelated({ onNavigate }) {
           border: '1px solid rgba(10,10,10,0.08)',
         }} className="ci-rel-grid">
           {related.map((r, i) => (
-            <button
+            <a
               key={r.page}
-              onClick={() => onNavigate(r.page)}
-              style={{
+              {...navProps(r.page)}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 padding: '2rem',
                 background: '#FFFFFF',
                 border: 'none',
@@ -7728,7 +7723,7 @@ function CiaticaRelated({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                 }}>→</span>
               </div>
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -7840,9 +7835,9 @@ function TendinitisHero({ onNavigate }) {
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#0A0A0A',
                   color: '#FFFFFF',
                   border: 'none',
@@ -7869,7 +7864,7 @@ function TendinitisHero({ onNavigate }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#blazina"
                 style={{
@@ -8652,9 +8647,9 @@ function TendinitisBlazina({ onNavigate }) {
               </div>
             </div>
 
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 marginTop: 'auto',
                 padding: '1.125rem 1.5rem',
                 background: phase === 4 ? '#DC2626' : '#0A0A0A',
@@ -8687,7 +8682,7 @@ function TendinitisBlazina({ onNavigate }) {
             >
               {phase === 4 ? 'Atención inmediata' : 'Agendar valoración'}
               <span>→</span>
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -9800,9 +9795,9 @@ function TendinitisCTA({ onNavigate }) {
           </div>
 
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -9821,7 +9816,7 @@ function TendinitisCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >Agendar valoración<span>→</span></button>
+            >Agendar valoración<span>→</span></a>
             <button
               style={{
                 background: 'transparent',
@@ -10008,10 +10003,10 @@ function TendinitisRelated({ onNavigate }) {
           border: '1px solid rgba(10,10,10,0.08)',
         }} className="te-rel-grid">
           {related.map((r, i) => (
-            <button
+            <a
               key={r.page}
-              onClick={() => onNavigate(r.page)}
-              style={{
+              {...navProps(r.page)}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 padding: '2rem',
                 background: '#FFFFFF',
                 border: 'none',
@@ -10089,7 +10084,7 @@ function TendinitisRelated({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                 }}>→</span>
               </div>
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -10201,9 +10196,9 @@ function HombroHero({ onNavigate }) {
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#0A0A0A',
                   color: '#FFFFFF',
                   border: 'none',
@@ -10230,7 +10225,7 @@ function HombroHero({ onNavigate }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#rom-test"
                 style={{
@@ -10976,9 +10971,9 @@ function HombroROMTest({ onNavigate }) {
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                  <button
-                    onClick={() => onNavigate('fisioterapia')}
-                    style={{
+                  <a
+                    {...navProps('fisioterapia')}
+                    style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                       flex: 1,
                       padding: '1.125rem 1.25rem',
                       background: totalScore > 8 ? '#DC2626' : '#C9A55A',
@@ -10996,7 +10991,7 @@ function HombroROMTest({ onNavigate }) {
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                   >
                     Agendar valoración →
-                  </button>
+                  </a>
                   <button
                     onClick={reset}
                     style={{
@@ -12035,9 +12030,9 @@ function HombroCTA({ onNavigate }) {
             </p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -12056,7 +12051,7 @@ function HombroCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >Agendar valoración<span>→</span></button>
+            >Agendar valoración<span>→</span></a>
             <button
               style={{
                 background: 'transparent',
@@ -12196,10 +12191,10 @@ function HombroRelated({ onNavigate }) {
           border: '1px solid rgba(10,10,10,0.08)',
         }} className="ho-rel-grid">
           {related.map((r, i) => (
-            <button
+            <a
               key={r.page}
-              onClick={() => onNavigate(r.page)}
-              style={{
+              {...navProps(r.page)}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 padding: '2rem',
                 background: '#FFFFFF',
                 border: 'none',
@@ -12237,7 +12232,7 @@ function HombroRelated({ onNavigate }) {
                 <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>Ver protocolo</span>
                 <span data-rel="arrow" style={{ fontSize: '1.5rem', color: 'rgba(10,10,10,0.3)', transition: 'all 0.4s', fontFamily: 'Space Grotesk' }}>→</span>
               </div>
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -12370,9 +12365,9 @@ function DhHero({ data, onNavigate }) {
               {data.heroDesc}
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#C9A55A',
                   color: '#0A0A0A',
                   border: 'none',
@@ -12390,7 +12385,7 @@ function DhHero({ data, onNavigate }) {
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = '#FFFFFF'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = '#C9A55A'; }}
-              >Agendar valoración<span>→</span></button>
+              >Agendar valoración<span>→</span></a>
               <a
                 href="#lesiones-deporte"
                 style={{
@@ -12686,7 +12681,7 @@ function DhCTA({ data, onNavigate }) {
             <p style={{ fontSize: '1.125rem', lineHeight: 1.55, opacity: 0.85, maxWidth: '520px' }}>{data.ctaDesc}</p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button onClick={() => onNavigate('fisioterapia')} style={{ background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></button>
+            <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
             <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
           </div>
         </div>
@@ -13003,14 +12998,14 @@ function LpHero({ data, onNavigate }) {
               letterSpacing: '-0.04em', fontFamily: 'Space Grotesk', color: '#0A0A0A', marginBottom: '2.5rem',
             }}>{data.heroTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{data.heroSub}</span></h1>
             <p style={{ fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)', lineHeight: 1.55, color: 'rgba(10,10,10,0.65)', maxWidth: '620px', marginBottom: '2rem' }} dangerouslySetInnerHTML={{ __html: data.heroDesc }} />
-            <button onClick={() => onNavigate('fisioterapia')} style={{
+            <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
               background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.25rem 2rem',
               fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
               cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', gap: '0.75rem',
             }} onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A55A'; e.currentTarget.style.color = '#0A0A0A'; }}
                onMouseLeave={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#FFFFFF'; }}>
               Agendar valoración<span>→</span>
-            </button>
+            </a>
           </div>
 
           <div style={{ background: '#0A0A0A', color: '#FFFFFF', padding: '2.5rem', position: 'relative', overflow: 'hidden' }}>
@@ -13247,7 +13242,7 @@ function LpCTA({ data, onNavigate }) {
             <p style={{ fontSize: '1.125rem', lineHeight: 1.55, opacity: 0.85, maxWidth: '520px' }}>{data.ctaDesc}</p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button onClick={() => onNavigate('fisioterapia')} style={{ background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></button>
+            <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
             <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
           </div>
         </div>
@@ -13268,7 +13263,7 @@ function LpRelated({ data, onNavigate }) {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'rgba(10,10,10,0.08)', border: '1px solid rgba(10,10,10,0.08)' }} className="lp-rel-grid">
           {data.related.map((r, i) => (
-            <button key={i} onClick={() => onNavigate(r.page)} style={{ padding: '2rem', background: '#FFFFFF', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'all 0.4s', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '170px', color: 'inherit', fontFamily: 'inherit' }}
+            <a key={i} {...navProps(r.page)} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  padding: '2rem', background: '#FFFFFF', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'all 0.4s', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '170px', color: 'inherit', fontFamily: 'inherit' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.querySelectorAll('[data-rel]').forEach(el => { if (el.dataset.rel === 'name') el.style.color = '#FFFFFF'; if (el.dataset.rel === 'zone') el.style.color = '#C9A55A'; if (el.dataset.rel === 'arrow') { el.style.color = '#C9A55A'; el.style.transform = 'translateX(8px)'; } }); }}
               onMouseLeave={(e) => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.querySelectorAll('[data-rel]').forEach(el => { if (el.dataset.rel === 'name') el.style.color = '#0A0A0A'; if (el.dataset.rel === 'zone') el.style.color = 'rgba(10,10,10,0.5)'; if (el.dataset.rel === 'arrow') { el.style.color = 'rgba(10,10,10,0.3)'; el.style.transform = 'translateX(0)'; } }); }}>
               <div style={{ fontSize: '0.625rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(10,10,10,0.4)' }}>{r.tag}</div>
@@ -13278,7 +13273,7 @@ function LpRelated({ data, onNavigate }) {
                 <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>Ver</span>
                 <span data-rel="arrow" style={{ fontSize: '1.5rem', color: 'rgba(10,10,10,0.3)', transition: 'all 0.4s', fontFamily: 'Space Grotesk' }}>→</span>
               </div>
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -13758,14 +13753,14 @@ function SvHero({ data, onNavigate }) {
               color: 'rgba(10,10,10,0.65)', maxWidth: '620px', marginBottom: '2rem',
             }} dangerouslySetInnerHTML={{ __html: data.heroDesc }} />
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button onClick={() => onNavigate('fisioterapia')} style={{
+              <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.25rem 2rem',
                 fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', gap: '0.75rem',
               }} onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A55A'; e.currentTarget.style.color = '#0A0A0A'; }}
                  onMouseLeave={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#FFFFFF'; }}>
                 Agendar valoración<span>→</span>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -13978,7 +13973,7 @@ function SvCTA({ data, onNavigate }) {
             <p style={{ fontSize: '1.125rem', lineHeight: 1.55, opacity: 0.85, maxWidth: '520px' }}>{data.ctaDesc}</p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button onClick={() => onNavigate('fisioterapia')} style={{ background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></button>
+            <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
             <button style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</button>
           </div>
         </div>
@@ -14394,9 +14389,9 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#0A0A0A',
                   color: '#FFFFFF',
                   border: 'none',
@@ -14423,7 +14418,7 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#catalogo"
                 style={{
@@ -15242,9 +15237,9 @@ function LesionesMethodStrip({ onNavigate }) {
             }}>
               Sea pubalgia, ciática, tendinitis o cualquier otra — todas pasan por las cuatro fases del Método Indestructible. Sin atajos, sin saltarse pasos.
             </p>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: 'transparent',
                 color: '#0A0A0A',
                 border: '1px solid rgba(10,10,10,0.2)',
@@ -15267,7 +15262,7 @@ function LesionesMethodStrip({ onNavigate }) {
               }}
             >
               Ver método completo →
-            </button>
+            </a>
           </div>
 
           {/* Phases ribbon */}
@@ -15418,9 +15413,9 @@ function LesionesCTA({ onNavigate }) {
             flexDirection: 'column',
             gap: '1rem',
           }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#C9A55A',
                 color: '#0A0A0A',
                 border: 'none',
@@ -15448,7 +15443,7 @@ function LesionesCTA({ onNavigate }) {
             >
               Agendar valoración
               <span style={{ fontSize: '1rem' }}>→</span>
-            </button>
+            </a>
             <button
               style={{
                 background: 'transparent',
@@ -15668,9 +15663,9 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#C9A55A',
                   color: '#0A0A0A',
                   border: 'none',
@@ -15695,7 +15690,7 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
+              </a>
               <a
                 href="#catalogo-deportes"
                 style={{
@@ -16694,9 +16689,9 @@ function DeportesCTA({ onNavigate }) {
             flexDirection: 'column',
             gap: '1rem',
           }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -16724,7 +16719,7 @@ function DeportesCTA({ onNavigate }) {
             >
               Agendar valoración
               <span style={{ fontSize: '1rem' }}>→</span>
-            </button>
+            </a>
             <button
               style={{
                 background: 'transparent',
@@ -17485,9 +17480,9 @@ function MetCTA({ onNavigate }) {
             </p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#0A0A0A',
                 color: '#FFFFFF',
                 border: 'none',
@@ -17506,10 +17501,10 @@ function MetCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >Agendar valoración<span>→</span></button>
-            <button
-              onClick={() => onNavigate('sobre')}
-              style={{
+            >Agendar valoración<span>→</span></a>
+            <a
+              {...navProps('sobre')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: 'transparent',
                 color: '#0A0A0A',
                 border: '1px solid rgba(10,10,10,0.4)',
@@ -17524,7 +17519,7 @@ function MetCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}
-            >Conocer a Germán</button>
+            >Conocer a Germán</a>
           </div>
         </div>
       </div>
@@ -17668,9 +17663,9 @@ function SobreHero({ onNavigate }) {
               <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Por eso entiendo tu lesión desde adentro — la he vivido.</span>
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('fisioterapia')}
-                style={{
+              <a
+                {...navProps('fisioterapia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: '#C9A55A',
                   color: '#0A0A0A',
                   border: 'none',
@@ -17691,10 +17686,10 @@ function SobreHero({ onNavigate }) {
               >
                 Agendar valoración
                 <span>→</span>
-              </button>
-              <button
-                onClick={() => onNavigate('metodologia')}
-                style={{
+              </a>
+              <a
+                {...navProps('metodologia')}
+                style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                   background: 'transparent',
                   color: '#FFFFFF',
                   border: '1px solid rgba(255,255,255,0.2)',
@@ -17711,7 +17706,7 @@ function SobreHero({ onNavigate }) {
                 onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#FFFFFF'; }}
               >
                 Ver el método
-              </button>
+              </a>
             </div>
           </div>
 
@@ -18511,9 +18506,9 @@ function SobreCTA({ onNavigate }) {
             </p>
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#C9A55A',
                 color: '#0A0A0A',
                 border: 'none',
@@ -18532,10 +18527,10 @@ function SobreCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = '#C9A55A'; e.currentTarget.style.transform = 'translateY(0)'; }}
-            >Agendar valoración<span>→</span></button>
-            <button
-              onClick={() => onNavigate('metodologia')}
-              style={{
+            >Agendar valoración<span>→</span></a>
+            <a
+              {...navProps('metodologia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: 'transparent',
                 color: '#FFFFFF',
                 border: '1px solid rgba(255,255,255,0.2)',
@@ -18550,7 +18545,7 @@ function SobreCTA({ onNavigate }) {
               }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C9A55A'; e.currentTarget.style.color = '#C9A55A'; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#FFFFFF'; }}
-            >Conocer el método</button>
+            >Conocer el método</a>
           </div>
         </div>
       </div>
@@ -18567,7 +18562,7 @@ function SobreCTA({ onNavigate }) {
 /* ==================== app.jsx ==================== */
 
 function App({ initialPage = 'home', onRouteChange } = {}) {
-  // Next.js owns the route. Do not render another page before its metadata loads.
+  // Astro selects the page at build time; the browser loads a complete document.
   const currentPage = initialPage;
   const [scrollProgress, setScrollProgress] = useState(0);
   
@@ -18576,7 +18571,7 @@ function App({ initialPage = 'home', onRouteChange } = {}) {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight - windowHeight;
       const scrolled = window.scrollY;
-      const progress = (scrolled / documentHeight) * 100;
+      const progress = documentHeight > 0 ? (scrolled / documentHeight) * 100 : 0;
       setScrollProgress(progress);
     };
     
@@ -18745,9 +18740,9 @@ function Nav({ currentPage, onNavigate }) {
             </NavLink>
           ))}
           <ThemeToggle lightText={lightText} />
-          <button
-            onClick={() => onNavigate('fisioterapia')}
-            style={{
+          <a
+            {...navProps('fisioterapia')}
+            style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
               background: '#C9A55A', color: '#0A0A0A', border: 'none',
               padding: '0.75rem 1.375rem', fontSize: '0.6875rem', fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
@@ -18757,7 +18752,7 @@ function Nav({ currentPage, onNavigate }) {
             onMouseLeave={(e) => { e.currentTarget.style.background = '#C9A55A'; e.currentTarget.style.color = '#0A0A0A'; }}
           >
             Agendar
-          </button>
+          </a>
         </div>
 
         {/* Mobile controls */}
@@ -19107,9 +19102,9 @@ function HeroSection({ onNavigate }) {
             flexWrap: 'wrap',
             alignItems: 'center',
           }}>
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: '#C9A55A',
                 color: '#0A0A0A',
                 border: 'none',
@@ -19138,11 +19133,11 @@ function HeroSection({ onNavigate }) {
                 Agendar Valoración
                 <span style={{ fontSize: '1.25rem' }}>→</span>
               </span>
-            </button>
+            </a>
             
-            <button
-              onClick={() => onNavigate('fisioterapia')}
-              style={{
+            <a
+              {...navProps('fisioterapia')}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 background: 'transparent',
                 color: '#FFFFFF',
                 border: '1px solid rgba(255,255,255,0.2)',
@@ -19164,7 +19159,7 @@ function HeroSection({ onNavigate }) {
               }}
             >
               Conoce el método
-            </button>
+            </a>
             
             {/* Rating inline */}
             <div style={{
@@ -20000,9 +19995,9 @@ function SportsSection({ onNavigate }) {
               ))}
             </div>
             
-            <button
-              onClick={() => onNavigate(current.page)}
-              style={{
+            <a
+              {...navProps(current.page)}
+              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                 padding: '1.25rem 2.5rem',
                 background: '#C9A55A',
                 color: '#0A0A0A',
@@ -20023,7 +20018,7 @@ function SportsSection({ onNavigate }) {
               }}
             >
               Ver protocolo {current.name} →
-            </button>
+            </a>
           </div>
           
           {/* Injuries panel */}
@@ -21459,9 +21454,9 @@ function FisioTecnicas({ onNavigate }) {
               </div>
               
               {tecnicas[activeIdx].page && (
-                <button
-                  onClick={() => onNavigate(tecnicas[activeIdx].page)}
-                  style={{
+                <a
+                  {...navProps(tecnicas[activeIdx].page)}
+                  style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
                     marginTop: '2rem',
                     background: '#0A0A0A',
                     color: '#FFFFFF',
@@ -21483,7 +21478,7 @@ function FisioTecnicas({ onNavigate }) {
                 >
                   Ver página de {tecnicas[activeIdx].name}
                   <span>→</span>
-                </button>
+                </a>
               )}
             </div>
           </div>
