@@ -31,6 +31,6 @@ Las URLs y el dominio canónico `https://germanmontenegro.fit` se conservan. `ww
 
 ## Despliegue
 
-Netlify usa `npm run build && npm test`, Node 24 y la carpeta `dist`. No requiere el plugin de Next ni un adaptador de servidor de Astro. Las pruebas de navegación y diseño en escritorio y móvil complementan las comprobaciones del build.
+Netlify usa `npm run build && npm test`, Node 24 y la carpeta `dist`. `NETLIFY_NEXT_PLUGIN_SKIP=true` desactiva la ejecución del runtime de Next heredado de la configuración del proyecto en Netlify. Astro no necesita un adaptador de servidor. Las pruebas de navegación y diseño en escritorio y móvil complementan las comprobaciones del build.
 
 La migración cambia la infraestructura de entrega. La lectura del sitemap en Search Console debe comprobarse después de publicar; un build correcto no demuestra que Google haya aceptado el sitemap.
