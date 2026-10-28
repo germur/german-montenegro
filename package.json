@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "start": "astro preview",
-    "test": "node scripts/verify-static-site.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
+    "test": "node scripts/verify-static-site.mjs && node scripts/verify-experience.mjs && node scripts/verify-internal-links.mjs && node scripts/verify-stat-copy.mjs",
     "prebuild": "node scripts/gen-seo-files.mjs"
   },
   "dependencies": {

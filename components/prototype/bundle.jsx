@@ -1,9 +1,25 @@
 /* AUTO-GENERATED from Claude Design prototype. eslint-disable */
 /* eslint-disable */
 import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect, Fragment } from "react";
+import { HomeExperience, AboutExperience, PhysioExperience, InjuryCatalogExperience, SportCatalogExperience, InjuryExperience, SportExperience, ServiceExperience } from "../site/Experience.jsx";
 import * as THREE from "three";
 import { pageToPath } from "@/lib/routes";
 import { PHONE_DISPLAY, PHONE_HREF, WHATSAPP_URL } from "@/lib/contact";
+
+
+// Keep complete explanations in static HTML while foregrounding their main point.
+function DensePassage({children, dangerouslySetInnerHTML, style, className = '', ...props}) {
+  const textOf = value => typeof value === 'string' || typeof value === 'number' ? String(value) : Array.isArray(value) ? value.map(textOf).join('') : React.isValidElement(value) ? textOf(value.props.children) : '';
+  const text = (dangerouslySetInnerHTML ? dangerouslySetInnerHTML.__html.replace(/<[^>]*>/g,'') : textOf(children)).replace(/\s+/g,' ').trim();
+  const sentence = text.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim();
+  if (!sentence || text.length < 170 || sentence.length >= text.length - 25) return <p style={style} {...props} dangerouslySetInnerHTML={dangerouslySetInnerHTML}>{dangerouslySetInnerHTML ? undefined : children}</p>;
+  return <div className={'gm-dense-passage '+className} style={style} {...props}><p className="gm-dense-key">{sentence}</p><details><summary>Leer la explicación completa <span aria-hidden="true">＋</span></summary><div className="gm-dense-content">{dangerouslySetInnerHTML ? <p dangerouslySetInnerHTML={dangerouslySetInnerHTML}/> : <p>{children}</p>}</div></details></div>;
+}
+
+function GuideIcon({kind='focus'}) {
+  const paths={focus:'M12 3v4m0 10v4M3 12h4m10 0h4M8 8h8v8H8z',load:'M4 8v8m4-10v12m8-12v12m4-10v8M8 12h8',move:'M5 17 10 12l4 3 5-9M14 6h5v5',time:'M12 8v4l3 2M20 12a8 8 0 1 1-8-8',care:'M12 5v14M5 12h14'};
+  return <span className="gm-guide-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={paths[kind]||paths.focus}/></svg></span>;
+}
 
 // Native links load each static document, including its own metadata.
 function navProps(page, onNavigate, after) {
@@ -68,11 +84,11 @@ function Sport3DIcon({ kind, size = 200 }) {
     if (kind === 'boxeo') {
       // Main mitt (egg-shaped fist, side profile)
       add(new THREE.SphereGeometry(1.05, 18, 14), 0, 0.5, 0, null, false, 1.05, 1.15, 0.95);
-      // Curled fingers — rounded front bulge
+      // Curled fingers, rounded front bulge
       add(new THREE.SphereGeometry(0.66, 14, 12), 0.55, 0.95, 0.15, null, false, 1, 1.15, 0.95);
       // Groove between fingers and thumb
       add(new THREE.TorusGeometry(0.5, 0.07, 8, 24), 0.35, 0.45, 0.6, [0.5, 0, 0.2], true);
-      // Thumb — capsule sticking out front-low
+      // Thumb, capsule sticking out front-low
       add(new THREE.SphereGeometry(0.4, 12, 10), 0.92, 0.05, 0.35, null, false, 1.3, 1, 1);
       // Wrist cuff
       add(new THREE.CylinderGeometry(0.7, 0.82, 0.9, 16), -0.15, -0.95, 0, [0, 0, 0.12], false);
@@ -83,7 +99,7 @@ function Sport3DIcon({ kind, size = 200 }) {
       // asi lee como cinturon y no como platillo. (Antes eran dos tiras
       // sueltas formando una T, que es justo lo que no parecia.)
       add(new THREE.TorusGeometry(0.95, 0.15, 10, 44), 0, 0, 0, [1.57, 0, 0], false);
-      // Nudo central al frente — dos lazos cruzados sobre la banda
+      // Nudo central al frente, dos lazos cruzados sobre la banda
       add(new THREE.BoxGeometry(0.46, 0.46, 0.24), 0, 0, 0.93, [0, 0, 0.28], false);
       add(new THREE.BoxGeometry(0.46, 0.46, 0.2), 0, 0, 0.98, [0, 0, -0.28], false);
       // Puntas colgando del nudo
@@ -95,7 +111,7 @@ function Sport3DIcon({ kind, size = 200 }) {
     } else if (kind === 'weightlifting') {
       // Bar
       add(new THREE.CylinderGeometry(0.1, 0.1, 4.0, 12), 0, 0, 0, [0, 0, HALF], false);
-      // Plates — pairs each side
+      // Plates, pairs each side
       add(new THREE.CylinderGeometry(0.95, 0.95, 0.22, 22), -1.35, 0, 0, [0, 0, HALF], false);
       add(new THREE.CylinderGeometry(0.72, 0.72, 0.22, 22), -1.62, 0, 0, [0, 0, HALF], false);
       add(new THREE.CylinderGeometry(0.95, 0.95, 0.22, 22), 1.35, 0, 0, [0, 0, HALF], false);
@@ -108,7 +124,7 @@ function Sport3DIcon({ kind, size = 200 }) {
       add(new THREE.SphereGeometry(1.05, 18, 14), 0, -0.45, 0, null, false, 1, 0.9, 1);
       // Flat shoulder of the bell
       add(new THREE.CylinderGeometry(0.6, 0.82, 0.32, 18), 0, 0.32, 0, null, true);
-      // Handle — two posts + top bar (clear squared kettlebell handle)
+      // Handle, two posts + top bar (clear squared kettlebell handle)
       add(new THREE.BoxGeometry(0.2, 0.72, 0.22), -0.52, 0.82, 0, [0, 0, 0.14], false);
       add(new THREE.BoxGeometry(0.2, 0.72, 0.22), 0.52, 0.82, 0, [0, 0, -0.14], false);
       add(new THREE.BoxGeometry(1.32, 0.22, 0.24), 0, 1.18, 0, null, false);
@@ -151,20 +167,19 @@ function Sport3DIcon({ kind, size = 200 }) {
 }
 
 /* ==================== body-map.jsx ==================== */
-// BODY MAP 3D - Interactive wireframe humanoid with Three.js
-// Drag to rotate, click on gold hotspots to see related injuries.
+// BODY MAP 2D - Accessible front and back silhouette
+// Select a body point or a named zone to see related injuries.
 
 // =====================================================================
 // MAIN SECTION
 // =====================================================================
 function BodyMapSection({ onNavigate }) {
   const [activeZone, setActiveZone] = React.useState(null);
-  const [hoveredZone, setHoveredZone] = React.useState(null);
-  const [isDragging, setIsDragging] = React.useState(false);
+  const [bodyView, setBodyView] = React.useState("front");
   const infoRef = React.useRef(null);
   const activeRef = React.useRef(null);
 
-  // Identidad estable: el canvas 3D captura esta funcion una sola vez.
+  // Identidad estable: el mapa conserva esta funcion una sola vez.
   const handleSelect = React.useCallback((id) => {
     const next = activeRef.current === id ? null : id;
     activeRef.current = next;
@@ -176,7 +191,7 @@ function BodyMapSection({ onNavigate }) {
     }
   }, []);
 
-  // Unified zone data (no front/back tabs in 3D, rotate instead)
+  // Shared zone data for front and back views
   const zones = [
     { id: 'cuello',    label: 'Cuello / Cervical',   pos: [0,    2.30, -0.18],
       injuries: [
@@ -267,834 +282,23 @@ function BodyMapSection({ onNavigate }) {
   const activeZoneData = activeZone ? zones.find(z => z.id === activeZone) : null;
   const sevColor = (s) => s === 'Alta' ? '#DC2626' : s === 'Media' ? '#C9A55A' : '#16A34A';
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#0A0A0A',
-      color: '#FFFFFF',
-      borderTop: '1px solid rgba(255,255,255,0.05)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Background giant text */}
-      <div style={{
-        position: 'absolute',
-        right: '-3%',
-        top: '-2rem',
-        fontSize: 'clamp(10rem, 22vw, 22rem)',
-        fontFamily: 'Space Grotesk',
-        fontWeight: 700,
-        color: 'rgba(201,165,90,0.05)',
-        lineHeight: 0.85,
-        letterSpacing: '-0.05em',
-        whiteSpace: 'nowrap',
-        pointerEvents: 'none',
-      }}>
-        DÓNDE.
-      </div>
-
-      <div className="container" style={{ position: 'relative' }}>
-        {/* Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '4rem',
-          marginBottom: '4rem',
-          alignItems: 'flex-end',
-        }} className="bm-header">
-          <div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              marginBottom: '1.5rem',
-            }}>
-              <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-              <div style={{
-                fontSize: '0.75rem',
-                color: '#C9A55A',
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                fontWeight: 600,
-              }}>
-                Diagnóstico interactivo · 3D
-              </div>
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(2.5rem, 5.5vw, 4.5rem)',
-              fontWeight: 700,
-              lineHeight: 0.95,
-              letterSpacing: '-0.03em',
-              fontFamily: 'Space Grotesk',
-            }}>
-              Marca
-              <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
-                dónde te duele.
-              </span>
-            </h2>
-          </div>
-
-          <p style={{
-            fontSize: '1.0625rem',
-            color: 'rgba(255,255,255,0.65)',
-            lineHeight: 1.6,
-            maxWidth: '440px',
-          }}>
-            Arrastra para rotar el cuerpo. Toca un punto dorado y te digo qué lesiones suelen estar detrás de ese dolor — y a cuál protocolo ir.
-          </p>
-        </div>
-
-        {/* Main interactive layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '0',
-          border: '1px solid rgba(255,255,255,0.08)',
-          background: '#0F0F0F',
-        }} className="bm-grid">
-          {/* LEFT: 3D Canvas */}
-          <div style={{
-            position: 'relative',
-            background: 'radial-gradient(ellipse at center, rgba(201,165,90,0.06) 0%, transparent 60%)',
-            borderRight: '1px solid rgba(255,255,255,0.08)',
-            minHeight: '720px',
-            overflow: 'hidden',
-          }} className="bm-canvas-wrap">
-            <BodyMap3DCanvas
-              zones={zones}
-              activeZone={activeZone}
-              onSelectZone={handleSelect}
-              onHoverZone={setHoveredZone}
-              onDragChange={setIsDragging}
-            />
-
-            {/* Top-right reset button */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('bm3d:reset'))}
-              style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '1.25rem',
-                background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(8px)',
-                color: 'rgba(255,255,255,0.7)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                padding: '0.625rem 1rem',
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                fontFamily: 'Space Grotesk',
-                transition: 'all 0.3s',
-                zIndex: 5,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#C9A55A';
-                e.currentTarget.style.color = '#C9A55A';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-              }}
-            >
-              ↺ Resetear
-            </button>
-
-            {/* Top-left meta */}
-            <div style={{
-              position: 'absolute',
-              top: '1.25rem',
-              left: '1.25rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.375rem',
-              zIndex: 5,
-              pointerEvents: 'none',
-            }}>
-              <div style={{
-                fontSize: '0.6875rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-                color: '#C9A55A',
-              }}>
-                Cuerpo · Humanoide
-              </div>
-              <div style={{
-                fontSize: '0.6875rem',
-                color: 'rgba(255,255,255,0.4)',
-                fontFamily: 'Space Grotesk',
-                letterSpacing: '0.1em',
-              }}>
-                {zones.length} zonas · {zones.reduce((s, z) => s + z.injuries.length, 0)} dx
-              </div>
-            </div>
-
-            {/* Hover label */}
-            {hoveredZone && !activeZone && (
-              <div style={{
-                position: 'absolute',
-                bottom: '4rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: '#0A0A0A',
-                border: '1px solid #C9A55A',
-                padding: '0.625rem 1.25rem',
-                fontSize: '0.75rem',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-                color: '#FFFFFF',
-                fontFamily: 'Space Grotesk',
-                whiteSpace: 'nowrap',
-                pointerEvents: 'none',
-                zIndex: 5,
-                animation: 'bmLabelIn 0.2s ease-out',
-              }}>
-                {zones.find(z => z.id === hoveredZone)?.label}
-              </div>
-            )}
-
-            {/* Bottom hint */}
-            <div style={{
-              position: 'absolute',
-              bottom: '1.25rem',
-              left: 0,
-              right: 0,
-              textAlign: 'center',
-              fontSize: '0.6875rem',
-              letterSpacing: '0.25em',
-              textTransform: 'uppercase',
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.35)',
-              fontFamily: 'Space Grotesk',
-              pointerEvents: 'none',
-              zIndex: 5,
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              alignItems: 'center',
-            }}>
-              {activeZone ? (
-                <span style={{ color: '#C9A55A' }}>✓ Zona seleccionada</span>
-              ) : isDragging ? (
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Rotando…</span>
-              ) : (
-                <>
-                  <span>⊕</span>
-                  <span className="bm-hint-text">Arrastra para rotar · Toca un punto dorado</span>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: Info panel */}
-          <div style={{
-            padding: '3rem',
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '720px',
-          }} className="bm-info" ref={infoRef}>
-            {!activeZoneData ? (
-              <BodyMapEmpty />
-            ) : (
-              <BodyMapDetail
-                zone={activeZoneData}
-                onNavigate={onNavigate}
-                sevColor={sevColor}
-                onClose={() => { activeRef.current = null; setActiveZone(null); }}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Selector de zonas por nombre — accesible, indexable y a prueba de dedos */}
-        <div className="bm-zones">
-          <div className="bm-zones-label">O elige la zona directamente</div>
-          <div className="bm-zones-list">
-            {zones.map(z => {
-              const on = activeZone === z.id;
-              return (
-                <button
-                  key={z.id}
-                  type="button"
-                  onClick={() => handleSelect(z.id)}
-                  onMouseEnter={() => setHoveredZone(z.id)}
-                  onMouseLeave={() => setHoveredZone(null)}
-                  aria-pressed={on}
-                  className={'bm-zone-chip' + (on ? ' is-on' : '')}
-                >
-                  {z.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Footer disclaimer */}
-        <div style={{
-          marginTop: '2rem',
-          padding: '1.25rem 1.5rem',
-          background: 'rgba(255,255,255,0.03)',
-          borderLeft: '2px solid #C9A55A',
-          fontSize: '0.875rem',
-          lineHeight: 1.55,
-          color: 'rgba(255,255,255,0.6)',
-          maxWidth: '900px',
-        }}>
-          <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>Esto es orientación, no diagnóstico.</strong> Las lesiones reales requieren evaluación presencial. Si tienes dolor agudo, fiebre, pérdida de fuerza o entumecimiento progresivo, agenda valoración inmediatamente.
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes bmLabelIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        .bm-zones { margin-top: 1.75rem; }
-        .bm-zones-label {
-          font-size: 0.6875rem; letter-spacing: 0.25em; text-transform: uppercase;
-          font-weight: 700; color: rgba(255,255,255,0.4); margin-bottom: 0.875rem;
-        }
-        .bm-zones-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .bm-zone-chip {
-          appearance: none;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.12);
-          color: rgba(255,255,255,0.75);
-          font-family: Space Grotesk, sans-serif;
-          font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.02em;
-          padding: 0.75rem 1rem;
-          min-height: 44px;
-          cursor: pointer;
-          transition: border-color 0.2s, color 0.2s, background 0.2s;
-          -webkit-tap-highlight-color: transparent;
-        }
-        .bm-zone-chip:hover, .bm-zone-chip:focus-visible {
-          border-color: #C9A55A; color: #C9A55A; outline: none;
-        }
-        .bm-zone-chip.is-on {
-          border-color: #C9A55A; background: #C9A55A; color: #0A0A0A;
-        }
-        @media (max-width: 900px) {
-          .bm-header { grid-template-columns: 1fr !important; }
-          .bm-grid { grid-template-columns: 1fr !important; }
-          .bm-canvas-wrap { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); min-height: 440px !important; }
-          .bm-info { min-height: auto !important; padding: 2rem !important; scroll-margin-top: 5rem; }
-          .bm-hint-text { font-size: 0.625rem; letter-spacing: 0.15em; }
-          .bm-zones-list { gap: 0.4375rem; }
-          .bm-zone-chip { font-size: 0.75rem; padding: 0.6875rem 0.875rem; }
-        }
-      ` }} />
-    </section>
-  );
+  return <section className="gm-body-section"><div className="container">
+    <div className="gm-section-label">EXPLORA POR ZONA</div><h2>¿Dónde te duele?</h2><p className="gm-body-intro">Selecciona una zona para conocer las lesiones relacionadas y cómo podemos ayudarte.</p>
+    <div className="gm-body-layout"><div className="gm-body-map">
+      <div className="gm-body-tabs" role="group" aria-label="Vista del cuerpo">{[['front','De frente'],['back','De espalda']].map(([view,label])=><button key={view} aria-pressed={bodyView===view} onClick={()=>setBodyView(view)}>{label}</button>)}</div>
+      <div className="gm-body-figure"><svg viewBox="0 0 260 560" aria-hidden="true" focusable="false">
+        <ellipse cx="130" cy="541" rx="72" ry="9" fill="#e6e9e5"/>
+        <path d="M130 24 C108 24 104 42 107 61 C109 76 117 82 119 85 L119 103 C102 110 84 108 75 124 C67 139 62 179 55 215 L43 282 C39 301 44 317 52 318 C60 319 64 309 67 294 L79 232 L92 179 L93 247 C90 267 91 283 101 303 L99 383 L95 496 L89 521 Q91 530 108 529 L119 522 L127 399 L130 325 L133 399 L141 522 L152 529 Q169 530 171 521 L165 496 L161 383 L159 303 C169 283 170 267 167 247 L168 179 L181 232 L193 294 C196 309 200 319 208 318 C216 317 221 301 217 282 L205 215 C198 179 193 139 185 124 C176 108 158 110 141 103 L141 85 C143 82 151 76 153 61 C156 42 152 24 130 24 Z" fill="#dedbd5" stroke="#817768" strokeWidth="1.5"/>
+        {bodyView==='front'?<g fill="none" stroke="#b7afa1" strokeWidth="1.5"><path d="M100 142 Q115 156 130 147 Q145 156 160 142 M130 150 L130 243 M105 201 Q130 215 155 201 M103 276 Q130 292 157 276"/></g>:<g fill="none" stroke="#b7afa1" strokeWidth="1.5"><path d="M130 110 L130 268 M105 136 Q103 164 123 179 M155 136 Q157 164 137 179 M102 280 Q117 300 130 285 Q143 300 158 280"/></g>}
+      </svg>{zones.filter(z=>bodyView==='back'?['cuello','lumbar','gluteo-d','gluteo-i','isquio-d','isquio-i'].includes(z.id):!['lumbar','gluteo-d','gluteo-i','isquio-d','isquio-i'].includes(z.id)).map(z=>{
+        const points={'cuello':[50,18],'hombro-d':[31,25],'hombro-i':[69,25],'codo-d':[24,40],'codo-i':[76,40],'lumbar':[50,43],'ingle':[50,53],'gluteo-d':[43,51],'gluteo-i':[57,51],'isquio-d':[42,65],'isquio-i':[58,65],'rodilla-d':[42,73],'rodilla-i':[58,73],'tibia':[42,84]};const [x,y]=points[z.id];
+        return <button key={z.id} className="gm-body-point" aria-label={z.label} aria-pressed={activeZone===z.id} title={z.label} style={{left:x+'%',top:y+'%'}} onClick={()=>handleSelect(z.id)}><span aria-hidden="true">＋</span></button>;
+      })}</div><p className="gm-body-caption">Toca un punto o elige una zona abajo.</p>
+      <div className="gm-body-zones">{zones.map(z=><button key={z.id} aria-pressed={activeZone===z.id} onClick={()=>{setBodyView(['lumbar','gluteo-d','gluteo-i','isquio-d','isquio-i'].includes(z.id)?'back':'front');handleSelect(z.id);}}>{z.label}{/-[di]$/.test(z.id)&&!/(derecho|izquierdo)/.test(z.label)?(z.id.endsWith('-d')?' · derecho':' · izquierdo'):''}</button>)}</div>
+    </div><div className="bm-info gm-body-detail" ref={infoRef} aria-live="polite">{activeZoneData?<BodyMapDetail zone={activeZoneData} onNavigate={onNavigate} sevColor={sevColor} onClose={()=>{activeRef.current=null;setActiveZone(null);}}/>:<BodyMapEmpty/>}</div></div>
+  </div></section>;
 }
 
-// =====================================================================
-// THREE.JS CANVAS COMPONENT
-// =====================================================================
-function BodyMap3DCanvas({ zones, activeZone, onSelectZone, onHoverZone, onDragChange }) {
-  const mountRef = React.useRef(null);
-  const stateRef = React.useRef({});
-
-  // Keep activeZone reachable from animate loop
-  React.useEffect(() => {
-    stateRef.current.activeZone = activeZone;
-  }, [activeZone]);
-
-  React.useEffect(() => {
-    const mount = mountRef.current;
-    if (!mount) return;
-
-    // ---- Scene setup ----
-    const w = mount.clientWidth || 480;
-    const h = mount.clientHeight || 560;
-    const isTouch = typeof window !== 'undefined' &&
-      (window.matchMedia('(hover: none)').matches || 'ontouchstart' in window);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-    camera.position.set(0, 0.5, 6.2);
-    camera.lookAt(0, 0.5, 0);
-
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    } catch (err) { console.warn('WebGL not available for body map:', err); return; }
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouch ? 1.5 : 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.domElement.style.display = 'block';
-    renderer.domElement.style.cursor = 'grab';
-    mount.appendChild(renderer.domElement);
-
-    // ---- Figure ----
-    const figureGroup = new THREE.Group();
-    scene.add(figureGroup);
-
-    const edgeMat = new THREE.LineBasicMaterial({
-      color: 0xC9A55A,
-      transparent: true,
-      opacity: 0.75,
-    });
-    const fillMat = new THREE.MeshBasicMaterial({
-      color: 0x1A1714,
-      transparent: true,
-      opacity: 0.85,
-    });
-
-    const bodyMeshes = [];
-
-    function addPart(geo, x, y, z, ry) {
-      // Fill mesh (silhouette)
-      const fill = new THREE.Mesh(geo, fillMat);
-      fill.position.set(x, y, z);
-      if (ry) fill.rotation.y = ry;
-      figureGroup.add(fill);
-      bodyMeshes.push(fill);
-
-      // Edges
-      const edges = new THREE.EdgesGeometry(geo, 18);
-      const lines = new THREE.LineSegments(edges, edgeMat);
-      lines.position.set(x, y, z);
-      if (ry) lines.rotation.y = ry;
-      figureGroup.add(lines);
-    }
-
-    // HEAD
-    addPart(new THREE.SphereGeometry(0.32, 12, 10), 0, 2.55, 0);
-    // NECK
-    addPart(new THREE.CylinderGeometry(0.11, 0.13, 0.2, 10), 0, 2.20, 0);
-    // SHOULDERS bar (cylinder horizontal)
-    addPart(new THREE.CylinderGeometry(0.14, 0.14, 1.05, 12), 0, 2.05, 0, 0);
-    figureGroup.children.slice(-2).forEach(c => c.rotation.z = Math.PI / 2);
-    // TORSO upper
-    addPart(new THREE.CylinderGeometry(0.45, 0.42, 0.55, 12), 0, 1.75, 0);
-    // TORSO mid
-    addPart(new THREE.CylinderGeometry(0.42, 0.36, 0.55, 12), 0, 1.25, 0);
-    // WAIST
-    addPart(new THREE.CylinderGeometry(0.36, 0.40, 0.4, 12), 0, 0.85, 0);
-    // PELVIS
-    addPart(new THREE.CylinderGeometry(0.40, 0.32, 0.4, 12), 0, 0.50, 0);
-
-    // SHOULDER joints
-    addPart(new THREE.SphereGeometry(0.15, 10, 8), -0.55, 2.05, 0);
-    addPart(new THREE.SphereGeometry(0.15, 10, 8),  0.55, 2.05, 0);
-
-    // UPPER ARMS
-    addPart(new THREE.CylinderGeometry(0.11, 0.10, 0.78, 10), -0.55, 1.65, 0);
-    addPart(new THREE.CylinderGeometry(0.11, 0.10, 0.78, 10),  0.55, 1.65, 0);
-
-    // ELBOWS
-    addPart(new THREE.SphereGeometry(0.11, 10, 8), -0.55, 1.25, 0);
-    addPart(new THREE.SphereGeometry(0.11, 10, 8),  0.55, 1.25, 0);
-
-    // FOREARMS
-    addPart(new THREE.CylinderGeometry(0.10, 0.085, 0.78, 10), -0.55, 0.85, 0);
-    addPart(new THREE.CylinderGeometry(0.10, 0.085, 0.78, 10),  0.55, 0.85, 0);
-
-    // WRISTS / Hands
-    addPart(new THREE.SphereGeometry(0.13, 10, 8), -0.55, 0.42, 0);
-    addPart(new THREE.SphereGeometry(0.13, 10, 8),  0.55, 0.42, 0);
-
-    // HIP joints
-    addPart(new THREE.SphereGeometry(0.13, 10, 8), -0.22, 0.30, 0);
-    addPart(new THREE.SphereGeometry(0.13, 10, 8),  0.22, 0.30, 0);
-
-    // UPPER LEGS
-    addPart(new THREE.CylinderGeometry(0.17, 0.14, 0.90, 12), -0.22, -0.15, 0);
-    addPart(new THREE.CylinderGeometry(0.17, 0.14, 0.90, 12),  0.22, -0.15, 0);
-
-    // KNEES
-    addPart(new THREE.SphereGeometry(0.14, 10, 8), -0.22, -0.62, 0);
-    addPart(new THREE.SphereGeometry(0.14, 10, 8),  0.22, -0.62, 0);
-
-    // LOWER LEGS
-    addPart(new THREE.CylinderGeometry(0.13, 0.09, 0.85, 12), -0.22, -1.08, 0);
-    addPart(new THREE.CylinderGeometry(0.13, 0.09, 0.85, 12),  0.22, -1.08, 0);
-
-    // ANKLES + FEET
-    addPart(new THREE.SphereGeometry(0.10, 8, 6), -0.22, -1.52, 0);
-    addPart(new THREE.SphereGeometry(0.10, 8, 6),  0.22, -1.52, 0);
-    addPart(new THREE.BoxGeometry(0.18, 0.10, 0.36),  -0.22, -1.60, 0.10);
-    addPart(new THREE.BoxGeometry(0.18, 0.10, 0.36),   0.22, -1.60, 0.10);
-
-    // ---- Floor disc (subtle shadow) ----
-    const discGeo = new THREE.RingGeometry(0.4, 1.4, 48);
-    const discMat = new THREE.MeshBasicMaterial({
-      color: 0xC9A55A,
-      transparent: true,
-      opacity: 0.08,
-      side: THREE.DoubleSide,
-    });
-    const disc = new THREE.Mesh(discGeo, discMat);
-    disc.position.y = -1.72;
-    disc.rotation.x = -Math.PI / 2;
-    scene.add(disc);
-
-    // Inner disc dot
-    const dotGeo = new THREE.CircleGeometry(0.4, 32);
-    const dotMat = new THREE.MeshBasicMaterial({
-      color: 0xC9A55A,
-      transparent: true,
-      opacity: 0.04,
-      side: THREE.DoubleSide,
-    });
-    const dot = new THREE.Mesh(dotGeo, dotMat);
-    dot.position.y = -1.72;
-    dot.rotation.x = -Math.PI / 2;
-    scene.add(dot);
-
-    // ---- Hotspots ----
-    const hotspotMeshes = [];
-    const hitMeshes = [];
-    const ringMeshes = [];
-    const labelGroup = new THREE.Group();
-    scene.add(labelGroup);
-
-    zones.forEach((zone, i) => {
-      // Core sphere
-      const coreGeo = new THREE.SphereGeometry(0.085, 14, 10);
-      const coreMat = new THREE.MeshBasicMaterial({
-        color: 0xC9A55A,
-        transparent: true,
-        opacity: 0.95,
-      });
-      const core = new THREE.Mesh(coreGeo, coreMat);
-      core.position.set(...zone.pos);
-      core.userData = { id: zone.id, label: zone.label, kind: 'hotspot', phase: i * 0.4 };
-      figureGroup.add(core);
-      hotspotMeshes.push(core);
-
-      // Hit proxy invisible — area de toque ~44px, no se puede tocar un punto de 8px
-      const hitGeo = new THREE.SphereGeometry(0.30, 10, 8);
-      const hitMat = new THREE.MeshBasicMaterial({
-        transparent: true, opacity: 0, depthWrite: false, colorWrite: false,
-      });
-      const hit = new THREE.Mesh(hitGeo, hitMat);
-      hit.position.set(...zone.pos);
-      hit.userData = { id: zone.id, kind: 'hit' };
-      figureGroup.add(hit);
-      hitMeshes.push(hit);
-
-      // Outer glow sphere
-      const glowGeo = new THREE.SphereGeometry(0.14, 12, 8);
-      const glowMat = new THREE.MeshBasicMaterial({
-        color: 0xC9A55A,
-        transparent: true,
-        opacity: 0.18,
-      });
-      const glow = new THREE.Mesh(glowGeo, glowMat);
-      glow.position.set(...zone.pos);
-      glow.userData = { id: zone.id, kind: 'glow' };
-      figureGroup.add(glow);
-
-      // Pulse ring (billboards to camera)
-      const ringG = new THREE.RingGeometry(0.10, 0.13, 24);
-      const ringM = new THREE.MeshBasicMaterial({
-        color: 0xC9A55A,
-        transparent: true,
-        opacity: 0.5,
-        side: THREE.DoubleSide,
-      });
-      const ring = new THREE.Mesh(ringG, ringM);
-      ring.position.set(...zone.pos);
-      ring.userData = { id: zone.id, kind: 'ring', phase: i * 0.4 };
-      figureGroup.add(ring);
-      ringMeshes.push(ring);
-    });
-
-    // ---- Interaction state ----
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragMoveDist = 0;
-    let pointerDown = false;
-
-    let targetRotY = 0;
-    let targetRotX = 0;
-    let currentRotY = 0;
-    let currentRotX = 0;
-    let lastInteractionTime = performance.now();
-
-    const mouse = new THREE.Vector2(-100, -100);
-    const raycaster = new THREE.Raycaster();
-    let hoveredId = null;
-
-    // ---- Event handlers ----
-    function getPointer(e) {
-      if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      if (e.changedTouches && e.changedTouches[0]) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-      return { x: e.clientX, y: e.clientY };
-    }
-
-    let pointerIsTouch = false;
-    let gestureLocked = false;
-    let gestureIsScroll = false;
-
-    const tmpVec = new THREE.Vector3();
-
-    // Normaliza la posicion del puntero a coordenadas de clip (-1..1)
-    function setMouseFrom(e) {
-      const rect = renderer.domElement.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const p = getPointer(e);
-      mouse.x = ((p.x - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((p.y - rect.top) / rect.height) * 2 + 1;
-    }
-
-    // Devuelve el id de zona bajo el puntero, descartando hotspots
-    // que quedan detras del cuerpo (antes se podia clickear a traves del torso)
-    function pickZone() {
-      if (mouse.x < -1 || mouse.x > 1 || mouse.y < -1 || mouse.y > 1) return null;
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(hitMeshes, false);
-      if (!hits.length) return null;
-      const bodyHits = raycaster.intersectObjects(bodyMeshes, false);
-      const nearBody = bodyHits.length ? bodyHits[0].distance : Infinity;
-      for (let i = 0; i < hits.length; i++) {
-        const obj = hits[i].object;
-        obj.getWorldPosition(tmpVec);
-        const centerDist = tmpVec.distanceTo(camera.position);
-        if (centerDist - 0.10 <= nearBody) return obj.userData.id;
-      }
-      return null;
-    }
-
-    function onPointerDown(e) {
-      pointerDown = true;
-      isDragging = false;
-      dragMoveDist = 0;
-      pointerIsTouch = e.pointerType === 'touch' || (e.changedTouches && e.changedTouches.length);
-      gestureLocked = false;
-      gestureIsScroll = false;
-      const p = getPointer(e);
-      dragStartX = p.x;
-      dragStartY = p.y;
-      // Clave en movil: un tap dispara pointerdown/pointerup sin pointermove,
-      // asi que sin esto el raycast se lanzaba contra la posicion inicial (-100,-100).
-      setMouseFrom(e);
-      lastInteractionTime = performance.now();
-      renderer.domElement.style.cursor = 'grabbing';
-    }
-
-    function onPointerMove(e) {
-      setMouseFrom(e);
-      const p = getPointer(e);
-
-      if (pointerDown) {
-        const dx = p.x - dragStartX;
-        const dy = p.y - dragStartY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (pointerIsTouch && !gestureLocked && dist > 6) {
-          gestureIsScroll = Math.abs(dy) > Math.abs(dx);
-          gestureLocked = true;
-        }
-        if (pointerIsTouch && gestureIsScroll) return;
-        if (dist > 4) {
-          isDragging = true;
-          onDragChange(true);
-          targetRotY += dx * 0.008;
-          if (!pointerIsTouch) {
-            targetRotX -= dy * 0.005;
-            targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX));
-          }
-          dragStartX = p.x;
-          dragStartY = p.y;
-          lastInteractionTime = performance.now();
-        }
-      }
-    }
-
-    function onPointerUp(e) {
-      if (pointerDown && !isDragging) {
-        // Fue un tap/click — recalculamos desde el propio evento por seguridad
-        setMouseFrom(e);
-        const id = pickZone();
-        if (id) {
-          onSelectZone(id);
-          lastInteractionTime = performance.now();
-        }
-      }
-      pointerDown = false;
-      if (isDragging) onDragChange(false);
-      isDragging = false;
-      // En tactil no hay hover: soltamos el puntero para que no quede pegado
-      if (pointerIsTouch) { mouse.x = -100; mouse.y = -100; }
-      renderer.domElement.style.cursor = 'grab';
-    }
-
-    function onPointerCancel() {
-      pointerDown = false;
-      if (isDragging) onDragChange(false);
-      isDragging = false;
-      mouse.x = -100;
-      mouse.y = -100;
-    }
-
-    function onPointerLeave() {
-      mouse.x = -100;
-      mouse.y = -100;
-    }
-
-    function onReset() {
-      targetRotY = 0;
-      targetRotX = 0;
-      lastInteractionTime = performance.now();
-    }
-
-    const dom = renderer.domElement;
-    dom.addEventListener('pointerdown', onPointerDown);
-    dom.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    dom.addEventListener('pointerleave', onPointerLeave);
-    dom.addEventListener('pointercancel', onPointerCancel);
-    window.addEventListener('bm3d:reset', onReset);
-
-    // ---- Resize ----
-    function onResize() {
-      const nw = mount.clientWidth;
-      const nh = mount.clientHeight;
-      if (!nw || !nh) return;
-      camera.aspect = nw / nh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
-    }
-    window.addEventListener('resize', onResize);
-
-    // El canvas cambia de alto en movil (barra del navegador, rotacion):
-    // window.resize no siempre dispara, ResizeObserver si.
-    let ro = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(onResize);
-      ro.observe(mount);
-    }
-
-    // No quemar bateria renderizando fuera de pantalla
-    let inView = true;
-    let io = null;
-    if (typeof IntersectionObserver !== 'undefined') {
-      io = new IntersectionObserver((entries) => {
-        inView = entries[0] ? entries[0].isIntersecting : true;
-      }, { rootMargin: '120px' });
-      io.observe(mount);
-    }
-
-    // ---- Animation loop ----
-    let frameId;
-    let elapsed = 0;
-    const tmpScale = new THREE.Vector3();
-    const baseColor = new THREE.Color(0xC9A55A);
-    const activeColor = new THREE.Color(0xFFFFFF);
-
-    function animate() {
-      if (!inView) {
-        frameId = requestAnimationFrame(animate);
-        return;
-      }
-      elapsed += 0.016;
-      const now = performance.now();
-      const idleMs = now - lastInteractionTime;
-
-      // Auto-rotation when idle (> 2.5s) and no zone selected
-      if (idleMs > 2500 && !stateRef.current.activeZone) {
-        targetRotY += 0.0035;
-      }
-
-      // Smooth rotation lerp
-      currentRotY += (targetRotY - currentRotY) * 0.08;
-      currentRotX += (targetRotX - currentRotX) * 0.08;
-      figureGroup.rotation.y = currentRotY;
-      figureGroup.rotation.x = currentRotX;
-
-      // Raycast (solo cuando el puntero esta sobre el canvas)
-      const newHoverId = pointerIsTouch && !pointerDown ? null : pickZone();
-      if (newHoverId !== hoveredId) {
-        hoveredId = newHoverId;
-        onHoverZone(newHoverId);
-        if (!isDragging) {
-          dom.style.cursor = hoveredId ? 'pointer' : 'grab';
-        }
-      }
-
-      // Hotspot states (scale + color)
-      hotspotMeshes.forEach(m => {
-        const isActive = m.userData.id === stateRef.current.activeZone;
-        const isHover = m.userData.id === hoveredId;
-        const targetScale = isActive ? 1.8 : isHover ? 1.4 : 1;
-        tmpScale.setScalar(targetScale);
-        m.scale.lerp(tmpScale, 0.18);
-
-        // Color lerp
-        m.material.color.lerp(isActive ? activeColor : baseColor, 0.12);
-      });
-
-      // Rings: pulse + billboard
-      ringMeshes.forEach(r => {
-        const isActive = r.userData.id === stateRef.current.activeZone;
-        const isHover = r.userData.id === hoveredId;
-        const t = ((elapsed * (isActive ? 1.4 : 1) + r.userData.phase) % 2) / 2;
-        const scale = 1 + t * 1.6;
-        r.scale.setScalar(scale);
-        r.material.opacity = (isActive || isHover ? 0.7 : 0.45) * (1 - t);
-        // Billboard: face camera regardless of parent rotation
-        r.quaternion.copy(camera.quaternion);
-        // Counter-rotate to undo figureGroup rotation (since ring is child)
-        r.quaternion.premultiply(figureGroup.quaternion.clone().invert());
-      });
-
-      // Floor disc subtle pulse
-      disc.material.opacity = 0.08 + Math.sin(elapsed * 1.2) * 0.02;
-
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
-    }
-    animate();
-
-    // ---- Cleanup ----
-    return () => {
-      cancelAnimationFrame(frameId);
-      dom.removeEventListener('pointerdown', onPointerDown);
-      dom.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      dom.removeEventListener('pointerleave', onPointerLeave);
-      dom.removeEventListener('pointercancel', onPointerCancel);
-      window.removeEventListener('resize', onResize);
-      if (ro) ro.disconnect();
-      if (io) io.disconnect();
-      window.removeEventListener('bm3d:reset', onReset);
-      // Dispose
-      scene.traverse(obj => {
-        if (obj.geometry) obj.geometry.dispose();
-        if (obj.material) {
-          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
-          else obj.material.dispose();
-        }
-      });
-      renderer.dispose();
-      if (dom.parentNode === mount) mount.removeChild(dom);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={mountRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        touchAction: 'pan-y',
-      }}
-    />
-  );
-}
-
-// =====================================================================
-// EMPTY STATE
-// =====================================================================
 function BodyMapEmpty() {
   return (
     <div style={{
@@ -1126,7 +330,7 @@ function BodyMapEmpty() {
         }}>
           Rota
           <br />
-          <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+          <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
             el cuerpo.
           </span>
         </div>
@@ -1136,7 +340,7 @@ function BodyMapEmpty() {
           color: 'rgba(255,255,255,0.6)',
           maxWidth: '380px',
         }}>
-          Arrastra con el cursor para girar 360°. Toca uno de los puntos dorados pulsantes y te muestro qué lesiones suelen estar detrás de ese dolor.
+          Elige la vista de frente o de espalda y toca una zona. También puedes seleccionarla por nombre para conocer las lesiones relacionadas.
         </p>
       </div>
 
@@ -1156,8 +360,8 @@ function BodyMapEmpty() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
           {[
-            { c: '#16A34A', l: 'Baja',  d: 'Lesión leve, recuperación 1—4 semanas' },
-            { c: '#C9A55A', l: 'Media', d: 'Tratamiento estructurado, 4—10 semanas' },
+            { c: '#16A34A', l: 'Baja',  d: 'Lesión leve, recuperación 1 a 4 semanas' },
+            { c: '#C9A55A', l: 'Media', d: 'Tratamiento estructurado, 4 a 10 semanas' },
             { c: '#DC2626', l: 'Alta',  d: 'Compleja, requiere protocolo extenso' },
           ].map(item => (
             <div key={item.l} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
@@ -1197,7 +401,7 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
             letterSpacing: '0.25em',
             textTransform: 'uppercase',
             fontWeight: 700,
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             marginBottom: '0.75rem',
           }}>
             Zona seleccionada
@@ -1312,7 +516,7 @@ function BodyMapDetail({ zone, onNavigate, sevColor, onClose }) {
                       letterSpacing: '0.15em',
                       textTransform: 'uppercase',
                       fontWeight: 600,
-                      color: '#C9A55A',
+                      color: 'var(--gm-accent-ink, #80622D)',
                     }}>
                       Ver protocolo →
                     </div>
@@ -1901,7 +1105,7 @@ function TreatmentTimeline() {
         <div key={i} style={timelineStyles.phase}>
           <div style={timelineStyles.number}>{phase.number}</div>
           <h3 style={timelineStyles.title}>{phase.title}</h3>
-          <p style={timelineStyles.description}>{phase.description}</p>
+          <DensePassage style={timelineStyles.description}>{phase.description}</DensePassage>
           <div style={timelineStyles.duration}>⏱ {phase.duration}</div>
         </div>
       ))}
@@ -2379,7 +1583,7 @@ function SiteFooter({ onNavigate }) {
   });
 
   return (
-    <footer style={{ background: '#0A0A0A', color: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
+    <footer className="gm-footer" style={{ background: '#0A0A0A', color: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
       {/* CTA strip */}
       <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="container" style={{
@@ -2387,7 +1591,7 @@ function SiteFooter({ onNavigate }) {
           display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '3rem', alignItems: 'center',
         }} className="ft-cta">
           <div>
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600, color: '#C9A55A', marginBottom: '1.25rem' }}>
+            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '1.25rem' }}>
               Bogotá · Fisioterapia deportiva
             </div>
             <h2 style={{
@@ -2395,7 +1599,7 @@ function SiteFooter({ onNavigate }) {
               letterSpacing: '-0.03em', fontFamily: 'Space Grotesk',
             }}>
               ¿Listo para
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}> volver?</span>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}> volver?</span>
             </h2>
           </div>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'flex-end' }} className="ft-cta-btns">
@@ -2439,11 +1643,11 @@ function SiteFooter({ onNavigate }) {
                 width: '38px', height: '38px', border: '1.5px solid rgba(255,255,255,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1rem', color: '#C9A55A', letterSpacing: '-0.03em' }}>GM</span>
+                <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '-0.03em' }}>GM</span>
               </div>
               <div style={{ lineHeight: 1.1 }}>
                 <div style={{ fontSize: '1rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.01em' }}>Germán Montenegro</div>
-                <div style={{ fontSize: '0.5625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600, color: '#C9A55A', marginTop: '0.25rem' }}>Fisioterapia Deportiva</div>
+                <div style={{ fontSize: '0.5625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--gm-accent-ink, #80622D)', marginTop: '0.25rem' }}>Fisioterapia Deportiva</div>
               </div>
             </a>
             <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.55)', maxWidth: '300px', marginBottom: '1.5rem' }}>
@@ -2456,17 +1660,17 @@ function SiteFooter({ onNavigate }) {
               marginBottom: '1.75rem',
             }}>
               <span style={{ width: '6px', height: '6px', background: '#C9A55A', flexShrink: 0 }} />
-              <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', color: '#C9A55A' }}>#latecnicaprimero</span>
+              <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', color: 'var(--gm-accent-ink, #80622D)' }}>#latecnicaprimero</span>
             </div>
             {/* Contact info */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {[
                 { k: 'Ubicación', v: 'Bogotá, Colombia' },
                 { k: 'WhatsApp', v: PHONE_DISPLAY },
-                { k: 'Horario', v: 'Lun–Vie 7–19 · Sáb 8–14' },
+                { k: 'Horario', v: 'Lun a Vie 7 a 19 · Sáb 8 a 14' },
               ].map(c => (
                 <div key={c.k} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8125rem' }}>
-                  <span style={{ color: '#C9A55A', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.625rem', minWidth: '62px', paddingTop: '0.1rem' }}>{c.k}</span>
+                  <span style={{ color: 'var(--gm-accent-ink, #80622D)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.625rem', minWidth: '62px', paddingTop: '0.1rem' }}>{c.k}</span>
                   {c.k === 'WhatsApp' ? <a href={WHATSAPP_URL} style={{ color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>{c.v}</a> : <span style={{ color: 'rgba(255,255,255,0.75)' }}>{c.v}</span>}
                 </div>
               ))}
@@ -2582,7 +1786,7 @@ function PubalgiaHero({ onNavigate }) {
         }}>
           <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>Pubalgia</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>Pubalgia</span>
         </div>
 
         <div style={{
@@ -2601,7 +1805,7 @@ function PubalgiaHero({ onNavigate }) {
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -2620,7 +1824,7 @@ function PubalgiaHero({ onNavigate }) {
             }}>
               Pubalgia.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Sin atajos.
               </span>
             </h1>
@@ -2719,7 +1923,7 @@ function PubalgiaHero({ onNavigate }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1.5rem',
             }}>
               TL;DR Clínico
@@ -2744,11 +1948,11 @@ function PubalgiaHero({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                   fontSize: '1.5rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 1,
                   marginBottom: '0.25rem',
                 }}>
-                  4—12
+                  4 a 12
                 </div>
                 <div style={{
                   fontSize: '0.6875rem',
@@ -2764,7 +1968,7 @@ function PubalgiaHero({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                   fontSize: '1.5rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 1,
                   marginBottom: '0.25rem',
                 }}>
@@ -2794,14 +1998,14 @@ function PubalgiaHero({ onNavigate }) {
 }
 
 // =====================================================================
-// WHAT IS — Editorial dual
+// WHAT IS, Editorial dual
 // =====================================================================
 function PubalgiaWhatIs() {
   const facts = [
     { label: 'Zona afectada',     value: 'Sínfisis púbica, aductores, recto abdominal' },
-    { label: 'Mecanismo',         value: 'Sobrecarga crónica + desbalance muscular pelvis—core' },
+    { label: 'Mecanismo',         value: 'Sobrecarga crónica + desbalance muscular pelvis y core' },
     { label: 'Deportes de riesgo', value: 'CrossFit, fútbol, running, weightlifting, BJJ' },
-    { label: 'Recuperación',      value: '4—12 semanas con tratamiento estructurado' },
+    { label: 'Recuperación',      value: '4 a 12 semanas con tratamiento estructurado' },
   ];
 
   return (
@@ -2828,7 +2032,7 @@ function PubalgiaWhatIs() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -2847,27 +2051,27 @@ function PubalgiaWhatIs() {
             }}>
               No es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 una sola lesión.
               </span>
             </h2>
 
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.125rem',
               lineHeight: 1.7,
               color: 'rgba(10,10,10,0.7)',
               marginBottom: '1.5rem',
             }}>
-              Pubalgia es un <strong style={{ color: '#0A0A0A' }}>síndrome de dolor inguinal</strong> — no una entidad única. Bajo el mismo síntoma pueden coexistir osteítis púbica, tendinopatía de aductores, conflicto de tejidos abdominales o disfunción del recto abdominal.
-            </p>
-            <p style={{
+              Pubalgia es un <strong style={{ color: '#0A0A0A' }}>síndrome de dolor inguinal</strong>, no una entidad única. Bajo el mismo síntoma pueden coexistir osteítis púbica, tendinopatía de aductores, conflicto de tejidos abdominales o disfunción del recto abdominal.
+            </DensePassage>
+            <DensePassage style={{
               fontSize: '1.0625rem',
               lineHeight: 1.65,
               color: 'rgba(10,10,10,0.6)',
               marginBottom: '1.5rem',
             }}>
-              Por eso el diagnóstico tradicional falla: te dan ibuprofeno y reposo. Vuelves a entrenar — vuelve el dolor. La pubalgia se resuelve atacando el desbalance pelvis—core—aductores que la produce, no solo la inflamación.
-            </p>
+              Por eso el diagnóstico tradicional falla: te dan ibuprofeno y reposo. Vuelves a entrenar, vuelve el dolor. La pubalgia se resuelve atacando el desbalance pelvis, core y aductores que la produce, no solo la inflamación.
+            </DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: '#FFFFFF',
@@ -2909,7 +2113,7 @@ function PubalgiaWhatIs() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                   }}>
                     {f.label}
@@ -2939,7 +2143,7 @@ function PubalgiaWhatIs() {
 }
 
 // =====================================================================
-// INTERACTIVE CHECKLIST — Self-assessment
+// INTERACTIVE CHECKLIST, Self-assessment
 // =====================================================================
 function PubalgiaChecklist({ onNavigate }) {
   const questions = [
@@ -2972,7 +2176,7 @@ function PubalgiaChecklist({ onNavigate }) {
         level: 'Bandera roja',
         color: '#DC2626',
         title: 'Atención inmediata.',
-        message: 'Síntomas que requieren evaluación urgente. No es solo pubalgia — puede ser hernia inguinal, lesión nerviosa o patología visceral. No esperes.',
+        message: 'Síntomas que requieren evaluación urgente. No es solo pubalgia, puede ser hernia inguinal, lesión nerviosa o patología visceral. No esperes.',
         ctaLabel: 'WhatsApp inmediato',
       };
     }
@@ -2980,12 +2184,12 @@ function PubalgiaChecklist({ onNavigate }) {
       level: 'Probabilidad alta',
       color: '#DC2626',
       title: 'Alta probabilidad.',
-      message: 'El patrón de síntomas coincide fuertemente con pubalgia. No es diagnóstico — es señal clara de que necesitas evaluación clínica profesional.',
+      message: 'El patrón de síntomas coincide fuertemente con pubalgia. No es diagnóstico, es señal clara de que necesitas evaluación clínica profesional.',
       ctaLabel: 'Agendar valoración',
     };
     if (score >= 4) return {
       level: 'Probabilidad media',
-      color: '#C9A55A',
+      color: 'var(--gm-accent-ink, #80622D)',
       title: 'Probabilidad media.',
       message: 'Algunos síntomas compatibles con pubalgia, pero también con otras lesiones (cadera, lumbar, recto abdominal). El diagnóstico diferencial es lo importante acá.',
       ctaLabel: 'Agendar valoración',
@@ -3048,7 +2252,7 @@ function PubalgiaChecklist({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -3066,7 +2270,7 @@ function PubalgiaChecklist({ onNavigate }) {
             }}>
               ¿Es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 pubalgia?
               </span>
             </h2>
@@ -3078,7 +2282,7 @@ function PubalgiaChecklist({ onNavigate }) {
             lineHeight: 1.55,
             maxWidth: '460px',
           }}>
-            Marca lo que apliquen. Te doy una probabilidad orientativa — no diagnóstico. Cualquier resultado se confirma solo en valoración presencial.
+            Marca lo que apliquen. Te doy una probabilidad orientativa, no diagnóstico. Cualquier resultado se confirma solo en valoración presencial.
           </p>
         </div>
 
@@ -3408,31 +2612,7 @@ function PubalgiaChecklist({ onNavigate }) {
 // PUBALGIA PAGE SHELL (uses components from both files via window)
 // =====================================================================
 function PubalgiaPage({ onNavigate }) {
-  const [openFaq, setOpenFaq] = React.useState(0);
-  const [activeSport, setActiveSport] = React.useState(0);
-  const [activePhase, setActivePhase] = React.useState(0);
-
-  const Hero = PubalgiaHero;
-  const WhatIs = PubalgiaWhatIs;
-  const Checklist = PubalgiaChecklist;
-
-  return (
-    <main>
-      <Hero onNavigate={onNavigate} />
-      <WhatIs />
-      <Checklist onNavigate={onNavigate} />
-      <PubalgiaSymptoms />
-      <PubalgiaCauses />
-      <PubalgiaBySport activeSport={activeSport} setActiveSport={setActiveSport} />
-      <PubalgiaDifferential />
-      <PubalgiaTreatment activePhase={activePhase} setActivePhase={setActivePhase} />
-      <PubalgiaExercises />
-      <PubalgiaRecovery />
-      <PubalgiaCTA onNavigate={onNavigate} />
-      <PubalgiaFAQ openFaq={openFaq} setOpenFaq={setOpenFaq} />
-      <PubalgiaRelated onNavigate={onNavigate} />
-    </main>
-  );
+  return <InjuryExperience page="pubalgia" assessment={<PubalgiaChecklist onNavigate={onNavigate}/>}/>;
 }
 
 // =====================================================================
@@ -3457,7 +2637,7 @@ function SectionHeader({ kicker, title, subtitle, intro, dark }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -3473,7 +2653,7 @@ function SectionHeader({ kicker, title, subtitle, intro, dark }) {
         }}>
           {title}
           <br />
-          <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span>
+          <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span>
         </h2>
       </div>
       {intro && (
@@ -3562,7 +2742,7 @@ function PubalgiaSymptoms() {
                     fontFamily: 'Space Grotesk',
                     fontSize: '0.8125rem',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                   }}>
                     {String(i + 1).padStart(2, '0')}
                   </div>
@@ -3715,7 +2895,7 @@ function PubalgiaCauses() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '3rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 0.85,
                   letterSpacing: '-0.03em',
                 }}>
@@ -3732,13 +2912,13 @@ function PubalgiaCauses() {
                   {c.title}.
                 </h3>
               </div>
-              <p style={{
+              <DensePassage style={{
                 fontSize: '1rem',
                 lineHeight: 1.55,
                 color: 'rgba(10,10,10,0.7)',
               }}>
                 {c.description}
-              </p>
+              </DensePassage>
               <div style={{
                 marginTop: 'auto',
                 paddingTop: '1.25rem',
@@ -3754,7 +2934,7 @@ function PubalgiaCauses() {
                   fontSize: '0.625rem',
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   fontWeight: 700,
                   fontStyle: 'normal',
                 }}>Ej.</span>
@@ -3775,7 +2955,7 @@ function PubalgiaCauses() {
 }
 
 // =====================================================================
-// BY SPORT — Tab interface
+// BY SPORT, Tab interface
 // =====================================================================
 function PubalgiaBySport({ activeSport, setActiveSport }) {
   const sports = [
@@ -3783,25 +2963,25 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
       name: 'CrossFit',
       trigger: 'Wall balls + box jumps repetitivos + sentadillas profundas con apertura forzada',
       scenario: 'Crossfittero que hace 150 wall balls en un WOD. Día siguiente: tirantez al toser. Semana 3: no puede sentadilla profunda sin dolor.',
-      stats: { '% de mis pacientes': '35%', 'Tiempo medio recuperación': '6—8 sem', 'Vuelta gradual': 'Sí, sin sprint' },
+      stats: { '% de mis pacientes': '35%', 'Tiempo medio recuperación': '6 a 8 sem', 'Vuelta gradual': 'Sí, sin sprint' },
     },
     {
       name: 'Running',
       trigger: 'Aumento brusco de kilometraje, sprint sin progresión, terreno irregular',
       scenario: 'Runner que pasa de 30 a 60 km/sem en mes. Empieza con tirantez tras tirada larga. No puede correr en bajada sin dolor.',
-      stats: { '% de mis pacientes': '25%', 'Tiempo medio recuperación': '5—7 sem', 'Vuelta gradual': 'Sí, sin sprint 4 sem' },
+      stats: { '% de mis pacientes': '25%', 'Tiempo medio recuperación': '5 a 7 sem', 'Vuelta gradual': 'Sí, sin sprint 4 sem' },
     },
     {
       name: 'Fútbol',
       trigger: 'Cambios de dirección + remates + tackles laterales',
       scenario: 'Jugador amateur de partido los sábados. Tras un sprint frenado en seco siente tirantez. No puede chutar con potencia.',
-      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '6—10 sem', 'Vuelta gradual': 'Sí, sin contacto 4 sem' },
+      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '6 a 10 sem', 'Vuelta gradual': 'Sí, sin contacto 4 sem' },
     },
     {
       name: 'Weightlifting',
       trigger: 'Sentadillas pesadas + clean catch en sentadilla profunda + jerk con split agresivo',
       scenario: 'Levantador que sube 1RM en sentadilla 10 kg en un mes. Empieza con molestia al pop-up del clean. No puede recibir profundo.',
-      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '4—8 sem', 'Vuelta gradual': 'Sí, sin profundidad 3 sem' },
+      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '4 a 8 sem', 'Vuelta gradual': 'Sí, sin profundidad 3 sem' },
     },
   ];
 
@@ -3838,7 +3018,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
           kicker="Por deporte · Casos reales"
           title="Cada deporte"
           subtitle="rompe distinto."
-          intro="La pubalgia del crossfittero no es la del runner ni la del futbolista. Los mecanismos cambian — el tratamiento se adapta."
+          intro="La pubalgia del crossfittero no es la del runner ni la del futbolista. Los mecanismos cambian, el tratamiento se adapta."
         />
 
         {/* Tabs */}
@@ -3887,7 +3067,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1rem',
             }}>
               Mecanismo · {current.name}
@@ -3914,7 +3094,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '0.5rem',
               }}>
                 Gatillo típico
@@ -3972,7 +3152,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
                   fontSize: '1.75rem',
                   fontFamily: 'Space Grotesk',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                 }}>
@@ -3998,7 +3178,7 @@ function PubalgiaBySport({ activeSport, setActiveSport }) {
 }
 
 // =====================================================================
-// DIFFERENTIAL DIAGNOSIS — Editorial table
+// DIFFERENTIAL DIAGNOSIS, Editorial table
 // =====================================================================
 function PubalgiaDifferential() {
   const rows = [
@@ -4036,22 +3216,22 @@ function PubalgiaDifferential() {
             minWidth: '720px',
           }} className="dx-row-head">
             <div style={{ padding: '1.25rem 1.5rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>
+              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Condición
               </div>
             </div>
             <div style={{ padding: '1.25rem 1.5rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>
+              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Localización
               </div>
             </div>
             <div style={{ padding: '1.25rem 1.5rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>
+              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Test clínico
               </div>
             </div>
             <div style={{ padding: '1.25rem 1.5rem' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>
+              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Hallazgo clave
               </div>
             </div>
@@ -4133,7 +3313,7 @@ function PubalgiaDifferential() {
 }
 
 // =====================================================================
-// TREATMENT — 4 phases
+// TREATMENT, 4 phases
 // =====================================================================
 function PubalgiaTreatment({ activePhase, setActivePhase }) {
   const phases = [
@@ -4145,19 +3325,19 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
     },
     {
       title: 'Reducir',
-      duration: 'Semanas 1—3',
+      duration: 'Semanas 1 a 3',
       desc: 'Terapia manual + punción seca en aductores. Reducir dolor sin perder masa muscular ni capacidad cardiovascular.',
       bullets: ['Terapia manual aductor', 'Punción seca trigger points', 'Trabajo isométrico de baja carga', 'Cardio sin impacto'],
     },
     {
       title: 'Fortalecer',
-      duration: 'Semanas 3—8',
+      duration: 'Semanas 3 a 8',
       desc: 'Aquí pasa la magia. Glúteo medio, core estabilizador, aductor con carga progresiva. Reentrenar el patrón.',
       bullets: ['Copenhagen plank progresivo', 'Glúteo medio carga', 'Core anti-rotación', 'Aductor excéntrico'],
     },
     {
       title: 'Volver',
-      duration: 'Semanas 6—12',
+      duration: 'Semanas 6 a 12',
       desc: 'Readaptación al gesto deportivo. Sprint, cambios de dirección, técnica específica. Vuelves más fuerte.',
       bullets: ['Sprint progresivo', 'Cambios de dirección', 'Test funcional específico', 'Vuelta a competir'],
     },
@@ -4191,7 +3371,7 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
             {phases.map((p, i) => {
               const isActive = activePhase === i;
               return (
-                <button
+                <button aria-pressed={isActive}
                   key={i}
                   onClick={() => setActivePhase(i)}
                   style={{
@@ -4277,7 +3457,7 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
 
             <div style={{
               fontSize: '0.6875rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -4298,7 +3478,7 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
               position: 'relative',
             }}>
               {phases[activePhase].title}
-              <span style={{ color: '#C9A55A' }}>.</span>
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>.</span>
             </h3>
 
             <p style={{
@@ -4355,15 +3535,15 @@ function PubalgiaTreatment({ activePhase, setActivePhase }) {
 }
 
 // =====================================================================
-// EXERCISES — Numbered grid
+// EXERCISES, Numbered grid
 // =====================================================================
 function PubalgiaExercises() {
   const exercises = [
     { name: 'Copenhagen plank',  goal: 'Aductor excéntrico',     sets: '3 × 30s', stage: 'Fase 3',  difficulty: 'Avanzada' },
-    { name: 'Side plank lift',   goal: 'Glúteo medio + core',    sets: '3 × 15',  stage: 'Fase 2—3', difficulty: 'Media' },
+    { name: 'Side plank lift',   goal: 'Glúteo medio + core',    sets: '3 × 15',  stage: 'Fase 2 a 3', difficulty: 'Media' },
     { name: 'Dead bug',          goal: 'Core anti-rotación',     sets: '3 × 10/lado', stage: 'Fase 2', difficulty: 'Baja' },
     { name: 'Bird dog',          goal: 'Estabilidad lumbar',     sets: '3 × 10/lado', stage: 'Fase 2', difficulty: 'Baja' },
-    { name: 'Aductor isométrico', goal: 'Activación segura',     sets: '5 × 10s', stage: 'Fase 1—2', difficulty: 'Baja' },
+    { name: 'Aductor isométrico', goal: 'Activación segura',     sets: '5 × 10s', stage: 'Fase 1 a 2', difficulty: 'Baja' },
     { name: 'Glúteo puente',     goal: 'Activación posterior',   sets: '3 × 15',  stage: 'Fase 2',  difficulty: 'Baja' },
   ];
 
@@ -4378,7 +3558,7 @@ function PubalgiaExercises() {
           kicker="Ejercicios · Plan base"
           title="Qué"
           subtitle="trabajamos."
-          intro="Ejercicios típicos del plan de fortalecimiento. El orden y la progresión dependen de tu caso — esto es referencia, no prescripción."
+          intro="Ejercicios típicos del plan de fortalecimiento. El orden y la progresión dependen de tu caso, esto es referencia, no prescripción."
         />
 
         <div style={{
@@ -4421,7 +3601,7 @@ function PubalgiaExercises() {
                 fontFamily: 'Space Grotesk',
                 fontSize: '0.875rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>
                 {String(i + 1).padStart(2, '0')}
               </div>
@@ -4453,7 +3633,7 @@ function PubalgiaExercises() {
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>
                 {e.stage}
               </div>
@@ -4478,7 +3658,7 @@ function PubalgiaExercises() {
           color: 'rgba(10,10,10,0.5)',
           maxWidth: '600px',
         }}>
-          No empieces sin diagnóstico. Hacer Copenhagen en fase aguda empeora la lesión. Esto es plan tipo — el tuyo se construye en valoración.
+          No empieces sin diagnóstico. Hacer Copenhagen en fase aguda empeora la lesión. Esto es plan tipo, el tuyo se construye en valoración.
         </div>
       </div>
 
@@ -4497,14 +3677,14 @@ function PubalgiaExercises() {
 }
 
 // =====================================================================
-// RECOVERY — Timeline visualization
+// RECOVERY, Timeline visualization
 // =====================================================================
 function PubalgiaRecovery() {
   const milestones = [
     { week: 'Sem 0',     status: 'Diagnóstico', desc: 'Evaluación + plan' },
-    { week: 'Sem 1—3',   status: 'Reducir dolor', desc: 'Manual + punción' },
-    { week: 'Sem 3—8',   status: 'Fortalecer',  desc: 'Plan progresivo' },
-    { week: 'Sem 6—12',  status: 'Volver',      desc: 'Readaptación deportiva' },
+    { week: 'Sem 1 a 3',   status: 'Reducir dolor', desc: 'Manual + punción' },
+    { week: 'Sem 3 a 8',   status: 'Fortalecer',  desc: 'Plan progresivo' },
+    { week: 'Sem 6 a 12',  status: 'Volver',      desc: 'Readaptación deportiva' },
   ];
 
   const factors = [
@@ -4589,7 +3769,7 @@ function PubalgiaRecovery() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                     fontFamily: 'Space Grotesk',
                   }}>
@@ -4834,13 +4014,13 @@ function PubalgiaCTA({ onNavigate }) {
 // =====================================================================
 function PubalgiaFAQ({ openFaq, setOpenFaq }) {
   const faqs = [
-    { q: '¿Puedo seguir entrenando con pubalgia?', a: 'No al mismo volumen. En fase aguda hay que reducir gestos dolorosos (sprint, sentadilla profunda, cambios de dirección) pero mantener cardio sin impacto, fuerza tren superior y trabajo de movilidad. Reposo total no — atrofia muscular.' },
+    { q: '¿Puedo seguir entrenando con pubalgia?', a: 'No al mismo volumen. En fase aguda hay que reducir gestos dolorosos (sprint, sentadilla profunda, cambios de dirección) pero mantener cardio sin impacto, fuerza tren superior y trabajo de movilidad. Reposo total no, atrofia muscular.' },
     { q: '¿La pubalgia es exclusiva de hombres?', a: 'No. Aunque es más frecuente en hombres por anatomía pélvica y patrones deportivos, las mujeres también la desarrollan, sobre todo en running de larga distancia, fútbol y deportes de saltos.' },
-    { q: '¿Necesito resonancia magnética?', a: 'Casi nunca. La pubalgia es diagnóstico clínico. La resonancia se reserva para casos crónicos (más de 3 meses sin mejora) o sospecha de rotura. No pidas pruebas innecesarias — pide diagnóstico.' },
-    { q: '¿Cuántas sesiones voy a necesitar?', a: 'Promedio: 8—12 sesiones en 8—12 semanas. Casos leves: 6 sesiones. Casos crónicos (más de 6 meses con dolor): hasta 16. Depende de severidad + adherencia al fortalecimiento entre sesiones.' },
-    { q: '¿Cuándo vuelvo a entrenar normal?', a: 'Vuelta gradual desde semana 3—4 (sin sprint ni cambios de dirección). Vuelta completa típicamente semana 8—12. El criterio es test funcional, no calendario.' },
+    { q: '¿Necesito resonancia magnética?', a: 'Casi nunca. La pubalgia es diagnóstico clínico. La resonancia se reserva para casos crónicos (más de 3 meses sin mejora) o sospecha de rotura. No pidas pruebas innecesarias, pide diagnóstico.' },
+    { q: '¿Cuántas sesiones voy a necesitar?', a: 'Promedio: 8 a 12 sesiones en 8 a 12 semanas. Casos leves: 6 sesiones. Casos crónicos (más de 6 meses con dolor): hasta 16. Depende de severidad + adherencia al fortalecimiento entre sesiones.' },
+    { q: '¿Cuándo vuelvo a entrenar normal?', a: 'Vuelta gradual desde semana 3 a 4 (sin sprint ni cambios de dirección). Vuelta completa típicamente semana 8 a 12. El criterio es test funcional, no calendario.' },
     { q: '¿La cirugía es opción?', a: 'En la mayoría de casos no. La cirugía se reserva para pubalgia atlética con hernia deportiva confirmada o casos crónicos refractarios a 6 meses de fisio bien hecha. Primero agotamos tratamiento conservador.' },
-    { q: '¿Por qué me dieron antiinflamatorios y no funcionó?', a: 'Porque la pubalgia no es inflamación pura — es desbalance biomecánico crónico. Los AINEs bajan el dolor temporalmente pero no corrigen el patrón. Vuelves a entrenar, vuelve la lesión.' },
+    { q: '¿Por qué me dieron antiinflamatorios y no funcionó?', a: 'Porque la pubalgia no es inflamación pura, es desbalance biomecánico crónico. Los AINEs bajan el dolor temporalmente pero no corrigen el patrón. Vuelves a entrenar, vuelve la lesión.' },
   ];
 
   return (
@@ -4854,7 +4034,7 @@ function PubalgiaFAQ({ openFaq, setOpenFaq }) {
           kicker="Preguntas frecuentes"
           title="Lo que"
           subtitle="me preguntan."
-          intro="Las dudas más comunes sobre pubalgia. Si no encuentras la tuya, WhatsApp directo — yo respondo, no asistente."
+          intro="Las dudas más comunes sobre pubalgia. Si no encuentras la tuya, WhatsApp directo, yo respondo, no asistente."
         />
 
         <div style={{
@@ -4981,7 +4161,7 @@ function PubalgiaRelated({ onNavigate }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -5076,7 +4256,7 @@ function PubalgiaRelated({ onNavigate }) {
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>
                   Ver protocolo
                 </span>
@@ -5147,7 +4327,7 @@ function CiaticaHero({ onNavigate }) {
         }}>
           <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>Ciática</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>Ciática</span>
         </div>
 
         <div style={{
@@ -5166,7 +4346,7 @@ function CiaticaHero({ onNavigate }) {
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -5185,7 +4365,7 @@ function CiaticaHero({ onNavigate }) {
             }}>
               Ciática.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Síntoma, no diagnóstico.
               </span>
             </h1>
@@ -5197,7 +4377,7 @@ function CiaticaHero({ onNavigate }) {
               maxWidth: '620px',
               marginBottom: '2rem',
             }}>
-              Dolor que recorre el trayecto del nervio ciático — glúteo, posterior del muslo, pantorrilla, pie.
+              Dolor que recorre el trayecto del nervio ciático, glúteo, posterior del muslo, pantorrilla, pie.
               <span style={{ color: '#0A0A0A', fontWeight: 500 }}> No es una sola enfermedad, son múltiples causas con el mismo síntoma.</span>
             </p>
 
@@ -5283,7 +4463,7 @@ function CiaticaHero({ onNavigate }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1.5rem',
             }}>
               TL;DR Clínico
@@ -5294,7 +4474,7 @@ function CiaticaHero({ onNavigate }) {
               color: 'rgba(255,255,255,0.9)',
               marginBottom: '1.5rem',
             }}>
-              Compresión o irritación del nervio ciático — generalmente por hernia discal, síndrome piramidal o estenosis lumbar. Diagnóstico diferencial primero.
+              Compresión o irritación del nervio ciático, generalmente por hernia discal, síndrome piramidal o estenosis lumbar. Diagnóstico diferencial primero.
             </p>
             <div style={{
               display: 'grid',
@@ -5304,11 +4484,11 @@ function CiaticaHero({ onNavigate }) {
               borderTop: '1px solid rgba(255,255,255,0.1)',
             }}>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>3—8</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>3 a 8</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Semanas</div>
               </div>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>Media</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>Media</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Complejidad</div>
               </div>
             </div>
@@ -5330,10 +4510,10 @@ function CiaticaHero({ onNavigate }) {
 // =====================================================================
 function CiaticaWhatIs() {
   const facts = [
-    { label: 'Nervio afectado',  value: 'Ciático (raíces L4—S3 → glúteo → pierna)' },
+    { label: 'Nervio afectado',  value: 'Ciático (raíces L4, S3 → glúteo → pierna)' },
     { label: 'Causas comunes',    value: 'Hernia discal · Piramidal · Estenosis · Disfunción facetaria' },
-    { label: 'Edad típica',       value: '30—50 años · Atletas y sedentarios' },
-    { label: 'Recuperación',      value: '3—8 semanas con tratamiento estructurado' },
+    { label: 'Edad típica',       value: '30 a 50 años · Atletas y sedentarios' },
+    { label: 'Recuperación',      value: '3 a 8 semanas con tratamiento estructurado' },
   ];
 
   return (
@@ -5359,7 +4539,7 @@ function CiaticaWhatIs() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -5378,27 +4558,27 @@ function CiaticaWhatIs() {
             }}>
               No es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 la lesión.
               </span>
             </h2>
 
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.125rem',
               lineHeight: 1.7,
               color: 'rgba(10,10,10,0.7)',
               marginBottom: '1.5rem',
             }}>
-              "Ciática" es <strong style={{ color: '#0A0A0A' }}>el síntoma</strong> — dolor por el trayecto del nervio ciático. Lo que está irritando ese nervio es lo que hay que diagnosticar: puede ser una hernia discal, un piramidal contracturado, una estenosis del canal lumbar o disfunción de las articulaciones facetarias.
-            </p>
-            <p style={{
+              "Ciática" es <strong style={{ color: '#0A0A0A' }}>el síntoma</strong>, dolor por el trayecto del nervio ciático. Lo que está irritando ese nervio es lo que hay que diagnosticar: puede ser una hernia discal, un piramidal contracturado, una estenosis del canal lumbar o disfunción de las articulaciones facetarias.
+            </DensePassage>
+            <DensePassage style={{
               fontSize: '1.0625rem',
               lineHeight: 1.65,
               color: 'rgba(10,10,10,0.6)',
               marginBottom: '1.5rem',
             }}>
-              Tratar "ciática" sin identificar la causa es como recetar antitusivos sin saber si tienes asma, alergia o neumonía. Cada origen tiene su tratamiento — y lo que funciona para uno empeora otro.
-            </p>
+              Tratar "ciática" sin identificar la causa es como recetar antitusivos sin saber si tienes asma, alergia o neumonía. Cada origen tiene su tratamiento, y lo que funciona para uno empeora otro.
+            </DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: '#FFFFFF',
@@ -5440,7 +4620,7 @@ function CiaticaWhatIs() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                   }}>
                     {f.label}
@@ -5470,7 +4650,7 @@ function CiaticaWhatIs() {
 }
 
 // =====================================================================
-// LASÈGUE TEST — Interactive tool
+// LASÈGUE TEST, Interactive tool
 // =====================================================================
 function CiaticaLasegue({ onNavigate }) {
   const [angleBucket, setAngleBucket] = React.useState(null); // 0, 30, 45, 60, 75, 90, 'none'
@@ -5489,16 +4669,16 @@ function CiaticaLasegue({ onNavigate }) {
         level: 'Negativo',
         color: '#16A34A',
         title: 'Test Lasègue negativo.',
-        explanation: 'No hay reproducción de dolor con elevación pasiva de la pierna. La ciática neural es poco probable. Si tienes dolor lumbar, el origen probablemente sea muscular, articular o postural — no nervioso.',
+        explanation: 'No hay reproducción de dolor con elevación pasiva de la pierna. La ciática neural es poco probable. Si tienes dolor lumbar, el origen probablemente sea muscular, articular o postural, no nervioso.',
         recommendation: 'Igual conviene valoración para identificar el origen real del dolor.',
       };
     }
     if (location === 'lumbar') {
       return {
         level: 'Equívoco',
-        color: '#C9A55A',
+        color: 'var(--gm-accent-ink, #80622D)',
         title: 'Dolor solo lumbar.',
-        explanation: 'Dolor en la zona baja de la espalda sin irradiación por la pierna no constituye Lasègue positivo. Sugiere disfunción lumbar local — facetaria, muscular o discal sin compresión radicular.',
+        explanation: 'Dolor en la zona baja de la espalda sin irradiación por la pierna no constituye Lasègue positivo. Sugiere disfunción lumbar local, facetaria, muscular o discal sin compresión radicular.',
         recommendation: 'Necesita diagnóstico diferencial. Agenda valoración.',
       };
     }
@@ -5508,25 +4688,25 @@ function CiaticaLasegue({ onNavigate }) {
           level: 'Positivo fuerte',
           color: '#DC2626',
           title: '⚠ Lasègue positivo precoz.',
-          explanation: 'Dolor radicular antes de 30° sugiere compresión nerviosa importante — frecuentemente hernia discal con compromiso significativo de la raíz. Es un hallazgo serio.',
+          explanation: 'Dolor radicular antes de 30° sugiere compresión nerviosa importante, frecuentemente hernia discal con compromiso significativo de la raíz. Es un hallazgo serio.',
           recommendation: 'No demores. Valoración urgente. Posible necesidad de imagen (RM).',
         };
       }
       if (angleBucket <= 60) {
         return {
           level: 'Positivo',
-          color: '#C9A55A',
+          color: 'var(--gm-accent-ink, #80622D)',
           title: 'Lasègue positivo.',
-          explanation: 'Dolor que irradia por la pierna entre 30—60° de elevación es Lasègue positivo clásico. Indica irritación del nervio ciático — habitualmente por hernia discal L4-L5 o L5-S1, o por síndrome piramidal.',
+          explanation: 'Dolor que irradia por la pierna entre 30 a 60° de elevación es Lasègue positivo clásico. Indica irritación del nervio ciático, habitualmente por hernia discal L4-L5 o L5-S1, o por síndrome piramidal.',
           recommendation: 'Agenda valoración. El tratamiento depende de la causa específica.',
         };
       }
       if (angleBucket <= 75) {
         return {
           level: 'Dudoso',
-          color: '#C9A55A',
+          color: 'var(--gm-accent-ink, #80622D)',
           title: 'Lasègue dudoso.',
-          explanation: 'Dolor radicular entre 60—75° tiene menos especificidad. Puede ser ciática leve, irritación neural sin hernia significativa, o tensión de isquiotibial. El diagnóstico diferencial es crítico.',
+          explanation: 'Dolor radicular entre 60 a 75° tiene menos especificidad. Puede ser ciática leve, irritación neural sin hernia significativa, o tensión de isquiotibial. El diagnóstico diferencial es crítico.',
           recommendation: 'Valoración para confirmar. No te quedes con la duda.',
         };
       }
@@ -5550,11 +4730,11 @@ function CiaticaLasegue({ onNavigate }) {
   }
 
   const angleButtons = [
-    { value: 30,    label: '0—30°',  short: '< 30°' },
-    { value: 45,    label: '30—45°', short: '30°' },
-    { value: 60,    label: '45—60°', short: '45°' },
-    { value: 75,    label: '60—75°', short: '60°' },
-    { value: 90,    label: '75—90°', short: '75°' },
+    { value: 30,    label: '0 a 30°',  short: '< 30°' },
+    { value: 45,    label: '30 a 45°', short: '30°' },
+    { value: 60,    label: '45 a 60°', short: '45°' },
+    { value: 75,    label: '60 a 75°', short: '60°' },
+    { value: 90,    label: '75 a 90°', short: '75°' },
     { value: 'none', label: 'No me duele', short: 'OK' },
   ];
 
@@ -5600,7 +4780,7 @@ function CiaticaLasegue({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -5618,7 +4798,7 @@ function CiaticaLasegue({ onNavigate }) {
             }}>
               ¿Es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 ciática real?
               </span>
             </h2>
@@ -6107,31 +5287,7 @@ function CiaticaLasegue({ onNavigate }) {
 // PAGE SHELL
 // =====================================================================
 function CiaticaPage({ onNavigate }) {
-  const [openFaq, setOpenFaq] = React.useState(0);
-  const [activeContext, setActiveContext] = React.useState(0);
-  const [activePhase, setActivePhase] = React.useState(0);
-
-  const Hero = CiaticaHero;
-  const WhatIs = CiaticaWhatIs;
-  const Lasegue = CiaticaLasegue;
-
-  return (
-    <main>
-      <Hero onNavigate={onNavigate} />
-      <WhatIs />
-      <Lasegue onNavigate={onNavigate} />
-      <CiaticaSymptoms />
-      <CiaticaCauses />
-      <CiaticaByContext activeContext={activeContext} setActiveContext={setActiveContext} />
-      <CiaticaDifferential />
-      <CiaticaTreatment activePhase={activePhase} setActivePhase={setActivePhase} />
-      <CiaticaExercises />
-      <CiaticaRecovery />
-      <CiaticaCTA onNavigate={onNavigate} />
-      <CiaticaFAQ openFaq={openFaq} setOpenFaq={setOpenFaq} />
-      <CiaticaRelated onNavigate={onNavigate} />
-    </main>
-  );
+  return <InjuryExperience page="ciatica" assessment={<CiaticaLasegue onNavigate={onNavigate}/>}/>;
 }
 
 // =====================================================================
@@ -6156,7 +5312,7 @@ function CiSectionHeader({ kicker, title, subtitle, intro, dark }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -6172,7 +5328,7 @@ function CiSectionHeader({ kicker, title, subtitle, intro, dark }) {
         }}>
           {title}
           <br />
-          <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span>
+          <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span>
         </h2>
       </div>
       {intro && (
@@ -6198,7 +5354,7 @@ function CiaticaSymptoms() {
     'Hormigueo o adormecimiento siguiendo el trayecto del nervio',
     'Dolor al toser, estornudar o pujar (indica origen radicular)',
     'Empeora al sentarse prolongado o doblarse hacia adelante',
-    'Suele ser unilateral (un lado solo) — bilateral es bandera roja',
+    'Suele ser unilateral (un lado solo), bilateral es bandera roja',
   ];
 
   const redFlags = [
@@ -6220,7 +5376,7 @@ function CiaticaSymptoms() {
           kicker="Síntomas · Patrón clínico"
           title="Cómo"
           subtitle="se siente."
-          intro="La ciática tiene un patrón muy característico — el dolor sigue el trayecto del nervio. Las banderas rojas pueden indicar síndrome de cauda equina: emergencia médica."
+          intro="La ciática tiene un patrón muy característico, el dolor sigue el trayecto del nervio. Las banderas rojas pueden indicar síndrome de cauda equina: emergencia médica."
         />
 
         <div style={{
@@ -6259,7 +5415,7 @@ function CiaticaSymptoms() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '0.8125rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>
                   {String(i + 1).padStart(2, '0')}
                 </div>
@@ -6307,7 +5463,7 @@ function CiaticaSymptoms() {
               color: 'rgba(255,255,255,0.75)',
               marginBottom: '1.5rem',
             }}>
-              No es ciática común. Es compresión severa de la cola de caballo — requiere cirugía urgente. Si presentas cualquiera de estos signos: emergencias inmediato.
+              No es ciática común. Es compresión severa de la cola de caballo, requiere cirugía urgente. Si presentas cualquiera de estos signos: emergencias inmediato.
             </p>
             {redFlags.map((f, i) => (
               <div key={i} style={{
@@ -6344,20 +5500,20 @@ function CiaticaSymptoms() {
 }
 
 // =====================================================================
-// CAUSES — 4 causes of sciatica
+// CAUSES, 4 causes of sciatica
 // =====================================================================
 function CiaticaCauses() {
   const causes = [
     {
       title: 'Hernia discal',
       description: 'El disco intervertebral protruye y comprime la raíz nerviosa. Causa más frecuente en menores de 50 años.',
-      example: 'Levantar peso con espalda flexionada + giro — el disco se rompe en L4-L5 o L5-S1.',
+      example: 'Levantar peso con espalda flexionada + giro, el disco se rompe en L4-L5 o L5-S1.',
       pct: '60%',
     },
     {
       title: 'Síndrome piramidal',
       description: 'Músculo piramidal (glúteo profundo) se contractura y aprisiona el nervio ciático en su trayecto.',
-      example: 'Runner con glúteos débiles + isquios tensos — el piramidal compensa y se contractura crónicamente.',
+      example: 'Runner con glúteos débiles + isquios tensos, el piramidal compensa y se contractura crónicamente.',
       pct: '20%',
     },
     {
@@ -6368,7 +5524,7 @@ function CiaticaCauses() {
     },
     {
       title: 'Disfunción facetaria',
-      description: 'Articulaciones facetarias de la columna lumbar irritadas — pueden referir dolor por el trayecto ciático.',
+      description: 'Articulaciones facetarias de la columna lumbar irritadas, pueden referir dolor por el trayecto ciático.',
       example: 'Sedentario crónico con extensión lumbar repetida (mal postural en silla) sin movilidad.',
       pct: '5%',
     },
@@ -6385,7 +5541,7 @@ function CiaticaCauses() {
           kicker="Causas · Origen real"
           title="Cuatro"
           subtitle="orígenes."
-          intro="La ciática no tiene una sola causa. Identificar cuál de las cuatro la produce es lo que define el tratamiento — y la diferencia entre mejorar o cronificarse."
+          intro="La ciática no tiene una sola causa. Identificar cuál de las cuatro la produce es lo que define el tratamiento, y la diferencia entre mejorar o cronificarse."
         />
 
         <div style={{
@@ -6413,7 +5569,7 @@ function CiaticaCauses() {
                 fontFamily: 'Space Grotesk',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.05em',
                 background: 'rgba(201,165,90,0.08)',
                 padding: '0.375rem 0.625rem',
@@ -6430,7 +5586,7 @@ function CiaticaCauses() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '3rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 0.85,
                   letterSpacing: '-0.03em',
                 }}>
@@ -6447,13 +5603,13 @@ function CiaticaCauses() {
                   {c.title}.
                 </h3>
               </div>
-              <p style={{
+              <DensePassage style={{
                 fontSize: '1rem',
                 lineHeight: 1.55,
                 color: 'rgba(10,10,10,0.7)',
               }}>
                 {c.description}
-              </p>
+              </DensePassage>
               <div style={{
                 marginTop: 'auto',
                 paddingTop: '1.25rem',
@@ -6469,7 +5625,7 @@ function CiaticaCauses() {
                   fontSize: '0.625rem',
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   fontWeight: 700,
                   fontStyle: 'normal',
                 }}>Ej.</span>
@@ -6490,7 +5646,7 @@ function CiaticaCauses() {
 }
 
 // =====================================================================
-// BY CONTEXT — situations triggering sciatica
+// BY CONTEXT, situations triggering sciatica
 // =====================================================================
 function CiaticaByContext({ activeContext, setActiveContext }) {
   const contexts = [
@@ -6499,28 +5655,28 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
       trigger: 'Sentado 8+ horas/día + flexión lumbar mantenida + glúteos dormidos',
       scenario: 'Persona de oficina que pasa 9h sentada. Empieza con tirantez lumbar. A los 3 meses: dolor que baja por la pierna al levantarse.',
       cause: 'Disfunción facetaria + piramidal',
-      stats: { 'Frecuencia': '45%', 'Tiempo recuperación': '4—6 sem', 'Pronóstico': 'Bueno con cambio postural' },
+      stats: { 'Frecuencia': '45%', 'Tiempo recuperación': '4 a 6 sem', 'Pronóstico': 'Bueno con cambio postural' },
     },
     {
       name: 'Levantamiento de peso',
       trigger: 'Deadlift o squat con flexión lumbar + giro súbito',
       scenario: 'Crossfittero o weightlifter que sube cargas sin descarga. Un día sintió un "clack" en la espalda + dolor inmediato hasta el pie.',
       cause: 'Hernia discal aguda',
-      stats: { 'Frecuencia': '25%', 'Tiempo recuperación': '6—12 sem', 'Pronóstico': 'Conservador 90%' },
+      stats: { 'Frecuencia': '25%', 'Tiempo recuperación': '6 a 12 sem', 'Pronóstico': 'Conservador 90%' },
     },
     {
       name: 'Running',
       trigger: 'Volumen alto + glúteo medio débil + isquios tensos',
       scenario: 'Runner que entrena 60 km/sem. Empieza con dolor en glúteo tras tirada larga. Progresa a dolor por pierna en bajadas.',
       cause: 'Síndrome piramidal',
-      stats: { 'Frecuencia': '20%', 'Tiempo recuperación': '4—8 sem', 'Pronóstico': 'Excelente con fortalecimiento' },
+      stats: { 'Frecuencia': '20%', 'Tiempo recuperación': '4 a 8 sem', 'Pronóstico': 'Excelente con fortalecimiento' },
     },
     {
       name: 'Edad / Artrosis',
       trigger: 'Degeneración articular + disco deshidratado + canal estrecho',
       scenario: 'Persona de 60+ que camina y aparece dolor irradiado. Mejora sentado o inclinado hacia adelante. Empeora con extensión.',
       cause: 'Estenosis lumbar',
-      stats: { 'Frecuencia': '10%', 'Tiempo recuperación': '8—16 sem', 'Pronóstico': 'Manejo crónico' },
+      stats: { 'Frecuencia': '10%', 'Tiempo recuperación': '8 a 16 sem', 'Pronóstico': 'Manejo crónico' },
     },
   ];
 
@@ -6556,7 +5712,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
           kicker="Por contexto · Casos reales"
           title="Cada contexto"
           subtitle="su mecanismo."
-          intro="La ciática del oficinista sedentario no es la del crossfittero ni la del runner ni la del adulto mayor. El contexto define la causa — y la causa, el tratamiento."
+          intro="La ciática del oficinista sedentario no es la del crossfittero ni la del runner ni la del adulto mayor. El contexto define la causa, y la causa, el tratamiento."
         />
 
         <div style={{
@@ -6604,7 +5760,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1rem',
             }}>
               {current.cause}
@@ -6630,7 +5786,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '0.5rem',
               }}>
                 Gatillo típico
@@ -6687,7 +5843,7 @@ function CiaticaByContext({ activeContext, setActiveContext }) {
                   fontSize: '1.5rem',
                   fontFamily: 'Space Grotesk',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1.1,
                 }}>
@@ -6735,7 +5891,7 @@ function CiaticaDifferential() {
           kicker="Diagnóstico diferencial"
           title="Misma pierna,"
           subtitle="distinto origen."
-          intro="Cinco condiciones producen dolor en el trayecto del ciático. Diferenciarlas define el tratamiento — y previene cronificación."
+          intro="Cinco condiciones producen dolor en el trayecto del ciático. Diferenciarlas define el tratamiento, y previene cronificación."
         />
 
         <div style={{
@@ -6759,7 +5915,7 @@ function CiaticaDifferential() {
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>
                   {h}
                 </div>
@@ -6831,7 +5987,7 @@ function CiaticaDifferential() {
 }
 
 // =====================================================================
-// TREATMENT — 4 phases
+// TREATMENT, 4 phases
 // =====================================================================
 function CiaticaTreatment({ activePhase, setActivePhase }) {
   const phases = [
@@ -6843,19 +5999,19 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
     },
     {
       title: 'Descomprimir',
-      duration: 'Semanas 1—2',
-      desc: 'Terapia manual lumbar, neurodinamia, alivio del piramidal con punción seca. Posiciones de descarga. No reposo absoluto — movilidad sin dolor.',
+      duration: 'Semanas 1 a 2',
+      desc: 'Terapia manual lumbar, neurodinamia, alivio del piramidal con punción seca. Posiciones de descarga. No reposo absoluto, movilidad sin dolor.',
       bullets: ['Terapia manual lumbar', 'Punción seca piramidal', 'Neurodinamia', 'Posiciones de descarga'],
     },
     {
       title: 'Estabilizar',
-      duration: 'Semanas 2—6',
+      duration: 'Semanas 2 a 6',
       desc: 'Core estabilizador, glúteo medio fuerte, control motor lumbar. Ejercicios de McKenzie si aplica. Reentrenar patrón de bisagra de cadera.',
       bullets: ['Core estabilizador', 'Glúteo medio carga', 'McKenzie si aplica', 'Patrón de cadera'],
     },
     {
       title: 'Volver',
-      duration: 'Semanas 4—8',
+      duration: 'Semanas 4 a 8',
       desc: 'Carga progresiva. Volver al deporte o actividad sin dolor radicular. Educación en mecánica de levantamiento, postura sentada, gestión de cargas.',
       bullets: ['Carga progresiva', 'Mecánica de levantamiento', 'Postura funcional', 'Vuelta a actividad'],
     },
@@ -6872,7 +6028,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
           kicker="Tratamiento · 4 fases"
           title="Proceso,"
           subtitle="no analgésicos."
-          intro="La ciática se resuelve por fases. Saltarse la estabilización garantiza recaída — el dolor se va, el patrón no."
+          intro="La ciática se resuelve por fases. Saltarse la estabilización garantiza recaída, el dolor se va, el patrón no."
         />
 
         <div style={{
@@ -6889,7 +6045,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
             {phases.map((p, i) => {
               const isActive = activePhase === i;
               return (
-                <button
+                <button aria-pressed={isActive}
                   key={i}
                   onClick={() => setActivePhase(i)}
                   style={{
@@ -6975,7 +6131,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
 
             <div style={{
               fontSize: '0.6875rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -6996,7 +6152,7 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
               position: 'relative',
             }}>
               {phases[activePhase].title}
-              <span style={{ color: '#C9A55A' }}>.</span>
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>.</span>
             </h3>
 
             <p style={{
@@ -7057,14 +6213,14 @@ function CiaticaTreatment({ activePhase, setActivePhase }) {
 // =====================================================================
 function CiaticaExercises() {
   const exercises = [
-    { name: 'Neurodinamia ciático',  goal: 'Movilizar nervio',         sets: '3 × 10 lentos', stage: 'Fase 1—2', difficulty: 'Baja' },
+    { name: 'Neurodinamia ciático',  goal: 'Movilizar nervio',         sets: '3 × 10 lentos', stage: 'Fase 1 a 2', difficulty: 'Baja' },
     { name: 'Cat-cow',                goal: 'Movilidad lumbar',         sets: '3 × 10',        stage: 'Fase 1', difficulty: 'Baja' },
     { name: 'Bird dog',               goal: 'Estabilidad lumbar',       sets: '3 × 10/lado',   stage: 'Fase 2', difficulty: 'Baja' },
     { name: 'Dead bug',               goal: 'Core anti-extensión',      sets: '3 × 10/lado',   stage: 'Fase 2', difficulty: 'Baja' },
     { name: 'Glúteo puente',          goal: 'Activación posterior',     sets: '3 × 15',        stage: 'Fase 2',   difficulty: 'Baja' },
-    { name: 'Side plank',             goal: 'Glúteo medio + core',      sets: '3 × 30s/lado',  stage: 'Fase 2—3', difficulty: 'Media' },
+    { name: 'Side plank',             goal: 'Glúteo medio + core',      sets: '3 × 30s/lado',  stage: 'Fase 2 a 3', difficulty: 'Media' },
     { name: 'McKenzie extension',     goal: 'Centralizar (si aplica)',  sets: '3 × 10',        stage: 'Variable', difficulty: 'Baja' },
-    { name: 'Hip hinge',              goal: 'Patrón de cadera',         sets: '3 × 12',        stage: 'Fase 3—4', difficulty: 'Media' },
+    { name: 'Hip hinge',              goal: 'Patrón de cadera',         sets: '3 × 12',        stage: 'Fase 3 a 4', difficulty: 'Media' },
   ];
 
   return (
@@ -7078,7 +6234,7 @@ function CiaticaExercises() {
           kicker="Ejercicios · Plan base"
           title="Qué"
           subtitle="trabajamos."
-          intro="Ejercicios típicos del plan. McKenzie funciona en hernias con centralización — pero empeora estenosis. Por eso el diagnóstico va antes del ejercicio."
+          intro="Ejercicios típicos del plan. McKenzie funciona en hernias con centralización, pero empeora estenosis. Por eso el diagnóstico va antes del ejercicio."
         />
 
         <div style={{
@@ -7121,7 +6277,7 @@ function CiaticaExercises() {
                 fontFamily: 'Space Grotesk',
                 fontSize: '0.875rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>{String(i + 1).padStart(2, '0')}</div>
               <div style={{
                 fontSize: '1.0625rem',
@@ -7142,7 +6298,7 @@ function CiaticaExercises() {
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>{e.stage}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{
@@ -7187,9 +6343,9 @@ function CiaticaExercises() {
 function CiaticaRecovery() {
   const milestones = [
     { week: 'Sem 0',   status: 'Diagnóstico',   desc: 'Lasègue + plan según causa' },
-    { week: 'Sem 1—2', status: 'Reducir dolor', desc: 'Manual + neurodinamia' },
-    { week: 'Sem 2—6', status: 'Estabilizar',   desc: 'Core + glúteo + control motor' },
-    { week: 'Sem 4—8', status: 'Volver',        desc: 'Carga progresiva + actividad' },
+    { week: 'Sem 1 a 2', status: 'Reducir dolor', desc: 'Manual + neurodinamia' },
+    { week: 'Sem 2 a 6', status: 'Estabilizar',   desc: 'Core + glúteo + control motor' },
+    { week: 'Sem 4 a 8', status: 'Volver',        desc: 'Carga progresiva + actividad' },
   ];
 
   const factors = [
@@ -7211,7 +6367,7 @@ function CiaticaRecovery() {
           kicker="Tiempo de recuperación"
           title="Entre 3"
           subtitle="y 8 semanas."
-          intro="La mayoría de ciáticas se resuelven con tratamiento conservador en 3—8 semanas. Hernias grandes o estenosis pueden tomar más. Cero ciática sin valoración."
+          intro="La mayoría de ciáticas se resuelven con tratamiento conservador en 3 a 8 semanas. Hernias grandes o estenosis pueden tomar más. Cero ciática sin valoración."
         />
 
         <div style={{
@@ -7270,7 +6426,7 @@ function CiaticaRecovery() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                     fontFamily: 'Space Grotesk',
                   }}>{m.week}</div>
@@ -7494,13 +6650,13 @@ function CiaticaCTA({ onNavigate }) {
 // =====================================================================
 function CiaticaFAQ({ openFaq, setOpenFaq }) {
   const faqs = [
-    { q: '¿Reposo en cama es bueno para la ciática?', a: 'No más de 1—2 días. La evidencia es clara: el reposo prolongado empeora la recuperación. Hay que moverse de forma controlada — caminar sin dolor, evitar gestos que disparen síntomas, mantener actividad de bajo impacto.' },
+    { q: '¿Reposo en cama es bueno para la ciática?', a: 'No más de 1 a 2 días. La evidencia es clara: el reposo prolongado empeora la recuperación. Hay que moverse de forma controlada, caminar sin dolor, evitar gestos que disparen síntomas, mantener actividad de bajo impacto.' },
     { q: '¿Necesito resonancia para diagnóstico?', a: 'Casi nunca al inicio. La ciática es diagnóstico clínico. La RM se reserva para: síntomas que persisten más de 6 semanas con tratamiento bien hecho, bandera roja neurológica, o sospecha de hernia que requiera intervención quirúrgica.' },
-    { q: '¿Cuándo es para cirugía?', a: 'En menos del 10% de casos. Indicación quirúrgica: déficit neurológico progresivo, cauda equina (urgencia), o ciática que no responde a 6—12 semanas de tratamiento conservador bien hecho. Primero agotamos opciones no invasivas.' },
-    { q: '¿Hielo o calor?', a: 'Hielo en las primeras 48—72h si hay inflamación aguda. Después, calor en zona lumbar y glúteo (relaja musculatura). Sin embargo, hielo o calor solo dan alivio sintomático — no resuelven la causa. El movimiento controlado sí.' },
-    { q: '¿Puedo entrenar con ciática?', a: 'Depende de la fase y la causa. En fase aguda hay que reducir gestos disparadores (sentadilla profunda, deadlift, sprint). Cardio sin impacto y trabajo de tren superior se mantienen. Vuelta a fuerza progresiva desde semana 3—4.' },
-    { q: '¿La ciática se cronifica?', a: 'Sí, si no se trata la causa. La fase aguda dura 4—8 semanas. Si pasada esa ventana sigue, hay que reevaluar — generalmente la causa es piramidal mal tratado o un problema postural no corregido. Recidivas frecuentes indican falta de fortalecimiento.' },
-    { q: '¿Las pastillas resuelven la ciática?', a: 'No. Los AINEs y miorrelajantes bajan el dolor temporalmente pero no corrigen la causa biomecánica. Funcionan como puente para empezar el tratamiento — no como solución. Vuelven al deporte, vuelve el dolor.' },
+    { q: '¿Cuándo es para cirugía?', a: 'En menos del 10% de casos. Indicación quirúrgica: déficit neurológico progresivo, cauda equina (urgencia), o ciática que no responde a 6 a 12 semanas de tratamiento conservador bien hecho. Primero agotamos opciones no invasivas.' },
+    { q: '¿Hielo o calor?', a: 'Hielo en las primeras 48 a 72h si hay inflamación aguda. Después, calor en zona lumbar y glúteo (relaja musculatura). Sin embargo, hielo o calor solo dan alivio sintomático, no resuelven la causa. El movimiento controlado sí.' },
+    { q: '¿Puedo entrenar con ciática?', a: 'Depende de la fase y la causa. En fase aguda hay que reducir gestos disparadores (sentadilla profunda, deadlift, sprint). Cardio sin impacto y trabajo de tren superior se mantienen. Vuelta a fuerza progresiva desde semana 3 a 4.' },
+    { q: '¿La ciática se cronifica?', a: 'Sí, si no se trata la causa. La fase aguda dura 4 a 8 semanas. Si pasada esa ventana sigue, hay que reevaluar, generalmente la causa es piramidal mal tratado o un problema postural no corregido. Recidivas frecuentes indican falta de fortalecimiento.' },
+    { q: '¿Las pastillas resuelven la ciática?', a: 'No. Los AINEs y miorrelajantes bajan el dolor temporalmente pero no corrigen la causa biomecánica. Funcionan como puente para empezar el tratamiento, no como solución. Vuelven al deporte, vuelve el dolor.' },
   ];
 
   return (
@@ -7514,7 +6670,7 @@ function CiaticaFAQ({ openFaq, setOpenFaq }) {
           kicker="Preguntas frecuentes"
           title="Lo que"
           subtitle="me preguntan."
-          intro="Las dudas más comunes sobre ciática. Si no encuentras la tuya, WhatsApp directo — respondo yo."
+          intro="Las dudas más comunes sobre ciática. Si no encuentras la tuya, WhatsApp directo, respondo yo."
         />
 
         <div style={{
@@ -7631,7 +6787,7 @@ function CiaticaRelated({ onNavigate }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -7718,7 +6874,7 @@ function CiaticaRelated({ onNavigate }) {
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>Ver protocolo</span>
                 <span data-rel="arrow" style={{
                   fontSize: '1.5rem',
@@ -7784,7 +6940,7 @@ function TendinitisHero({ onNavigate }) {
         }}>
           <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>Tendinitis Rotuliana</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>Tendinitis Rotuliana</span>
         </div>
 
         <div style={{
@@ -7803,7 +6959,7 @@ function TendinitisHero({ onNavigate }) {
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -7822,7 +6978,7 @@ function TendinitisHero({ onNavigate }) {
             }}>
               Tendinitis
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 rotuliana.
               </span>
             </h1>
@@ -7834,7 +6990,7 @@ function TendinitisHero({ onNavigate }) {
               maxWidth: '620px',
               marginBottom: '2rem',
             }}>
-              Dolor en el polo inferior de la rótula — el sello del atleta que salta.
+              Dolor en el polo inferior de la rótula, el sello del atleta que salta.
               <span style={{ color: '#0A0A0A', fontWeight: 500 }}> No es inflamación, es degeneración. Y el reposo no la cura.</span>
             </p>
 
@@ -7920,7 +7076,7 @@ function TendinitisHero({ onNavigate }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1.5rem',
             }}>
               TL;DR Clínico
@@ -7931,7 +7087,7 @@ function TendinitisHero({ onNavigate }) {
               color: 'rgba(255,255,255,0.9)',
               marginBottom: '1.5rem',
             }}>
-              Tendinopatía del tendón rotuliano por sobrecarga. No es inflamación clásica — es degeneración del colágeno. Solo carga progresiva (excéntricos) la cura.
+              Tendinopatía del tendón rotuliano por sobrecarga. No es inflamación clásica, es degeneración del colágeno. Solo carga progresiva (excéntricos) la cura.
             </p>
             <div style={{
               display: 'grid',
@@ -7941,11 +7097,11 @@ function TendinitisHero({ onNavigate }) {
               borderTop: '1px solid rgba(255,255,255,0.1)',
             }}>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>4—10</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>4 a 10</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Semanas</div>
               </div>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>Media</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>Media</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Complejidad</div>
               </div>
             </div>
@@ -7970,7 +7126,7 @@ function TendinitisWhatIs() {
     { label: 'Zona afectada',  value: 'Polo inferior de la rótula → tendón rotuliano' },
     { label: 'Mecanismo',      value: 'Sobrecarga de saltos · degeneración del colágeno' },
     { label: 'Deportes de riesgo', value: 'CrossFit, baloncesto, voleibol, running, fútbol' },
-    { label: 'Recuperación',   value: '4—10 semanas con carga excéntrica progresiva' },
+    { label: 'Recuperación',   value: '4 a 10 semanas con carga excéntrica progresiva' },
   ];
 
   return (
@@ -7996,7 +7152,7 @@ function TendinitisWhatIs() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -8015,27 +7171,27 @@ function TendinitisWhatIs() {
             }}>
               No es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 inflamación.
               </span>
             </h2>
 
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.125rem',
               lineHeight: 1.7,
               color: 'rgba(10,10,10,0.7)',
               marginBottom: '1.5rem',
             }}>
-              El nombre "tendinitis" engaña. La evidencia actual demuestra que es <strong style={{ color: '#0A0A0A' }}>tendinopatía</strong> — degeneración del colágeno del tendón por sobrecarga repetida, no inflamación clásica. Por eso el ibuprofeno no la cura.
-            </p>
-            <p style={{
+              El nombre "tendinitis" engaña. La evidencia actual demuestra que es <strong style={{ color: '#0A0A0A' }}>tendinopatía</strong>, degeneración del colágeno del tendón por sobrecarga repetida, no inflamación clásica. Por eso el ibuprofeno no la cura.
+            </DensePassage>
+            <DensePassage style={{
               fontSize: '1.0625rem',
               lineHeight: 1.65,
               color: 'rgba(10,10,10,0.6)',
               marginBottom: '1.5rem',
             }}>
-              El tendón necesita <strong style={{ color: '#0A0A0A' }}>carga, no reposo</strong>. Específicamente carga excéntrica progresiva — el clásico declines squat de Stanish. Reposar empeora. Cargar mal empeora. Cargar bien remodela.
-            </p>
+              El tendón necesita <strong style={{ color: '#0A0A0A' }}>carga, no reposo</strong>. Específicamente carga excéntrica progresiva, el clásico declines squat de Stanish. Reposar empeora. Cargar mal empeora. Cargar bien remodela.
+            </DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: '#FFFFFF',
@@ -8044,7 +7200,7 @@ function TendinitisWhatIs() {
               lineHeight: 1.6,
               color: 'rgba(10,10,10,0.75)',
             }}>
-              <strong style={{ color: '#0A0A0A' }}>Importante:</strong> La fase clínica (Blazina 1—4) determina qué carga puedes tolerar. Fase 4 es rotura — territorio quirúrgico. Las otras tres se tratan conservadoramente.
+              <strong style={{ color: '#0A0A0A' }}>Importante:</strong> La fase clínica (Blazina 1 a 4) determina qué carga puedes tolerar. Fase 4 es rotura, territorio quirúrgico. Las otras tres se tratan conservadoramente.
             </div>
           </div>
 
@@ -8077,7 +7233,7 @@ function TendinitisWhatIs() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                   }}>
                     {f.label}
@@ -8107,7 +7263,7 @@ function TendinitisWhatIs() {
 }
 
 // =====================================================================
-// BLAZINA CLASSIFICATION — Interactive tool
+// BLAZINA CLASSIFICATION, Interactive tool
 // =====================================================================
 function TendinitisBlazina({ onNavigate }) {
   const [phase, setPhase] = React.useState(1);
@@ -8126,7 +7282,7 @@ function TendinitisBlazina({ onNavigate }) {
         'Sensación de "agujetas" en el polo inferior de rótula',
       ],
       doThis: [
-        'Mantener actividad reduciendo volumen 20—30%',
+        'Mantener actividad reduciendo volumen 20 a 30%',
         'Iniciar carga excéntrica ligera (declines squats)',
         'Hielo post-entrenamiento si hay molestia',
         'Identificar el error de carga que lo disparó',
@@ -8134,16 +7290,16 @@ function TendinitisBlazina({ onNavigate }) {
       avoid: [
         'Aumentar volumen "porque ya no duele entrenando"',
         'Saltos pliométricos repetidos sin progresión',
-        'Reposo total — el tendón pierde capacidad',
+        'Reposo total, el tendón pierde capacidad',
       ],
-      recovery: '2—4 semanas',
+      recovery: '2 a 4 semanas',
     },
     {
       n: 2,
       title: 'Fase 2',
       level: 'Moderada',
-      color: '#C9A55A',
-      summary: 'Dolor durante Y después de la actividad — pero sin perder rendimiento.',
+      color: 'var(--gm-accent-ink, #80622D)',
+      summary: 'Dolor durante Y después de la actividad, pero sin perder rendimiento.',
       symptoms: [
         'Dolor que aparece al calentar y persiste durante el entrenamiento',
         'Dolor post-actividad más prolongado (horas)',
@@ -8151,7 +7307,7 @@ function TendinitisBlazina({ onNavigate }) {
         'Aparece al subir/bajar escaleras o al levantarse de silla baja',
       ],
       doThis: [
-        'Reducir volumen 40—50% y eliminar saltos',
+        'Reducir volumen 40 a 50% y eliminar saltos',
         'Carga excéntrica progresiva (3× semana mínimo)',
         'Spanish squat + isométricos largos (45s)',
         'Valoración profesional para identificar causa biomecánica',
@@ -8161,39 +7317,39 @@ function TendinitisBlazina({ onNavigate }) {
         'Estiramientos agresivos del cuádriceps',
         'Infiltraciones de corticoides (debilitan tendón)',
       ],
-      recovery: '4—8 semanas',
+      recovery: '4 a 8 semanas',
     },
     {
       n: 3,
       title: 'Fase 3',
       level: 'Severa',
       color: '#DC2626',
-      summary: 'Dolor que afecta tu rendimiento — ya no puedes entrenar normal.',
+      summary: 'Dolor que afecta tu rendimiento, ya no puedes entrenar normal.',
       symptoms: [
         'Dolor durante toda la actividad, no solo al inicio',
-        'Pierdes rendimiento — saltas menos, corres más lento',
+        'Pierdes rendimiento, saltas menos, corres más lento',
         'Dolor en actividades cotidianas (escaleras, sentarse)',
         'Puede haber engrosamiento palpable del tendón',
       ],
       doThis: [
         'Suspender actividad de impacto temporalmente',
         'Tratamiento profesional obligatorio',
-        'Carga excéntrica supervisada — sin progresar solo',
+        'Carga excéntrica supervisada, sin progresar solo',
         'Mantener cardio sin impacto (bici, natación)',
       ],
       avoid: [
         'Volver al deporte sin completar fortalecimiento',
         'Confiar en analgésicos para entrenar',
-        'Cirugía como primera opción — agotar conservador',
+        'Cirugía como primera opción, agotar conservador',
       ],
-      recovery: '8—16 semanas',
+      recovery: '8 a 16 semanas',
     },
     {
       n: 4,
       title: 'Fase 4',
       level: 'Rotura',
       color: '#7F1D1D',
-      summary: '⚠ Rotura del tendón — parcial o completa.',
+      summary: '⚠ Rotura del tendón, parcial o completa.',
       symptoms: [
         'Dolor súbito intenso durante esfuerzo (salto o sprint)',
         'Sensación de "chasquido" o "tirón" en el momento',
@@ -8208,9 +7364,9 @@ function TendinitisBlazina({ onNavigate }) {
       ],
       avoid: [
         'Tratar de "caminar para ver si se compone"',
-        'Demorar la consulta — el tendón retrasado se retrae',
+        'Demorar la consulta, el tendón retrasado se retrae',
       ],
-      recovery: '4—12 meses con cirugía',
+      recovery: '4 a 12 meses con cirugía',
     },
   ];
 
@@ -8258,7 +7414,7 @@ function TendinitisBlazina({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -8276,7 +7432,7 @@ function TendinitisBlazina({ onNavigate }) {
             }}>
               ¿En qué
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 fase estoy?
               </span>
             </h2>
@@ -8288,7 +7444,7 @@ function TendinitisBlazina({ onNavigate }) {
             lineHeight: 1.55,
             maxWidth: '460px',
           }}>
-            La clasificación de Blazina marca cómo de avanzada está la tendinopatía. Cada fase tiene su tratamiento — saber dónde estás cambia todo.
+            La clasificación de Blazina marca cómo de avanzada está la tendinopatía. Cada fase tiene su tratamiento, saber dónde estás cambia todo.
           </p>
         </div>
 
@@ -8303,7 +7459,7 @@ function TendinitisBlazina({ onNavigate }) {
           {phases.map((p, i) => {
             const isActive = phase === p.n;
             return (
-              <button
+              <button aria-pressed={isActive}
                 key={p.n}
                 onClick={() => setPhase(p.n)}
                 style={{
@@ -8429,7 +7585,7 @@ function TendinitisBlazina({ onNavigate }) {
                 <ellipse cx="120" cy="185" rx="22" ry="14" fill="rgba(10,10,10,0.1)" stroke="rgba(10,10,10,0.6)" strokeWidth="1.5" />
                 <text x="120" y="188" textAnchor="middle" fill="rgba(10,10,10,0.5)" fontSize="8" fontFamily="Space Grotesk" fontWeight="600" letterSpacing="0.1em">RÓTULA</text>
 
-                {/* Patellar tendon — this is where the action is, color by phase severity */}
+                {/* Patellar tendon, this is where the action is, color by phase severity */}
                 <rect
                   x="105"
                   y="199"
@@ -8713,31 +7869,7 @@ function TendinitisBlazina({ onNavigate }) {
 // TENDINITIS ROTULIANA - PARTE 2 - Resto + TendinitisPage shell
 
 function TendinitisPage({ onNavigate }) {
-  const [openFaq, setOpenFaq] = React.useState(0);
-  const [activeSport, setActiveSport] = React.useState(0);
-  const [activePhase, setActivePhase] = React.useState(0);
-
-  const Hero = TendinitisHero;
-  const WhatIs = TendinitisWhatIs;
-  const Blazina = TendinitisBlazina;
-
-  return (
-    <main>
-      <Hero onNavigate={onNavigate} />
-      <WhatIs />
-      <Blazina onNavigate={onNavigate} />
-      <TendinitisSymptoms />
-      <TendinitisCauses />
-      <TendinitisBySport activeSport={activeSport} setActiveSport={setActiveSport} />
-      <TendinitisDifferential />
-      <TendinitisTreatment activePhase={activePhase} setActivePhase={setActivePhase} />
-      <TendinitisExercises />
-      <TendinitisRecovery />
-      <TendinitisCTA onNavigate={onNavigate} />
-      <TendinitisFAQ openFaq={openFaq} setOpenFaq={setOpenFaq} />
-      <TendinitisRelated onNavigate={onNavigate} />
-    </main>
-  );
+  return <InjuryExperience page="tendinitis" assessment={<TendinitisBlazina onNavigate={onNavigate}/>}/>;
 }
 
 // SHARED HEADER (local)
@@ -8760,7 +7892,7 @@ function TeSectionHeader({ kicker, title, subtitle, intro, dark }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -8774,7 +7906,7 @@ function TeSectionHeader({ kicker, title, subtitle, intro, dark }) {
           fontFamily: 'Space Grotesk',
           color: dark ? '#FFFFFF' : '#0A0A0A',
         }}>
-          {title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span>
+          {title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span>
         </h2>
       </div>
       {intro && (
@@ -8794,7 +7926,7 @@ function TeSectionHeader({ kicker, title, subtitle, intro, dark }) {
 function TendinitisSymptoms() {
   const symptoms = [
     'Dolor localizado en polo inferior de rótula (se señala con un dedo)',
-    'Aparece al iniciar actividad — puede mejorar con calentamiento',
+    'Aparece al iniciar actividad, puede mejorar con calentamiento',
     'Empeora al subir/bajar escaleras o al levantarse de silla baja',
     'Dolor con saltos, sentadilla profunda y frenada en sprint',
     'Sensación de rigidez en rodilla por la mañana',
@@ -8857,7 +7989,7 @@ function TendinitisSymptoms() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '0.8125rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>{String(i + 1).padStart(2, '0')}</div>
                 <div style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: '#0A0A0A' }}>{s}</div>
               </div>
@@ -8922,7 +8054,7 @@ function TendinitisCauses() {
   const causes = [
     { title: 'Sobrecarga de saltos', description: 'Volumen de saltos que excede capacidad de adaptación del tendón.', example: 'Crossfittero que pasa de 80 a 200 box jumps semanales sin progresión.' },
     { title: 'Cuádriceps tenso',     description: 'Cuádriceps acortado tira del tendón rotuliano repetidamente.',         example: 'Runner que jamás trabaja movilidad de cuádriceps tras correr.' },
-    { title: 'Glúteo medio débil',   description: 'Sin estabilidad de cadera, rodilla colapsa medial. Tendón sufre.',     example: 'Atleta con valgo dinámico en sentadilla — sentadilla con rodilla al centro.' },
+    { title: 'Glúteo medio débil',   description: 'Sin estabilidad de cadera, rodilla colapsa medial. Tendón sufre.',     example: 'Atleta con valgo dinámico en sentadilla, sentadilla con rodilla al centro.' },
     { title: 'Errores técnicos',     description: 'Aterrizajes rígidos, sentadilla profunda con descontrol, sprint con frenada.', example: 'Cazar box jumps con rodilla extendida + pelvis caída.' },
   ];
 
@@ -8961,7 +8093,7 @@ function TendinitisCauses() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '3rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 0.85,
                   letterSpacing: '-0.03em',
                 }}>0{i + 1}</div>
@@ -8974,7 +8106,7 @@ function TendinitisCauses() {
                   color: '#0A0A0A',
                 }}>{c.title}.</h3>
               </div>
-              <p style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.description}</p>
+              <DensePassage style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.description}</DensePassage>
               <div style={{
                 marginTop: 'auto',
                 paddingTop: '1.25rem',
@@ -8990,7 +8122,7 @@ function TendinitisCauses() {
                   fontSize: '0.625rem',
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   fontWeight: 700,
                   fontStyle: 'normal',
                 }}>Ej.</span>
@@ -9017,25 +8149,25 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
       name: 'CrossFit',
       trigger: 'Box jumps + wall balls + sentadilla profunda con valgo dinámico',
       scenario: 'Crossfittero que entrena 5×/sem. Empieza con tirantez al box jump. Semana 4: dolor al subir escaleras. Semana 8: no puede squat profundo.',
-      stats: { '% de mis pacientes': '40%', 'Tiempo medio recuperación': '6—10 sem', 'Vuelta gradual': 'Sí, sin saltos 4 sem' },
+      stats: { '% de mis pacientes': '40%', 'Tiempo medio recuperación': '6 a 10 sem', 'Vuelta gradual': 'Sí, sin saltos 4 sem' },
     },
     {
       name: 'Voleibol / Básquet',
       trigger: 'Saltos repetidos con caída rígida + aterrizajes asimétricos',
-      scenario: 'Jugador amateur que entrena 3—4 días + partido. Empieza con dolor post-partido. Después dolor durante el salto. Pierde altura de salto.',
-      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '8—12 sem', 'Vuelta gradual': 'Carga progresiva 6 sem' },
+      scenario: 'Jugador amateur que entrena 3 a 4 días + partido. Empieza con dolor post-partido. Después dolor durante el salto. Pierde altura de salto.',
+      stats: { '% de mis pacientes': '20%', 'Tiempo medio recuperación': '8 a 12 sem', 'Vuelta gradual': 'Carga progresiva 6 sem' },
     },
     {
       name: 'Running',
       trigger: 'Volumen alto + bajadas pronunciadas + cuádriceps tenso crónico',
       scenario: 'Runner de trail que entrena 60+ km/sem. Bajadas pronunciadas. Empieza con tirantez tras tirada larga. Progresa a dolor en escaleras.',
-      stats: { '% de mis pacientes': '25%', 'Tiempo medio recuperación': '4—8 sem', 'Vuelta gradual': 'Sí, sin bajadas 3 sem' },
+      stats: { '% de mis pacientes': '25%', 'Tiempo medio recuperación': '4 a 8 sem', 'Vuelta gradual': 'Sí, sin bajadas 3 sem' },
     },
     {
       name: 'Fútbol',
       trigger: 'Sprints + frenadas en seco + remates con descarga sobre la rodilla',
       scenario: 'Jugador de partido los sábados. Sprint + frenada en partido. Día siguiente: dolor al subir auto. Semana 2: dolor con cualquier descarga.',
-      stats: { '% de mis pacientes': '15%', 'Tiempo medio recuperación': '6—10 sem', 'Vuelta gradual': 'Sin contacto 4 sem' },
+      stats: { '% de mis pacientes': '15%', 'Tiempo medio recuperación': '6 a 10 sem', 'Vuelta gradual': 'Sin contacto 4 sem' },
     },
   ];
 
@@ -9069,7 +8201,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
           kicker="Por deporte · Casos reales"
           title="Cada salto"
           subtitle="es distinto."
-          intro="La tendinopatía del crossfittero no es la del voleibolista ni la del runner. Cada gesto deportivo carga el tendón distinto — y el plan se adapta."
+          intro="La tendinopatía del crossfittero no es la del voleibolista ni la del runner. Cada gesto deportivo carga el tendón distinto, y el plan se adapta."
         />
 
         <div style={{
@@ -9115,7 +8247,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1rem',
             }}>Mecanismo · {current.name}</div>
             <h3 style={{
@@ -9137,7 +8269,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '0.5rem',
               }}>Gatillo típico</div>
               <p style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(255,255,255,0.85)' }}>{current.trigger}</p>
@@ -9176,7 +8308,7 @@ function TendinitisBySport({ activeSport, setActiveSport }) {
                   fontSize: '1.75rem',
                   fontFamily: 'Space Grotesk',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                 }}>{val}</div>
@@ -9220,7 +8352,7 @@ function TendinitisDifferential() {
           kicker="Diagnóstico diferencial"
           title="No todo dolor"
           subtitle="de rodilla es esto."
-          intro="Cinco condiciones se confunden con tendinopatía rotuliana. Diferenciarlas evita tratamientos equivocados — y meses perdidos."
+          intro="Cinco condiciones se confunden con tendinopatía rotuliana. Diferenciarlas evita tratamientos equivocados, y meses perdidos."
         />
 
         <div style={{
@@ -9239,7 +8371,7 @@ function TendinitisDifferential() {
                 padding: '1.25rem 1.5rem',
                 borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none',
               }}>
-                <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{h}</div>
+                <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{h}</div>
               </div>
             ))}
           </div>
@@ -9307,9 +8439,9 @@ function TendinitisDifferential() {
 function TendinitisTreatment({ activePhase, setActivePhase }) {
   const phases = [
     { title: 'Diagnóstico',  duration: 'Sesión 1 · 60 min', desc: 'Palpación, decline squat, evaluación de cuádriceps y glúteo, identificación de error de carga. Fase Blazina específica para tu caso.', bullets: ['Decline squat test', 'Palpación polo inferior', 'Fuerza cuádriceps/glúteo', 'Identificar error de carga'] },
-    { title: 'Descargar',    duration: 'Semanas 1—2',       desc: 'Reducir volumen de saltos. Mantener cardio sin impacto. Iniciar isométricos largos (45s × 5 reps) para alivio del dolor.',           bullets: ['Reducir saltos 50—100%', 'Isométricos 45s × 5', 'Cardio sin impacto', 'Hielo post-actividad'] },
-    { title: 'Cargar',       duration: 'Semanas 2—8',       desc: 'AQUÍ pasa la magia. Carga excéntrica progresiva (declines, Spanish squats) tres veces por semana. El tendón se remodela con carga, no con reposo.', bullets: ['Decline squat excéntrico', 'Spanish squat', 'HSR (heavy slow resistance)', 'Fortalecimiento glúteo medio'] },
-    { title: 'Volver',       duration: 'Semanas 6—10',      desc: 'Vuelta progresiva a saltos. Empezar con saltos verticales bajos, sin impacto, aumentando altura y volumen semana a semana.',          bullets: ['Saltos verticales bajos', 'Pliometría progresiva', 'Patrón de aterrizaje', 'Vuelta al deporte específico'] },
+    { title: 'Descargar',    duration: 'Semanas 1 a 2',       desc: 'Reducir volumen de saltos. Mantener cardio sin impacto. Iniciar isométricos largos (45s × 5 reps) para alivio del dolor.',           bullets: ['Reducir saltos 50 a 100%', 'Isométricos 45s × 5', 'Cardio sin impacto', 'Hielo post-actividad'] },
+    { title: 'Cargar',       duration: 'Semanas 2 a 8',       desc: 'AQUÍ pasa la magia. Carga excéntrica progresiva (declines, Spanish squats) tres veces por semana. El tendón se remodela con carga, no con reposo.', bullets: ['Decline squat excéntrico', 'Spanish squat', 'HSR (heavy slow resistance)', 'Fortalecimiento glúteo medio'] },
+    { title: 'Volver',       duration: 'Semanas 6 a 10',      desc: 'Vuelta progresiva a saltos. Empezar con saltos verticales bajos, sin impacto, aumentando altura y volumen semana a semana.',          bullets: ['Saltos verticales bajos', 'Pliometría progresiva', 'Patrón de aterrizaje', 'Vuelta al deporte específico'] },
   ];
 
   return (
@@ -9340,7 +8472,7 @@ function TendinitisTreatment({ activePhase, setActivePhase }) {
             {phases.map((p, i) => {
               const isActive = activePhase === i;
               return (
-                <button
+                <button aria-pressed={isActive}
                   key={i}
                   onClick={() => setActivePhase(i)}
                   style={{
@@ -9409,7 +8541,7 @@ function TendinitisTreatment({ activePhase, setActivePhase }) {
 
             <div style={{
               fontSize: '0.6875rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -9426,7 +8558,7 @@ function TendinitisTreatment({ activePhase, setActivePhase }) {
               color: '#0A0A0A',
               marginBottom: '1.5rem',
               position: 'relative',
-            }}>{phases[activePhase].title}<span style={{ color: '#C9A55A' }}>.</span></h3>
+            }}>{phases[activePhase].title}<span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>.</span></h3>
 
             <p style={{
               fontSize: '1.0625rem',
@@ -9530,7 +8662,7 @@ function TendinitisExercises() {
             onMouseEnter={(el) => el.currentTarget.style.background = '#FAFAFA'}
             onMouseLeave={(el) => el.currentTarget.style.background = '#FFFFFF'}
             className="te-ex-row">
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.875rem', fontWeight: 700, color: '#C9A55A' }}>{String(i + 1).padStart(2, '0')}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.875rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{String(i + 1).padStart(2, '0')}</div>
               <div style={{
                 fontSize: '1.0625rem',
                 fontFamily: 'Space Grotesk',
@@ -9550,7 +8682,7 @@ function TendinitisExercises() {
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>{e.stage}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{
@@ -9593,9 +8725,9 @@ function TendinitisExercises() {
 function TendinitisRecovery() {
   const milestones = [
     { week: 'Sem 0',    status: 'Diagnóstico',  desc: 'Decline squat + fase Blazina' },
-    { week: 'Sem 1—2',  status: 'Descargar',     desc: 'Isométricos + reducir saltos' },
-    { week: 'Sem 2—8',  status: 'Cargar',        desc: 'Excéntricos progresivos' },
-    { week: 'Sem 6—10', status: 'Volver',        desc: 'Pliometría + vuelta deporte' },
+    { week: 'Sem 1 a 2',  status: 'Descargar',     desc: 'Isométricos + reducir saltos' },
+    { week: 'Sem 2 a 8',  status: 'Cargar',        desc: 'Excéntricos progresivos' },
+    { week: 'Sem 6 a 10', status: 'Volver',        desc: 'Pliometría + vuelta deporte' },
   ];
 
   const factors = [
@@ -9670,7 +8802,7 @@ function TendinitisRecovery() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                     fontFamily: 'Space Grotesk',
                   }}>{m.week}</div>
@@ -9860,13 +8992,13 @@ function TendinitisCTA({ onNavigate }) {
 // FAQ
 function TendinitisFAQ({ openFaq, setOpenFaq }) {
   const faqs = [
-    { q: '¿El reposo cura la tendinitis rotuliana?', a: 'No. La evidencia es clara: el tendón se degenera con la inactividad. Necesita carga progresiva (excéntricos) para remodelarse. El reposo solo alivia mientras dura — al volver al deporte, el dolor regresa porque el tendón sigue débil.' },
+    { q: '¿El reposo cura la tendinitis rotuliana?', a: 'No. La evidencia es clara: el tendón se degenera con la inactividad. Necesita carga progresiva (excéntricos) para remodelarse. El reposo solo alivia mientras dura, al volver al deporte, el dolor regresa porque el tendón sigue débil.' },
     { q: '¿Las infiltraciones de cortisona sirven?', a: 'A corto plazo sí, pero a largo plazo empeoran. La cortisona debilita la matriz del tendón y aumenta riesgo de rotura. Se reservan para casos muy puntuales y solo bajo prescripción especialista. La cura sigue siendo carga progresiva.' },
-    { q: '¿Cuánto tarda en notarse mejora con excéntricos?', a: 'Las primeras 2 semanas no notas casi nada — incluso puede doler un poco más por la carga. A partir de la semana 4 empieza el alivio. Entre semana 6—10 normalmente vuelves al deporte sin restricciones. Paciencia los primeros 14 días es crítica.' },
-    { q: '¿Puedo entrenar con dolor?', a: 'Depende de la fase. En Blazina 1—2 puedes entrenar reduciendo volumen 30—50% y eliminando saltos. En Blazina 3 hay que parar saltos completamente. La regla: dolor < 4/10 durante y debe volver a normal en 24h. Si excede, has cargado de más.' },
-    { q: '¿Necesito resonancia o ecografía?', a: 'Casi nunca al inicio. Es diagnóstico clínico — el decline squat reproduce el dolor con alta especificidad. La ecografía se reserva para casos crónicos refractarios o sospecha de rotura parcial. No pidas pruebas innecesarias.' },
-    { q: '¿Cuándo es para cirugía?', a: 'En menos del 10%. Indicaciones: rotura completa del tendón (Blazina 4) o tendinopatía crónica refractaria a 6—12 meses de tratamiento conservador bien hecho. La cirugía siempre es último recurso — recuperación de 6—12 meses.' },
-    { q: '¿Las plantillas o rodilleras ayudan?', a: 'Las rodilleras tipo "patellar strap" pueden dar alivio sintomático durante actividad — útil para Blazina 2. Pero no curan, solo reducen carga momentáneamente. Las plantillas se usan solo si hay alteración biomecánica del pie identificada en valoración.' },
+    { q: '¿Cuánto tarda en notarse mejora con excéntricos?', a: 'Las primeras 2 semanas no notas casi nada, incluso puede doler un poco más por la carga. A partir de la semana 4 empieza el alivio. Entre semana 6 a 10 normalmente vuelves al deporte sin restricciones. Paciencia los primeros 14 días es crítica.' },
+    { q: '¿Puedo entrenar con dolor?', a: 'Depende de la fase. En Blazina 1 a 2 puedes entrenar reduciendo volumen 30 a 50% y eliminando saltos. En Blazina 3 hay que parar saltos completamente. La regla: dolor < 4/10 durante y debe volver a normal en 24h. Si excede, has cargado de más.' },
+    { q: '¿Necesito resonancia o ecografía?', a: 'Casi nunca al inicio. Es diagnóstico clínico, el decline squat reproduce el dolor con alta especificidad. La ecografía se reserva para casos crónicos refractarios o sospecha de rotura parcial. No pidas pruebas innecesarias.' },
+    { q: '¿Cuándo es para cirugía?', a: 'En menos del 10%. Indicaciones: rotura completa del tendón (Blazina 4) o tendinopatía crónica refractaria a 6 a 12 meses de tratamiento conservador bien hecho. La cirugía siempre es último recurso, recuperación de 6 a 12 meses.' },
+    { q: '¿Las plantillas o rodilleras ayudan?', a: 'Las rodilleras tipo "patellar strap" pueden dar alivio sintomático durante actividad, útil para Blazina 2. Pero no curan, solo reducen carga momentáneamente. Las plantillas se usan solo si hay alteración biomecánica del pie identificada en valoración.' },
   ];
 
   return (
@@ -9992,7 +9124,7 @@ function TendinitisRelated({ onNavigate }) {
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
           <div style={{
             fontSize: '0.75rem',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -10079,7 +9211,7 @@ function TendinitisRelated({ onNavigate }) {
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>Ver protocolo</span>
                 <span data-rel="arrow" style={{
                   fontSize: '1.5rem',
@@ -10145,7 +9277,7 @@ function HombroHero({ onNavigate }) {
         }}>
           <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>Hombro Congelado</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>Hombro Congelado</span>
         </div>
 
         <div style={{
@@ -10164,7 +9296,7 @@ function HombroHero({ onNavigate }) {
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -10183,7 +9315,7 @@ function HombroHero({ onNavigate }) {
             }}>
               Hombro
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 congelado.
               </span>
             </h1>
@@ -10196,7 +9328,7 @@ function HombroHero({ onNavigate }) {
               marginBottom: '2rem',
             }}>
               Pérdida progresiva de movilidad del hombro por inflamación y fibrosis de la cápsula.
-              <span style={{ color: '#0A0A0A', fontWeight: 500 }}> Tiene 3 fases con reglas distintas — tratar la fase equivocada empeora todo.</span>
+              <span style={{ color: '#0A0A0A', fontWeight: 500 }}> Tiene 3 fases con reglas distintas, tratar la fase equivocada empeora todo.</span>
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -10274,7 +9406,7 @@ function HombroHero({ onNavigate }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '1.5rem',
             }}>
               TL;DR Clínico
@@ -10285,7 +9417,7 @@ function HombroHero({ onNavigate }) {
               color: 'rgba(255,255,255,0.9)',
               marginBottom: '1.5rem',
             }}>
-              Capsulitis adhesiva: la cápsula del hombro se inflama y contrae. Limita el movimiento activo Y pasivo. Tres fases — congelamiento, congelado, descongelamiento.
+              Capsulitis adhesiva: la cápsula del hombro se inflama y contrae. Limita el movimiento activo Y pasivo. Tres fases, congelamiento, congelado, descongelamiento.
             </p>
             <div style={{
               display: 'grid',
@@ -10295,11 +9427,11 @@ function HombroHero({ onNavigate }) {
               borderTop: '1px solid rgba(255,255,255,0.1)',
             }}>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>8—24</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>8 a 24</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Semanas</div>
               </div>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>Alta</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>Alta</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Complejidad</div>
               </div>
             </div>
@@ -10323,8 +9455,8 @@ function HombroWhatIs() {
   const facts = [
     { label: 'Zona afectada',  value: 'Cápsula articular glenohumeral' },
     { label: 'Mecanismo',      value: 'Inflamación → fibrosis → contractura capsular' },
-    { label: 'Población',      value: '40—60 años · Más en mujeres · Diabéticos x4 riesgo' },
-    { label: 'Recuperación',   value: '8—24 semanas según fase y tratamiento' },
+    { label: 'Población',      value: '40 a 60 años · Más en mujeres · Diabéticos x4 riesgo' },
+    { label: 'Recuperación',   value: '8 a 24 semanas según fase y tratamiento' },
   ];
 
   return (
@@ -10350,7 +9482,7 @@ function HombroWhatIs() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -10369,27 +9501,27 @@ function HombroWhatIs() {
             }}>
               No es
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 un músculo.
               </span>
             </h2>
 
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.125rem',
               lineHeight: 1.7,
               color: 'rgba(10,10,10,0.7)',
               marginBottom: '1.5rem',
             }}>
-              El hombro congelado afecta la <strong style={{ color: '#0A0A0A' }}>cápsula articular</strong>, no el manguito ni el músculo. La cápsula se inflama, se engrosa y se contrae — literalmente "encoge" el espacio articular. Por eso pierdes movilidad en todas direcciones, no solo en un gesto.
-            </p>
-            <p style={{
+              El hombro congelado afecta la <strong style={{ color: '#0A0A0A' }}>cápsula articular</strong>, no el manguito ni el músculo. La cápsula se inflama, se engrosa y se contrae, literalmente "encoge" el espacio articular. Por eso pierdes movilidad en todas direcciones, no solo en un gesto.
+            </DensePassage>
+            <DensePassage style={{
               fontSize: '1.0625rem',
               lineHeight: 1.65,
               color: 'rgba(10,10,10,0.6)',
               marginBottom: '1.5rem',
             }}>
-              La clave diagnóstica: limita el movimiento <strong style={{ color: '#0A0A0A' }}>activo Y pasivo</strong>. Si alguien te mueve el brazo y tampoco llega, es capsular. Si te lo mueven y sí llega, es muscular o tendinoso — otra cosa.
-            </p>
+              La clave diagnóstica: limita el movimiento <strong style={{ color: '#0A0A0A' }}>activo Y pasivo</strong>. Si alguien te mueve el brazo y tampoco llega, es capsular. Si te lo mueven y sí llega, es muscular o tendinoso, otra cosa.
+            </DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: '#FFFFFF',
@@ -10398,7 +9530,7 @@ function HombroWhatIs() {
               lineHeight: 1.6,
               color: 'rgba(10,10,10,0.75)',
             }}>
-              <strong style={{ color: '#0A0A0A' }}>Importante:</strong> El tratamiento depende de la fase. En fase de congelamiento (dolorosa), estirar agresivo empeora. En fase congelada, hay que movilizar. Saber la fase lo es todo — pruébalo abajo.
+              <strong style={{ color: '#0A0A0A' }}>Importante:</strong> El tratamiento depende de la fase. En fase de congelamiento (dolorosa), estirar agresivo empeora. En fase congelada, hay que movilizar. Saber la fase lo es todo, pruébalo abajo.
             </div>
           </div>
 
@@ -10431,7 +9563,7 @@ function HombroWhatIs() {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     marginBottom: '0.375rem',
                   }}>
                     {f.label}
@@ -10461,7 +9593,7 @@ function HombroWhatIs() {
 }
 
 // =====================================================================
-// ROM AUTO-TEST — Interactive range of motion self-assessment
+// ROM AUTO-TEST, Interactive range of motion self-assessment
 // =====================================================================
 function HombroROMTest({ onNavigate }) {
   const movements = [
@@ -10493,7 +9625,7 @@ function HombroROMTest({ onNavigate }) {
       id: 'rotacion-ext',
       name: 'Rotación externa',
       instruction: 'Codo pegado al cuerpo, doblado 90°. Gira el antebrazo hacia afuera sin despegar el codo.',
-      normal: '60—90°',
+      normal: '60 a 90°',
       levels: [
         { label: 'Giro libremente hacia afuera', score: 0, deg: 80 },
         { label: 'Giro un poco, con tirantez', score: 1, deg: 45 },
@@ -10534,14 +9666,14 @@ function HombroROMTest({ onNavigate }) {
         level: 'Movilidad normal',
         color: '#16A34A',
         title: 'Movilidad conservada.',
-        message: 'Tu rango de movimiento parece normal en las 4 direcciones. Es poco probable que sea hombro congelado. Si tienes dolor, puede ser tendinopatía del manguito, bursitis o pinzamiento — otra cosa.',
+        message: 'Tu rango de movimiento parece normal en las 4 direcciones. Es poco probable que sea hombro congelado. Si tienes dolor, puede ser tendinopatía del manguito, bursitis o pinzamiento, otra cosa.',
         phase: null,
       };
     }
     if (totalScore <= 4) {
       return {
         level: 'Restricción leve',
-        color: '#C9A55A',
+        color: 'var(--gm-accent-ink, #80622D)',
         title: 'Restricción inicial.',
         message: 'Hay limitación leve, posiblemente en fase temprana de congelamiento o por otra causa (manguito, pinzamiento). La rotación externa restringida es el signo más sugestivo de capsulitis. Vale la pena evaluar pronto.',
         phase: 'Posible Fase 1 (congelamiento)',
@@ -10553,14 +9685,14 @@ function HombroROMTest({ onNavigate }) {
         color: '#DC2626',
         title: 'Restricción significativa.',
         message: 'Limitación importante en varios planos. Si el movimiento pasivo (cuando otro te mueve el brazo) también está limitado, el patrón es muy compatible con capsulitis adhesiva. Necesitas valoración para confirmar fase y tratamiento.',
-        phase: 'Compatible con Fase 1—2',
+        phase: 'Compatible con Fase 1 a 2',
       };
     }
     return {
       level: 'Restricción severa',
       color: '#7F1D1D',
       title: 'Hombro muy rígido.',
-      message: 'Pérdida severa de movilidad multidireccional — patrón clásico de hombro congelado en fase congelada (fase 2). El tratamiento aquí es movilización progresiva supervisada. No fuerces estiramientos por tu cuenta. Valoración prioritaria.',
+      message: 'Pérdida severa de movilidad multidireccional, patrón clásico de hombro congelado en fase congelada (fase 2). El tratamiento aquí es movilización progresiva supervisada. No fuerces estiramientos por tu cuenta. Valoración prioritaria.',
       phase: 'Compatible con Fase 2 (congelado)',
     };
   }
@@ -10615,7 +9747,7 @@ function HombroROMTest({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -10633,7 +9765,7 @@ function HombroROMTest({ onNavigate }) {
             }}>
               ¿Cuánto
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 te mueves?
               </span>
             </h2>
@@ -10710,7 +9842,7 @@ function HombroROMTest({ onNavigate }) {
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   marginBottom: '0.5rem',
                 }}>
                   Normal: {current.normal}
@@ -10739,7 +9871,7 @@ function HombroROMTest({ onNavigate }) {
                     const done = answers[m.id] !== undefined;
                     const isActive = activeMovement === i;
                     return (
-                      <button
+                      <button aria-pressed={isActive}
                         key={m.id}
                         onClick={() => setActiveMovement(i)}
                         style={{
@@ -10758,7 +9890,7 @@ function HombroROMTest({ onNavigate }) {
                           position: 'relative',
                         }}
                       >
-                        {done && !isActive && <span style={{ color: '#C9A55A', marginRight: '0.25rem' }}>✓</span>}
+                        {done && !isActive && <span style={{ color: 'var(--gm-accent-ink, #80622D)', marginRight: '0.25rem' }}>✓</span>}
                         {m.name}
                       </button>
                     );
@@ -11028,7 +10160,7 @@ function HombroROMTest({ onNavigate }) {
           color: 'rgba(10,10,10,0.5)',
           maxWidth: '700px',
         }}>
-          Este test orienta, no diagnostica. La diferencia clave del hombro congelado es que limita el movimiento <strong style={{ color: '#0A0A0A' }}>pasivo</strong> (cuando otro te mueve el brazo) — eso solo se confirma en valoración presencial.
+          Este test orienta, no diagnostica. La diferencia clave del hombro congelado es que limita el movimiento <strong style={{ color: '#0A0A0A' }}>pasivo</strong> (cuando otro te mueve el brazo), eso solo se confirma en valoración presencial.
         </div>
       </div>
 
@@ -11059,7 +10191,7 @@ function HombroROMSvg({ movement, visDeg, submitted, answers, movements }) {
   let armX, armY, armX2, armY2;
 
   if (movement.id === 'flexion') {
-    // Flexion: arm rotates forward/up in sagittal — we show side view, arm goes up-forward
+    // Flexion: arm rotates forward/up in sagittal, we show side view, arm goes up-forward
     const rad = visDeg * Math.PI / 180;
     armX = sx + armLen * Math.sin(rad) * 0.9;
     armY = sy - armLen * Math.sin(rad);
@@ -11150,31 +10282,7 @@ function HombroROMSvg({ movement, visDeg, submitted, answers, movements }) {
 // HOMBRO CONGELADO - PARTE 2 - Resto + HombroPage shell
 
 function HombroPage({ onNavigate }) {
-  const [openFaq, setOpenFaq] = React.useState(0);
-  const [activePhaseNat, setActivePhaseNat] = React.useState(0);
-  const [activePhase, setActivePhase] = React.useState(0);
-
-  const Hero = HombroHero;
-  const WhatIs = HombroWhatIs;
-  const ROMTest = HombroROMTest;
-
-  return (
-    <main>
-      <Hero onNavigate={onNavigate} />
-      <WhatIs />
-      <ROMTest onNavigate={onNavigate} />
-      <HombroPhases activePhaseNat={activePhaseNat} setActivePhaseNat={setActivePhaseNat} />
-      <HombroSymptoms />
-      <HombroCauses />
-      <HombroDifferential />
-      <HombroTreatment activePhase={activePhase} setActivePhase={setActivePhase} />
-      <HombroExercises />
-      <HombroRecovery />
-      <HombroCTA onNavigate={onNavigate} />
-      <HombroFAQ openFaq={openFaq} setOpenFaq={setOpenFaq} />
-      <HombroRelated onNavigate={onNavigate} />
-    </main>
-  );
+  return <InjuryExperience page="hombro" assessment={<HombroROMTest onNavigate={onNavigate}/>}/>;
 }
 
 // SHARED HEADER (local)
@@ -11190,7 +10298,7 @@ function HoSectionHeader({ kicker, title, subtitle, intro, dark }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
         </div>
         <h2 style={{
           fontSize: 'clamp(2.5rem, 5vw, 4rem)',
@@ -11199,7 +10307,7 @@ function HoSectionHeader({ kicker, title, subtitle, intro, dark }) {
           letterSpacing: '-0.03em',
           fontFamily: 'Space Grotesk',
           color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
+        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span></h2>
       </div>
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
@@ -11210,7 +10318,7 @@ function HoSectionHeader({ kicker, title, subtitle, intro, dark }) {
 }
 
 // =====================================================================
-// NATURAL PHASES — 3 phases of frozen shoulder (clickable)
+// NATURAL PHASES, 3 phases of frozen shoulder (clickable)
 // =====================================================================
 function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
   const phases = [
@@ -11219,23 +10327,23 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
       title: 'Congelamiento',
       eng: 'Freezing',
       color: '#DC2626',
-      duration: '6 semanas — 9 meses',
+      duration: '6 semanas, 9 meses',
       pain: 'Alto',
       mobility: 'Disminuyendo',
       summary: 'Dolor intenso, especialmente nocturno. La movilidad empieza a perderse.',
-      detail: 'La fase más dolorosa. El dolor domina sobre la rigidez. Aparece dolor nocturno que interrumpe el sueño. Aquí estirar agresivo es contraproducente — la prioridad es controlar dolor y mantener movilidad sin forzar.',
+      detail: 'La fase más dolorosa. El dolor domina sobre la rigidez. Aparece dolor nocturno que interrumpe el sueño. Aquí estirar agresivo es contraproducente, la prioridad es controlar dolor y mantener movilidad sin forzar.',
       treatment: 'Control del dolor · Movilidad suave sin forzar · NO estiramiento agresivo',
     },
     {
       n: 2,
       title: 'Congelado',
       eng: 'Frozen',
-      color: '#C9A55A',
-      duration: '4 — 12 meses',
+      color: 'var(--gm-accent-ink, #80622D)',
+      duration: '4, 12 meses',
       pain: 'Medio',
       mobility: 'Mínima',
       summary: 'El dolor baja pero la rigidez es máxima. El hombro está "bloqueado".',
-      detail: 'El dolor disminuye pero la rigidez alcanza su punto máximo. El hombro está realmente "congelado" — movimiento muy limitado en todas direcciones. Aquí SÍ se moviliza progresivamente. Es la fase donde la fisioterapia activa marca más diferencia.',
+      detail: 'El dolor disminuye pero la rigidez alcanza su punto máximo. El hombro está realmente "congelado", movimiento muy limitado en todas direcciones. Aquí SÍ se moviliza progresivamente. Es la fase donde la fisioterapia activa marca más diferencia.',
       treatment: 'Movilización progresiva · Terapia manual · Ejercicios de rango activo',
     },
     {
@@ -11243,11 +10351,11 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
       title: 'Descongelamiento',
       eng: 'Thawing',
       color: '#16A34A',
-      duration: '6 meses — 2 años',
+      duration: '6 meses, 2 años',
       pain: 'Bajo',
       mobility: 'Recuperando',
       summary: 'La movilidad regresa gradualmente. El hombro se "descongela".',
-      detail: 'La movilidad regresa progresivamente. El dolor es mínimo. Aquí se acelera la recuperación con fortalecimiento y trabajo de rango completo. Sin tratamiento puede tardar hasta 2 años — con fisioterapia bien dirigida se acorta significativamente.',
+      detail: 'La movilidad regresa progresivamente. El dolor es mínimo. Aquí se acelera la recuperación con fortalecimiento y trabajo de rango completo. Sin tratamiento puede tardar hasta 2 años, con fisioterapia bien dirigida se acorta significativamente.',
       treatment: 'Fortalecimiento · Rango completo · Vuelta a actividad normal',
     },
   ];
@@ -11297,7 +10405,7 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
           {phases.map((p, i) => {
             const isActive = activePhaseNat === i;
             return (
-              <button
+              <button aria-pressed={isActive}
                 key={p.n}
                 onClick={() => setActivePhaseNat(i)}
                 style={{
@@ -11383,12 +10491,12 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
               lineHeight: 1.05,
               marginBottom: '1.25rem',
             }}>{current.summary}</h3>
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.0625rem',
               lineHeight: 1.65,
               color: 'rgba(255,255,255,0.7)',
               marginBottom: '2rem',
-            }}>{current.detail}</p>
+            }}>{current.detail}</DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: `${current.color}15`,
@@ -11433,7 +10541,7 @@ function HombroPhases({ activePhaseNat, setActivePhaseNat }) {
                 marginBottom: '0.75rem',
               }}>
                 <span style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>Movilidad</span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'Space Grotesk', color: '#C9A55A' }}>{current.mobility}</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--gm-accent-ink, #80622D)' }}>{current.mobility}</span>
               </div>
               <div style={{ height: '6px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                 <div style={{
@@ -11527,7 +10635,7 @@ function HombroSymptoms() {
                 borderBottom: i < symptoms.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
                 alignItems: 'flex-start',
               }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: '#C9A55A' }}>{String(i + 1).padStart(2, '0')}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{String(i + 1).padStart(2, '0')}</div>
                 <div style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: '#0A0A0A' }}>{s}</div>
               </div>
             ))}
@@ -11578,7 +10686,7 @@ function HombroSymptoms() {
 // CAUSES
 function HombroCauses() {
   const causes = [
-    { title: 'Idiopática', description: 'En muchos casos no hay causa clara. Aparece sin trauma previo, sobre todo entre 40—60 años.', example: 'Persona de 50 años que un día nota rigidez progresiva sin haberse lastimado.', pct: '40%' },
+    { title: 'Idiopática', description: 'En muchos casos no hay causa clara. Aparece sin trauma previo, sobre todo entre 40 a 60 años.', example: 'Persona de 50 años que un día nota rigidez progresiva sin haberse lastimado.', pct: '40%' },
     { title: 'Inmovilización', description: 'Tras cirugía, fractura o lesión que obligó a no mover el hombro. La cápsula se contrae por desuso.', example: 'Paciente que tuvo el brazo en cabestrillo 4 semanas y no lo movilizó después.', pct: '30%' },
     { title: 'Diabetes', description: 'Los diabéticos tienen hasta 4× más riesgo. La glicación afecta el colágeno de la cápsula.', example: 'Diabético tipo 2 que desarrolla rigidez bilateral progresiva.', pct: '20%' },
     { title: 'Endocrina / otros', description: 'Tiroides, enfermedad cardiovascular o ciertos fármacos predisponen a capsulitis.', example: 'Paciente con hipotiroidismo que desarrolla hombro congelado.', pct: '10%' },
@@ -11595,7 +10703,7 @@ function HombroCauses() {
           kicker="Causas · Factores de riesgo"
           title="A veces"
           subtitle="sin razón."
-          intro="El hombro congelado puede aparecer sin causa aparente. Pero hay factores que multiplican el riesgo — sobre todo diabetes e inmovilización prolongada."
+          intro="El hombro congelado puede aparecer sin causa aparente. Pero hay factores que multiplican el riesgo, sobre todo diabetes e inmovilización prolongada."
         />
 
         <div style={{
@@ -11622,15 +10730,15 @@ function HombroCauses() {
                 fontFamily: 'Space Grotesk',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 background: 'rgba(201,165,90,0.08)',
                 padding: '0.375rem 0.625rem',
               }}>{c.pct}</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
                 <h3 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.05, color: '#0A0A0A' }}>{c.title}.</h3>
               </div>
-              <p style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.description}</p>
+              <DensePassage style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.description}</DensePassage>
               <div style={{
                 marginTop: 'auto',
                 paddingTop: '1.25rem',
@@ -11646,7 +10754,7 @@ function HombroCauses() {
                   fontSize: '0.625rem',
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   fontWeight: 700,
                   fontStyle: 'normal',
                 }}>Ej.</span>
@@ -11671,7 +10779,7 @@ function HombroDifferential() {
   const rows = [
     { condition: 'Hombro congelado', location: 'Cápsula (global)', test: 'Movilidad activa = pasiva', finding: 'Restricción activa Y pasiva. Rotación externa muy limitada' },
     { condition: 'Rotura manguito',  location: 'Tendones manguito', test: 'Pasiva > activa',       finding: 'Pasivo conservado, activo limitado. Debilidad' },
-    { condition: 'Pinzamiento',      location: 'Subacromial',       test: 'Neer + Hawkins',        finding: 'Dolor en arco 60—120°, no pérdida global' },
+    { condition: 'Pinzamiento',      location: 'Subacromial',       test: 'Neer + Hawkins',        finding: 'Dolor en arco 60 a 120°, no pérdida global' },
     { condition: 'Artrosis glenohumeral', location: 'Cartílago articular', test: 'Rx + crepitación', finding: 'Crujidos + dolor + rigidez. Mayores' },
     { condition: 'Tendinitis calcificante', location: 'Tendón (calcio)', test: 'Ecografía / Rx',    finding: 'Dolor agudo súbito. Depósito visible en imagen' },
   ];
@@ -11700,7 +10808,7 @@ function HombroDifferential() {
           }}>
             {['Condición', 'Localización', 'Test clínico', 'Hallazgo clave'].map((h, i, arr) => (
               <div key={h} style={{ padding: '1.25rem 1.5rem', borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-                <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{h}</div>
+                <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{h}</div>
               </div>
             ))}
           </div>
@@ -11734,7 +10842,7 @@ function HombroDifferential() {
 function HombroTreatment({ activePhase, setActivePhase }) {
   const phases = [
     { title: 'Diagnóstico',  duration: 'Sesión 1 · 60 min', desc: 'Confirmar capsulitis (activo = pasivo), identificar fase natural (1/2/3), descartar manguito y otras patologías. Plan según fase.', bullets: ['Movilidad activa vs pasiva', 'Identificar fase natural', 'Descartar manguito', 'Plan según fase'] },
-    { title: 'Calmar',       duration: 'Fase congelamiento', desc: 'Si está en fase dolorosa: control del dolor, movilidad suave sin forzar. Aquí NO se estira agresivo — empeora la inflamación capsular.', bullets: ['Control del dolor', 'Movilidad pendular suave', 'Terapia manual gentil', 'Educación de la fase'] },
+    { title: 'Calmar',       duration: 'Fase congelamiento', desc: 'Si está en fase dolorosa: control del dolor, movilidad suave sin forzar. Aquí NO se estira agresivo, empeora la inflamación capsular.', bullets: ['Control del dolor', 'Movilidad pendular suave', 'Terapia manual gentil', 'Educación de la fase'] },
     { title: 'Movilizar',    duration: 'Fase congelado',     desc: 'Cuando el dolor baja y domina la rigidez: movilización progresiva, terapia manual, estiramiento capsular dirigido. La fase donde más se gana.', bullets: ['Movilización articular', 'Estiramiento capsular', 'Rango activo-asistido', 'Terapia manual intensiva'] },
     { title: 'Fortalecer',   duration: 'Fase descongelado',  desc: 'Con movilidad recuperándose: fortalecer manguito y escápula, recuperar rango completo, volver a actividad normal sin compensaciones.', bullets: ['Fortalecer manguito', 'Control escapular', 'Rango completo', 'Vuelta a actividad'] },
   ];
@@ -11750,7 +10858,7 @@ function HombroTreatment({ activePhase, setActivePhase }) {
           kicker="Tratamiento · Según fase"
           title="Cada fase,"
           subtitle="su regla."
-          intro="El error más común: estirar agresivo en fase dolorosa. El tratamiento del hombro congelado se adapta a la fase natural — calmar primero, movilizar después, fortalecer al final."
+          intro="El error más común: estirar agresivo en fase dolorosa. El tratamiento del hombro congelado se adapta a la fase natural, calmar primero, movilizar después, fortalecer al final."
         />
 
         <div style={{
@@ -11763,7 +10871,7 @@ function HombroTreatment({ activePhase, setActivePhase }) {
             {phases.map((p, i) => {
               const isActive = activePhase === i;
               return (
-                <button
+                <button aria-pressed={isActive}
                   key={i}
                   onClick={() => setActivePhase(i)}
                   style={{
@@ -11801,8 +10909,8 @@ function HombroTreatment({ activePhase, setActivePhase }) {
             animation: 'hoTxFade 0.4s ease-out',
           }}>
             <div style={{ position: 'absolute', top: '1rem', right: '2rem', fontFamily: 'Space Grotesk', fontSize: '8rem', fontWeight: 700, color: 'rgba(201,165,90,0.08)', lineHeight: 0.85, letterSpacing: '-0.04em' }}>0{activePhase + 1}</div>
-            <div style={{ fontSize: '0.6875rem', color: '#C9A55A', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1rem', position: 'relative' }}>Paso {String(activePhase + 1).padStart(2, '0')} · {phases[activePhase].duration}</div>
-            <h3 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: '#0A0A0A', marginBottom: '1.5rem', position: 'relative' }}>{phases[activePhase].title}<span style={{ color: '#C9A55A' }}>.</span></h3>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1rem', position: 'relative' }}>Paso {String(activePhase + 1).padStart(2, '0')} · {phases[activePhase].duration}</div>
+            <h3 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: '#0A0A0A', marginBottom: '1.5rem', position: 'relative' }}>{phases[activePhase].title}<span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>.</span></h3>
             <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)', maxWidth: '500px', marginBottom: '2rem', position: 'relative' }}>{phases[activePhase].desc}</p>
             <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(10,10,10,0.06)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               {phases[activePhase].bullets.map((b, i) => (
@@ -11828,10 +10936,10 @@ function HombroTreatment({ activePhase, setActivePhase }) {
 function HombroExercises() {
   const exercises = [
     { name: 'Pendulares de Codman',     goal: 'Movilidad suave (fase 1)',  sets: '3 × 1 min', stage: 'Fase 1',   difficulty: 'Baja' },
-    { name: 'Deslizamiento en pared',   goal: 'Flexión asistida',          sets: '3 × 10',    stage: 'Fase 1—2', difficulty: 'Baja' },
+    { name: 'Deslizamiento en pared',   goal: 'Flexión asistida',          sets: '3 × 10',    stage: 'Fase 1 a 2', difficulty: 'Baja' },
     { name: 'Estiramiento cruzado',     goal: 'Cápsula posterior',         sets: '3 × 30s',   stage: 'Fase 2',   difficulty: 'Media' },
     { name: 'Rotación ext. con bastón', goal: 'Rotación externa',          sets: '3 × 10',    stage: 'Fase 2',   difficulty: 'Media' },
-    { name: 'Toalla a la espalda',      goal: 'Rotación interna',          sets: '3 × 10',    stage: 'Fase 2—3', difficulty: 'Media' },
+    { name: 'Toalla a la espalda',      goal: 'Rotación interna',          sets: '3 × 10',    stage: 'Fase 2 a 3', difficulty: 'Media' },
     { name: 'Remo con banda',           goal: 'Fortalecer escápula',       sets: '3 × 15',    stage: 'Fase 3',   difficulty: 'Media' },
     { name: 'Rotación ext. resistida',  goal: 'Fortalecer manguito',       sets: '3 × 12',    stage: 'Fase 3',   difficulty: 'Media' },
     { name: 'Flexiones en pared',       goal: 'Control escapular',         sets: '3 × 12',    stage: 'Fase 3',   difficulty: 'Baja' },
@@ -11878,11 +10986,11 @@ function HombroExercises() {
             onMouseEnter={(el) => el.currentTarget.style.background = '#FAFAFA'}
             onMouseLeave={(el) => el.currentTarget.style.background = '#FFFFFF'}
             className="ho-ex-row">
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.875rem', fontWeight: 700, color: '#C9A55A' }}>{String(i + 1).padStart(2, '0')}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.875rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{String(i + 1).padStart(2, '0')}</div>
               <div style={{ fontSize: '1.0625rem', fontFamily: 'Space Grotesk', fontWeight: 600, letterSpacing: '-0.01em', color: '#0A0A0A' }}>{e.name}</div>
               <div style={{ fontSize: '0.9375rem', color: 'rgba(10,10,10,0.65)' }}>{e.goal}</div>
               <div style={{ fontSize: '0.9375rem', fontFamily: 'Space Grotesk', fontWeight: 600, color: '#0A0A0A' }}>{e.sets}</div>
-              <div style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{e.stage}</div>
+              <div style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{e.stage}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: e.difficulty === 'Avanzada' ? '#DC2626' : e.difficulty === 'Media' ? '#C9A55A' : '#16A34A' }} />
                 <span style={{ fontSize: '0.875rem', color: '#0A0A0A' }}>{e.difficulty}</span>
@@ -11913,9 +11021,9 @@ function HombroExercises() {
 // RECOVERY
 function HombroRecovery() {
   const milestones = [
-    { week: 'Fase 1',  status: 'Congelamiento', desc: '6 sem—9 meses · controlar dolor' },
-    { week: 'Fase 2',  status: 'Congelado',     desc: '4—12 meses · movilizar' },
-    { week: 'Fase 3',  status: 'Descongelado',  desc: '6 meses—2 años · fortalecer' },
+    { week: 'Fase 1',  status: 'Congelamiento', desc: '6 sem, 9 meses · controlar dolor' },
+    { week: 'Fase 2',  status: 'Congelado',     desc: '4 a 12 meses · movilizar' },
+    { week: 'Fase 3',  status: 'Descongelado',  desc: '6 meses, 2 años · fortalecer' },
     { week: 'Meta',    status: 'Rango completo', desc: 'Movilidad y fuerza restauradas' },
   ];
 
@@ -11938,7 +11046,7 @@ function HombroRecovery() {
           kicker="Tiempo de recuperación"
           title="De meses"
           subtitle="a años."
-          intro="El hombro congelado es la lesión más lenta del catálogo. Sin tratar puede tardar hasta 2—3 años. Con fisioterapia bien dirigida se acorta significativamente — sobre todo si se empieza en fase congelada."
+          intro="El hombro congelado es la lesión más lenta del catálogo. Sin tratar puede tardar hasta 2 a 3 años. Con fisioterapia bien dirigida se acorta significativamente, sobre todo si se empieza en fase congelada."
         />
 
         <div style={{
@@ -11964,7 +11072,7 @@ function HombroRecovery() {
                     border: `3px solid ${i === 0 ? '#DC2626' : i === 1 ? '#C9A55A' : i === 2 ? '#16A34A' : '#0A0A0A'}`,
                     boxShadow: i === 0 ? '0 0 0 4px rgba(220,38,38,0.15)' : 'none',
                   }} />
-                  <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.375rem', fontFamily: 'Space Grotesk' }}>{m.week}</div>
+                  <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '0.375rem', fontFamily: 'Space Grotesk' }}>{m.week}</div>
                   <h4 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', color: '#0A0A0A', marginBottom: '0.375rem', lineHeight: 1.05 }}>{m.status}.</h4>
                   <p style={{ fontSize: '0.9375rem', color: 'rgba(10,10,10,0.6)', lineHeight: 1.5 }}>{m.desc}</p>
                 </div>
@@ -12087,13 +11195,13 @@ function HombroCTA({ onNavigate }) {
 // FAQ
 function HombroFAQ({ openFaq, setOpenFaq }) {
   const faqs = [
-    { q: '¿El hombro congelado se cura solo?', a: 'Eventualmente sí, pero puede tardar 1—3 años y dejar rigidez residual. La fisioterapia bien dirigida acorta significativamente el tiempo y mejora el resultado final. No tratarlo es apostar a años de limitación innecesaria.' },
+    { q: '¿El hombro congelado se cura solo?', a: 'Eventualmente sí, pero puede tardar 1 a 3 años y dejar rigidez residual. La fisioterapia bien dirigida acorta significativamente el tiempo y mejora el resultado final. No tratarlo es apostar a años de limitación innecesaria.' },
     { q: '¿Por qué me duele más de noche?', a: 'Es típico de la fase de congelamiento. Por la noche, sin distracciones y con ciertas posiciones que comprimen la cápsula inflamada, el dolor se intensifica. Dormir con el brazo apoyado en una almohada suele ayudar. Es señal de fase 1 activa.' },
-    { q: '¿Debo forzar el estiramiento para ganar movilidad?', a: 'Depende de la fase. En fase de congelamiento (dolorosa), forzar empeora la inflamación. En fase congelada (rígida, menos dolor), sí se moviliza progresivamente. Estirar agresivo en el momento equivocado es el error más común — por eso importa saber la fase.' },
-    { q: '¿La infiltración sirve?', a: 'En fase de congelamiento, una infiltración de corticoides puede ayudar a controlar el dolor y permitir empezar la movilización antes. Se valora caso a caso con criterio médico. No es la solución única — el trabajo de movilidad sigue siendo central.' },
+    { q: '¿Debo forzar el estiramiento para ganar movilidad?', a: 'Depende de la fase. En fase de congelamiento (dolorosa), forzar empeora la inflamación. En fase congelada (rígida, menos dolor), sí se moviliza progresivamente. Estirar agresivo en el momento equivocado es el error más común, por eso importa saber la fase.' },
+    { q: '¿La infiltración sirve?', a: 'En fase de congelamiento, una infiltración de corticoides puede ayudar a controlar el dolor y permitir empezar la movilización antes. Se valora caso a caso con criterio médico. No es la solución única, el trabajo de movilidad sigue siendo central.' },
     { q: '¿Tiene que ver con la diabetes?', a: 'Sí, mucho. Los diabéticos tienen hasta 4 veces más riesgo de hombro congelado, suele ser más severo y bilateral. La glicación del colágeno afecta la elasticidad capsular. El control glucémico es parte del manejo.' },
-    { q: '¿Puede darme en el otro hombro?', a: 'Sí. Hasta un 20—30% de los pacientes desarrollan hombro congelado en el lado contrario, generalmente dentro de los 5 años. Es más frecuente en diabéticos. Por eso conviene aprender el patrón y actuar rápido si reaparece.' },
-    { q: '¿Cuándo se opera?', a: 'Rara vez. La gran mayoría se resuelve con tratamiento conservador. La cirugía (liberación capsular artroscópica o manipulación bajo anestesia) se reserva para casos que no mejoran tras 6—12 meses de fisioterapia bien hecha. Siempre último recurso.' },
+    { q: '¿Puede darme en el otro hombro?', a: 'Sí. Hasta un 20 a 30% de los pacientes desarrollan hombro congelado en el lado contrario, generalmente dentro de los 5 años. Es más frecuente en diabéticos. Por eso conviene aprender el patrón y actuar rápido si reaparece.' },
+    { q: '¿Cuándo se opera?', a: 'Rara vez. La gran mayoría se resuelve con tratamiento conservador. La cirugía (liberación capsular artroscópica o manipulación bajo anestesia) se reserva para casos que no mejoran tras 6 a 12 meses de fisioterapia bien hecha. Siempre último recurso.' },
   ];
 
   return (
@@ -12184,7 +11292,7 @@ function HombroRelated({ onNavigate }) {
       <div className="container">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>Otras lesiones · Ver protocolo</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>Otras lesiones · Ver protocolo</div>
         </div>
 
         <div style={{
@@ -12233,7 +11341,7 @@ function HombroRelated({ onNavigate }) {
               <h3 data-rel="name" style={{ fontSize: '1.625rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', color: '#0A0A0A', transition: 'color 0.4s', lineHeight: 1.05 }}>{r.name}</h3>
               <div data-rel="zone" style={{ fontSize: '0.875rem', color: 'rgba(10,10,10,0.5)', transition: 'color 0.4s' }}>{r.zone}</div>
               <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>Ver protocolo</span>
+                <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>Ver protocolo</span>
                 <span data-rel="arrow" style={{ fontSize: '1.5rem', color: 'rgba(10,10,10,0.3)', transition: 'all 0.4s', fontFamily: 'Space Grotesk' }}>→</span>
               </div>
             </a>
@@ -12267,7 +11375,7 @@ function DhSectionHeader({ kicker, title, subtitle, intro, dark }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
         </div>
         <h2 style={{
           fontSize: 'clamp(2.5rem, 5vw, 4rem)',
@@ -12276,7 +11384,7 @@ function DhSectionHeader({ kicker, title, subtitle, intro, dark }) {
           letterSpacing: '-0.03em',
           fontFamily: 'Space Grotesk',
           color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
+        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span></h2>
       </div>
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
@@ -12338,14 +11446,14 @@ function DhHero({ data, onNavigate }) {
         }}>
           <a {...navProps('deportes', onNavigate)} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Deportes</a>
           <span style={{ color: 'rgba(255,255,255,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>{data.name}</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>{data.name}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '4rem', alignItems: 'flex-end' }} className="dh-hero-grid">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
             </div>
             <h1 style={{
               fontSize: 'clamp(2.75rem, 6.5vw, 6rem)',
@@ -12357,7 +11465,7 @@ function DhHero({ data, onNavigate }) {
             }}>
               {data.heroTitle}
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{data.heroSub}</span>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{data.heroSub}</span>
             </h1>
             <p style={{
               fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)',
@@ -12428,7 +11536,7 @@ function DhHero({ data, onNavigate }) {
             {data.stats.map((s, i) => (
               <div key={i} style={{ padding: '1.5rem 0', borderBottom: i < data.stats.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.375rem' }}>
-                  <div style={{ fontSize: 'clamp(2.25rem, 3.5vw, 3rem)', fontFamily: 'Space Grotesk', fontWeight: 700, color: '#C9A55A', lineHeight: 1, letterSpacing: '-0.03em' }}>{s.value}</div>
+                  <div style={{ fontSize: 'clamp(2.25rem, 3.5vw, 3rem)', fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, letterSpacing: '-0.03em' }}>{s.value}</div>
                   {s.suffix && <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{s.suffix}</div>}
                 </div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '0.125rem' }}>{s.label}</div>
@@ -12460,7 +11568,7 @@ function DhWhyMe({ data }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'flex-start' }} className="dh-why-grid">
           <div>
             {data.whyParas.map((p, i) => (
-              <p key={i} style={{
+              <DensePassage key={i} style={{
                 fontSize: i === 0 ? '1.125rem' : '1.0625rem',
                 lineHeight: i === 0 ? 1.7 : 1.65,
                 color: i === 0 ? 'rgba(10,10,10,0.75)' : 'rgba(10,10,10,0.65)',
@@ -12469,7 +11577,7 @@ function DhWhyMe({ data }) {
             ))}
           </div>
           <div style={{ background: '#0A0A0A', color: '#FFFFFF', padding: '2.5rem' }}>
-            <div style={{ fontSize: '4rem', fontFamily: 'Space Grotesk', color: '#C9A55A', lineHeight: 0.5, marginBottom: '1.5rem' }}>"</div>
+            <div style={{ fontSize: '4rem', fontFamily: 'Space Grotesk', color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.5, marginBottom: '1.5rem' }}>"</div>
             <p style={{
               fontSize: 'clamp(1.375rem, 2vw, 1.75rem)',
               fontFamily: 'Space Grotesk',
@@ -12479,7 +11587,7 @@ function DhWhyMe({ data }) {
               letterSpacing: '-0.01em',
               marginBottom: '2rem',
             }}>{data.whyQuote}</p>
-            <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>Germán Montenegro</div>
+            <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>Germán Montenegro</div>
           </div>
         </div>
       </div>
@@ -12582,10 +11690,10 @@ function DhCauses({ data }) {
           {data.causes.map((c, i) => (
             <div key={i} style={{ padding: '2.5rem 2rem', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '240px' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
                 <h3 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.05, color: '#0A0A0A' }}>{c.title}.</h3>
               </div>
-              <p style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.desc}</p>
+              <DensePassage style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.desc}</DensePassage>
             </div>
           ))}
         </div>
@@ -12613,7 +11721,7 @@ function DhReturn({ data }) {
           {data.returnSteps.map((s, i) => (
             <div key={i} style={{ position: 'relative', marginBottom: i < data.returnSteps.length - 1 ? '2.5rem' : 0 }}>
               <div style={{ position: 'absolute', left: '-3rem', top: '2px', width: '20px', height: '20px', borderRadius: '50%', background: '#0A0A0A', border: '3px solid #C9A55A', boxShadow: i === 0 ? '0 0 0 4px rgba(201,165,90,0.15)' : 'none' }} />
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.5rem' }}>{s.label}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '0.5rem' }}>{s.label}</div>
               <h4 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '0.5rem' }}>{s.title}</h4>
               <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.7)', maxWidth: '700px' }}>{s.desc}</p>
             </div>
@@ -12686,7 +11794,7 @@ function DhCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -12724,14 +11832,14 @@ const WEIGHTLIFTING_DATA = {
     { value: '90+', suffix: 'atletas', label: 'Levantadores', desc: 'Halterofilia y powerlifting' },
     { value: '10', suffix: 'años', label: 'Entrenando', desc: 'Atleta activo de la barra' },
     { value: '5', suffix: '', label: 'Lesiones top', desc: 'Cubren la mayoría' },
-    { value: '4—10', suffix: 'sem', label: 'Recuperación', desc: 'Promedio típico' },
+    { value: '4 a 10', suffix: 'sem', label: 'Recuperación', desc: 'Promedio típico' },
   ],
   whyKicker: 'Por qué yo', whyTitle: 'Un fisio que', whySub: 'recibe profundo.',
   whyIntro: 'Las lesiones de la barra no son misterio. Son técnica que colapsa bajo carga o cargas que suben más rápido que el tejido. Y se previenen.',
   whyParas: [
-    'Sé lo que es <strong>fallar un clean al 90%</strong>, la tensión lumbar de un peso muerto pesado, la posición overhead del jerk que castiga el hombro. La barra es parte de mi semana — no la leí en un manual.',
+    'Sé lo que es <strong>fallar un clean al 90%</strong>, la tensión lumbar de un peso muerto pesado, la posición overhead del jerk que castiga el hombro. La barra es parte de mi semana, no la leí en un manual.',
     'Esa experiencia cambia el diagnóstico. Cuando me dices que te duele la muñeca en el front squat o la cadera al recibir el clean, sé exactamente en qué punto del levantamiento falla tu mecánica, y qué movilidad o fuerza te está faltando.',
-    'Mi enfoque no es "baja el peso y ya". Es identificar el patrón técnico o el déficit de movilidad que te rompe, corregirlo, y devolverte a la barra levantando más que antes — sin compensaciones.',
+    'Mi enfoque no es "baja el peso y ya". Es identificar el patrón técnico o el déficit de movilidad que te rompe, corregirlo, y devolverte a la barra levantando más que antes, sin compensaciones.',
   ],
   whyQuote: 'La barra no perdona el déficit de movilidad. Lo que no resuelves en el calentamiento, lo pagas en el 1RM.',
   injTitle: 'Las de', injSub: 'la barra.',
@@ -12754,16 +11862,16 @@ const WEIGHTLIFTING_DATA = {
   returnWord: 'A LA BARRA.', returnKicker: 'Return to platform', returnTitle: 'Vuelves a levantar.', returnSub: 'Progresivo.',
   returnIntro: 'No es "ya puedes cargar". Es reconstruir la tolerancia a la carga y la posición, levantamiento por levantamiento, sin recaer.',
   returnSteps: [
-    { label: 'Fase 1', title: 'Sin el gesto lesivo.', desc: 'Mantienes el entrenamiento que no compromete la lesión. Si es el hombro, trabajas piernas; si es lumbar, tren superior. No paras — adaptas.' },
+    { label: 'Fase 1', title: 'Sin el gesto lesivo.', desc: 'Mantienes el entrenamiento que no compromete la lesión. Si es el hombro, trabajas piernas; si es lumbar, tren superior. No paras, adaptas.' },
     { label: 'Fase 2', title: 'Patrón corregido.', desc: 'Reintroducimos el levantamiento con técnica revisada y carga ligera. Primero la posición perfecta, después la intensidad.' },
     { label: 'Fase 3', title: 'Carga progresiva.', desc: 'Subimos el peso de forma gradual y periodizada, monitoreando la respuesta del tejido. El cuerpo reaprende a tolerar la carga pesada.' },
     { label: 'Fase 4', title: 'Vuelta al 1RM.', desc: 'Retorno a los levantamientos máximos, ahora con mejor movilidad y mecánica que antes de lesionarte. Más fuerte, no solo recuperado.' },
   ],
   faqs: [
-    { q: '¿Tengo que bajar el peso por mi lesión?', a: 'Temporalmente sí, pero el objetivo es volver a tu carga máxima — y superarla. Reducir el peso es parte del proceso de readaptación, no una rendición. Volver al 1RM con el patrón corregido es la meta. Parar del todo rara vez es necesario.' },
+    { q: '¿Tengo que bajar el peso por mi lesión?', a: 'Temporalmente sí, pero el objetivo es volver a tu carga máxima, y superarla. Reducir el peso es parte del proceso de readaptación, no una rendición. Volver al 1RM con el patrón corregido es la meta. Parar del todo rara vez es necesario.' },
     { q: '¿Cuánto tiempo paro de entrenar?', a: 'Idealmente cero días de parón total. Lo que cambia es QUÉ entrenas. Una lesión de hombro no impide trabajar sentadilla; una lumbar no impide press de banca. Adaptamos el estímulo. Solo lesiones agudas severas requieren descanso completo, y son pocas.' },
     { q: '¿Es la técnica o es el peso lo que me lesionó?', a: 'Casi siempre es la combinación: técnica que colapsa bajo una carga que subió demasiado rápido. Evalúo tu mecánica de levantamiento real y tu historial de cargas. Muchas veces el problema no es la técnica en sí, sino la falta de movilidad que te impide ejecutarla bajo peso.' },
-    { q: '¿Necesito mejorar mi movilidad?', a: 'Probablemente. La mayoría de lesiones de weightlifting tienen un componente de movilidad limitada — tobillo que no deja recibir profundo, hombro que no llega al overhead, cadera que no abre. Trabajamos la movilidad específica que tu levantamiento necesita.' },
+    { q: '¿Necesito mejorar mi movilidad?', a: 'Probablemente. La mayoría de lesiones de weightlifting tienen un componente de movilidad limitada, tobillo que no deja recibir profundo, hombro que no llega al overhead, cadera que no abre. Trabajamos la movilidad específica que tu levantamiento necesita.' },
     { q: '¿Las muñequeras y el cinturón previenen lesiones?', a: 'Ayudan a soportar la carga en levantamientos pesados, pero no corrigen la causa. Una muñequera no arregla una muñeca débil ni un cinturón un core deficiente. Son herramientas de soporte para el 1RM, no sustitutos del fortalecimiento.' },
     { q: '¿Atiendes powerlifting y halterofilia?', a: 'Ambos. Aunque los levantamientos difieren (sentadilla/banca/peso muerto vs snatch/clean & jerk), los principios de diagnóstico y readaptación son los mismos. Conozco las demandas específicas de cada disciplina y adapto el plan a tu deporte de fuerza.' },
   ],
@@ -12784,7 +11892,7 @@ const CROSSFIT_DATA = {
   whyKicker: 'Por qué yo', whyTitle: 'Un fisio que', whySub: 'falla cleans.',
   whyIntro: 'La diferencia entre un fisio que leyó sobre CrossFit y uno que entrena cada semana se nota en el primer minuto de la consulta.',
   whyParas: [
-    'Sé lo que es <strong>fallar un clean al 90%</strong>, el dolor de hombro después de 100 kipping pull-ups, la tirantez de cadera tras 150 wall balls. No te explico el CrossFit — lo entreno.',
+    'Sé lo que es <strong>fallar un clean al 90%</strong>, el dolor de hombro después de 100 kipping pull-ups, la tirantez de cadera tras 150 wall balls. No te explico el CrossFit, lo entreno.',
     'Esa experiencia cambia el diagnóstico. Cuando me dices que te duele el hombro en el muscle-up, sé exactamente en qué fase del movimiento, qué músculo compensa, y qué error técnico probablemente lo causó. No adivino.',
     'Mi consultorio está pensado para el crossfitter: evaluamos tu técnica real, no movimientos aislados. Y el plan de retorno te devuelve al WOD escalando inteligente, sin perder tu progreso.',
   ],
@@ -12804,13 +11912,13 @@ const CROSSFIT_DATA = {
   causes: [
     { title: 'Volumen', desc: 'Escalar el volumen antes que la técnica. Pasar de 3 a 6 WODs sin descarga. La causa #1 que veo en el box.' },
     { title: 'Movilidad', desc: 'Posición overhead limitada, tobillo rígido, cadera tensa. El cuerpo compensa en la articulación equivocada.' },
-    { title: 'Fatiga', desc: 'Los WODs son contra reloj. La técnica colapsa con la fatiga — y ahí aparece la lesión, en la última ronda.' },
+    { title: 'Fatiga', desc: 'Los WODs son contra reloj. La técnica colapsa con la fatiga, y ahí aparece la lesión, en la última ronda.' },
     { title: 'Ego', desc: 'Subir RX cuando deberías escalar. Más peso del que tu patrón soporta. La barra no perdona el ego.' },
   ],
   returnWord: 'AL BOX.', returnKicker: 'Return to box', returnTitle: 'Vuelves al WOD.', returnSub: 'Escalando inteligente.',
   returnIntro: 'No es "ya puedes entrenar". Es reintroducir los movimientos de forma progresiva, escalando lo justo para no recaer.',
   returnSteps: [
-    { label: 'Fase 1', title: 'Sin el gesto lesivo.', desc: 'Mantienes el resto del entrenamiento, eliminando solo el movimiento que provoca dolor. No paras de entrenar — escalas.' },
+    { label: 'Fase 1', title: 'Sin el gesto lesivo.', desc: 'Mantienes el resto del entrenamiento, eliminando solo el movimiento que provoca dolor. No paras de entrenar, escalas.' },
     { label: 'Fase 2', title: 'Patrón corregido.', desc: 'Reintroducimos el movimiento con técnica revisada y carga reducida. Primero el patrón, luego la intensidad.' },
     { label: 'Fase 3', title: 'Volumen progresivo.', desc: 'Aumentamos repeticiones y carga gradualmente, monitoreando la respuesta. El tejido reaprende a tolerar el volumen del WOD.' },
     { label: 'Fase 4', title: 'RX sin miedo.', desc: 'Vuelta completa al WOD a tu nivel, ahora con mejor mecánica que antes de lesionarte. Más fuerte, no solo recuperado.' },
@@ -12822,7 +11930,7 @@ const CROSSFIT_DATA = {
     { q: '¿Cómo escalar el WOD durante el regreso?', a: 'Esa es justo parte de mi trabajo. Te doy escalas específicas para cada movimiento según tu fase: sustituir kipping por strict, reducir altura de box, cambiar el rango de movimiento. Escalar bien es una habilidad, no una rendición.' },
     { q: '¿Cuáles son los movimientos más lesivos del CrossFit?', a: 'No hay movimientos "malos", hay cargas mal gestionadas. Dicho eso, los que más lesiones generan por mala técnica o exceso de volumen: kipping (hombro), deadlift (lumbar), box jumps (rodilla/Aquiles), HSPU y snatch (hombro/muñeca).' },
     { q: '¿Necesito cambiar mi técnica para no lesionarme?', a: 'A veces sí, a veces es cuestión de volumen y movilidad. Evalúo tu técnica real y te digo qué ajustar. Muchas veces el problema no es la técnica sino la falta de movilidad que te impide ejecutarla bien. Trabajamos ambas.' },
-    { q: '¿Atiendes en mi mismo box?', a: 'Trabajo con varios boxes de Bogotá y mi consultorio está dentro de uno. Tengo acuerdos con 8 boxes partners. Si entrenas en alguno, pregunta — es posible que ya tengamos convenio. Si no, podemos coordinar.' },
+    { q: '¿Atiendes en mi mismo box?', a: 'Trabajo con varios boxes de Bogotá y mi consultorio está dentro de uno. Tengo acuerdos con 8 boxes partners. Si entrenas en alguno, pregunta, es posible que ya tengamos convenio. Si no, podemos coordinar.' },
   ],
   ctaTitle: 'Vuelves al box.', ctaSub: 'Más fuerte.',
   ctaDesc: 'Primera sesión: evaluación de tu gesto + diagnóstico + plan de retorno al WOD. 60 min. Por un fisio que entrena CrossFit, no que leyó sobre él.',
@@ -12842,8 +11950,8 @@ const BJJ_DATA = {
   whyIntro: 'El jiu-jitsu castiga cuello, hombro y rodilla de formas muy específicas que solo entiendes si has pasado horas en el mat.',
   whyParas: [
     'Compito. Cinturón azul y dos títulos nacionales. Conozco la tensión de <strong>defender una llave de rodilla</strong>, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. He sentido el codo después de defender armbars toda una clase.',
-    'Esa experiencia cambia cómo trato a un grappler. No te digo "deja el BJJ". Entiendo que el mat es parte de tu vida. Y sé que las lesiones del grappling tienen patrones — la guardia que tensa la rodilla, el agarre que castiga el codo.',
-    'Mi enfoque: tratar la lesión, corregir el patrón de movimiento o la mecánica defensiva que la causó, y devolverte a rodar. Con longevidad — para que entrenes 10 años más, no 10 meses.',
+    'Esa experiencia cambia cómo trato a un grappler. No te digo "deja el BJJ". Entiendo que el mat es parte de tu vida. Y sé que las lesiones del grappling tienen patrones, la guardia que tensa la rodilla, el agarre que castiga el codo.',
+    'Mi enfoque: tratar la lesión, corregir el patrón de movimiento o la mecánica defensiva que la causó, y devolverte a rodar. Con longevidad, para que entrenes 10 años más, no 10 meses.',
   ],
   whyQuote: 'El BJJ no perdona la rigidez. La movilidad de cadera y columna es tu mejor defensa contra la lesión.',
   injTitle: 'Las del', injSub: 'mat.',
@@ -12860,7 +11968,7 @@ const BJJ_DATA = {
   causesTitle: 'No es', causesSub: 'solo rodar duro.',
   causesIntro: 'El grappling lesiona distinto. Cuatro factores explican la mayoría de lesiones del mat.',
   causes: [
-    { title: 'Volumen', desc: 'Rodar 5—6 veces por semana sin descarga ni recuperación. El cuerpo no distingue entrenamiento de competición — acumula.' },
+    { title: 'Volumen', desc: 'Rodar 5 a 6 veces por semana sin descarga ni recuperación. El cuerpo no distingue entrenamiento de competición, acumula.' },
     { title: 'Defensa tardía', desc: 'Tapear tarde por ego en sparring. Esperar al último segundo en una llave es cómo se rompen codos y hombros.' },
     { title: 'Rigidez', desc: 'Cadera y columna tensas obligan a otras articulaciones a compensar. El grappler rígido se lesiona más que el flexible.' },
     { title: 'Falta de fuerza', desc: 'El BJJ es técnico, pero sin fuerza de soporte el tejido cede. El strength & conditioning previene, no estorba.' },
@@ -12869,18 +11977,18 @@ const BJJ_DATA = {
   returnIntro: 'No es "ya puedes rodar". Es reintroducir el sparring de forma progresiva, protegiendo la zona lesionada mientras recuperas confianza.',
   returnSteps: [
     { label: 'Fase 1', title: 'Solo técnica.', desc: 'Drilling sin resistencia, movimientos controlados. Mantienes el contacto con el mat sin el riesgo del sparring intenso.' },
-    { label: 'Fase 2', title: 'Sparring suave.', desc: 'Rolls al 40—50% con compañeros de confianza, evitando posiciones que comprometan la zona. Flow rolling.' },
+    { label: 'Fase 2', title: 'Sparring suave.', desc: 'Rolls al 40 a 50% con compañeros de confianza, evitando posiciones que comprometan la zona. Flow rolling.' },
     { label: 'Fase 3', title: 'Posiciones controladas.', desc: 'Reintroducimos progresivamente las posiciones que evitabas, con la mecánica defensiva corregida.' },
     { label: 'Fase 4', title: 'Roll completo.', desc: 'Vuelta al sparring a tu intensidad habitual, ahora con mejor movilidad y un patrón defensivo que protege la lesión.' },
   ],
   faqs: [
-    { q: '¿Tengo que dejar el BJJ por mi codo?', a: 'Casi nunca. La epitrocleítis del grappler se trata mientras sigues entrenando técnica. Lo que ajustamos es el sparring y ciertos agarres temporalmente. Parar del todo rara vez es necesario — modificamos la práctica.' },
-    { q: '¿Cuánto descanso del mat por una lesión de hombro?', a: 'Depende de la severidad. Lesiones leves: sigues drillando, evitas posiciones de riesgo (kimura, americana). Moderadas: 2—4 semanas sin sparring, manteniendo técnica. Severas se evalúan caso a caso. Rara vez parón completo.' },
+    { q: '¿Tengo que dejar el BJJ por mi codo?', a: 'Casi nunca. La epitrocleítis del grappler se trata mientras sigues entrenando técnica. Lo que ajustamos es el sparring y ciertos agarres temporalmente. Parar del todo rara vez es necesario, modificamos la práctica.' },
+    { q: '¿Cuánto descanso del mat por una lesión de hombro?', a: 'Depende de la severidad. Lesiones leves: sigues drillando, evitas posiciones de riesgo (kimura, americana). Moderadas: 2 a 4 semanas sin sparring, manteniendo técnica. Severas se evalúan caso a caso. Rara vez parón completo.' },
     { q: '¿Puedo entrenar técnica sin sparring durante la recuperación?', a: 'Sí, y es lo ideal. El drilling sin resistencia mantiene tu juego afilado, tu acondicionamiento y tu conexión con el mat mientras el tejido se recupera. Es la mejor forma de no perder progreso durante una lesión.' },
-    { q: '¿Cómo prevenir la oreja de coliflor?', a: 'Protección (cascos/headgear) durante sparring intenso, drenaje inmediato si se inflama (no esperes), y evitar la fricción repetida. Una vez formada es permanente sin cirugía. La prevención es la única solución real — actúa rápido al primer signo.' },
+    { q: '¿Cómo prevenir la oreja de coliflor?', a: 'Protección (cascos/headgear) durante sparring intenso, drenaje inmediato si se inflama (no esperes), y evitar la fricción repetida. Una vez formada es permanente sin cirugía. La prevención es la única solución real, actúa rápido al primer signo.' },
     { q: '¿Vale la pena el strength & conditioning para BJJ?', a: 'Absolutamente. El BJJ es técnico, pero la fuerza de soporte previene lesiones y mejora tu juego. No te hará rígido si lo haces bien. Trabajo de cuello, agarre, cadera y core específico para grappling reduce mucho el riesgo de lesión.' },
     { q: '¿Cómo manejar lesiones recurrentes de dedos?', a: 'Los dedos del grappler sufren por el agarre del gi. Tape preventivo, fortalecimiento de antebrazo y agarre, y descanso de los agarres más agresivos cuando hay molestia. Las lesiones recurrentes indican que hay que fortalecer la base, no solo tapear.' },
-    { q: '¿Atiendes en mi misma academia?', a: 'Trabajo con varias academias de Bogotá y tengo acuerdos con 3 partners. Si entrenas en alguna, pregunta — puede que ya tengamos convenio. Conozco el ambiente del mat, así que la consulta es entre grapplers.' },
+    { q: '¿Atiendes en mi misma academia?', a: 'Trabajo con varias academias de Bogotá y tengo acuerdos con 3 partners. Si entrenas en alguna, pregunta, puede que ya tengamos convenio. Conozco el ambiente del mat, así que la consulta es entre grapplers.' },
   ],
   ctaTitle: 'Vuelves a rodar.', ctaSub: 'Por más años.',
   ctaDesc: 'Primera sesión: evaluación de tu mecánica + diagnóstico + plan de retorno al mat. 60 min. Por un fisio que rueda, no que vio videos.',
@@ -12901,7 +12009,7 @@ const BOXEO_DATA = {
   whyParas: [
     'El boxeo tiene un patrón de lesión propio: la <strong>mano y la muñeca</strong> que absorben el impacto del golpe, el hombro que trabaja miles de repeticiones de jab y cross, el cuello que encaja. Cada golpe es carga sobre una cadena que hay que entender.',
     'He tratado a suficientes boxeadores amateur y competitivos para conocer sus gestos críticos: el cierre del puño al impacto, la rotación del hombro en el cross, la tensión cervical de la defensa. Cuando me describes el dolor, sé qué parte del golpeo lo provoca.',
-    'Mi enfoque no es "deja de boxear". Es identificar el patrón —el vendaje deficiente, la técnica de puño, el déficit de movilidad de hombro— que te rompe, corregirlo, y devolverte al ring golpeando sin dolor.',
+    'Mi enfoque no es "deja de boxear". Es identificar el patrón, el vendaje deficiente, la técnica de puño, el déficit de movilidad de hombro,  que te rompe, corregirlo, y devolverte al ring golpeando sin dolor.',
   ],
   whyQuote: 'En boxeo, una muñeca mal alineada al impacto es una lesión esperando ocurrir. La técnica del puño protege tanto como pega.',
   injTitle: 'Las del', injSub: 'ring.',
@@ -12930,7 +12038,7 @@ const BOXEO_DATA = {
     { label: 'Fase 4', title: 'Vuelta al sparring.', desc: 'Retorno al sparring y al ring a tu intensidad habitual, ahora con mejor técnica de puño y la movilidad que protege la zona lesionada.' },
   ],
   faqs: [
-    { q: '¿Tengo que dejar de boxear por mi lesión de mano?', a: 'Casi nunca del todo. Trabajamos la técnica sin impacto (sombra, desplazamientos) mientras la mano se recupera, y reintroducimos el golpeo de forma progresiva. Parar por completo rara vez es necesario — adaptamos el entrenamiento. Lo que sí corregimos es la causa: técnica de puño y vendaje.' },
+    { q: '¿Tengo que dejar de boxear por mi lesión de mano?', a: 'Casi nunca del todo. Trabajamos la técnica sin impacto (sombra, desplazamientos) mientras la mano se recupera, y reintroducimos el golpeo de forma progresiva. Parar por completo rara vez es necesario, adaptamos el entrenamiento. Lo que sí corregimos es la causa: técnica de puño y vendaje.' },
     { q: '¿Por qué me duele la muñeca al golpear?', a: 'Casi siempre por una mala alineación de la muñeca al impacto o un vendaje que no la estabiliza. La fuerza del golpe debe transmitirse en línea recta por los nudillos; si la muñeca se dobla, la articulación absorbe la carga y se lesiona. Corregir la técnica del puño es clave.' },
     { q: '¿El vendaje realmente previene lesiones?', a: 'Mucho. Un buen vendaje protege los huesos del metacarpo, estabiliza la muñeca y da soporte a los nudillos. Un vendaje deficiente es una de las causas más comunes de lesiones de mano en boxeo. Te enseño a vendarte bien como parte de la prevención.' },
     { q: '¿Puedo seguir entrenando con dolor de hombro?', a: 'Con modificaciones, casi siempre. Reducimos temporalmente el volumen de golpeo que carga el hombro y mantenemos el trabajo de piernas, core y técnica. El hombro del boxeador necesita fortalecimiento del manguito, no reposo total.' },
@@ -12941,10 +12049,18 @@ const BOXEO_DATA = {
   ctaDesc: 'Primera sesión: evaluación de tu golpeo + diagnóstico + plan de retorno al ring. 60 min. Fisioterapia que entiende las demandas del boxeo.',
 };
 
-function WeightliftingPage({ onNavigate }) { return <DeporteHubPage data={WEIGHTLIFTING_DATA} onNavigate={onNavigate} />; }
-function CrossFitPage({ onNavigate }) { return <DeporteHubPage data={CROSSFIT_DATA} onNavigate={onNavigate} />; }
-function BJJPage({ onNavigate }) { return <DeporteHubPage data={BJJ_DATA} onNavigate={onNavigate} />; }
-function BoxeoPage({ onNavigate }) { return <DeporteHubPage data={BOXEO_DATA} onNavigate={onNavigate} />; }
+function WeightliftingPage({ onNavigate }) {
+  return <SportExperience page="weightlifting"/>;
+}
+function CrossFitPage({ onNavigate }) {
+  return <SportExperience page="crossfit"/>;
+}
+function BJJPage({ onNavigate }) {
+  return <SportExperience page="bjj"/>;
+}
+function BoxeoPage({ onNavigate }) {
+  return <SportExperience page="boxeo"/>;
+}
 
 /* ==================== lesion-pillar.jsx ==================== */
 // LESIÓN PILLAR - Componente reutilizable para pillars de lesión secundarios
@@ -12959,12 +12075,12 @@ function LpSectionHeader({ kicker, title, subtitle, intro, dark }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
         </div>
         <h2 style={{
           fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700, lineHeight: 1,
           letterSpacing: '-0.03em', fontFamily: 'Space Grotesk', color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
+        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span></h2>
       </div>
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
@@ -12988,19 +12104,19 @@ function LpHero({ data, onNavigate }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem', fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600 }}>
           <a {...navProps('lesiones', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Lesiones</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>{data.name}</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>{data.name}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', alignItems: 'flex-end' }} className="lp-hero-grid">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
             </div>
             <h1 style={{
               fontSize: 'clamp(2.75rem, 6.5vw, 6rem)', fontWeight: 700, lineHeight: 0.9,
               letterSpacing: '-0.04em', fontFamily: 'Space Grotesk', color: '#0A0A0A', marginBottom: '2.5rem',
-            }}>{data.heroTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{data.heroSub}</span></h1>
+            }}>{data.heroTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{data.heroSub}</span></h1>
             <p style={{ fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)', lineHeight: 1.55, color: 'rgba(10,10,10,0.65)', maxWidth: '620px', marginBottom: '2rem' }} dangerouslySetInnerHTML={{ __html: data.heroDesc }} />
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
               background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.25rem 2rem',
@@ -13014,15 +12130,15 @@ function LpHero({ data, onNavigate }) {
 
           <div style={{ background: '#0A0A0A', color: '#FFFFFF', padding: '2.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#C9A55A' }} />
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '1.5rem' }}>TL;DR Clínico</div>
+            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '1.5rem' }}>TL;DR Clínico</div>
             <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.9)', marginBottom: '1.5rem' }}>{data.tldr}</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>{data.recovery}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>{data.recovery}</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Recuperación</div>
               </div>
               <div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, marginBottom: '0.25rem' }}>{data.complexity}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 1, marginBottom: '0.25rem' }}>{data.complexity}</div>
                 <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Complejidad</div>
               </div>
             </div>
@@ -13036,167 +12152,38 @@ function LpHero({ data, onNavigate }) {
 
 // WHAT IS
 function LpWhatIs({ data }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FAFAFA', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'flex-start' }} className="lp-wi-grid">
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>Qué es realmente</div>
-            </div>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: 'Space Grotesk', color: '#0A0A0A', marginBottom: '2rem' }}>{data.whatTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{data.whatSub}</span></h2>
-            {data.whatParas.map((p, i) => (
-              <p key={i} style={{ fontSize: i === 0 ? '1.125rem' : '1.0625rem', lineHeight: i === 0 ? 1.7 : 1.65, color: i === 0 ? 'rgba(10,10,10,0.75)' : 'rgba(10,10,10,0.65)', marginBottom: '1.5rem' }} dangerouslySetInnerHTML={{ __html: p }} />
-            ))}
-          </div>
-          <div style={{ border: '1px solid rgba(10,10,10,0.08)', background: '#FFFFFF' }}>
-            {data.facts.map((f, i) => (
-              <div key={i} style={{ padding: '1.75rem 2rem', borderBottom: i < data.facts.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none', display: 'grid', gridTemplateColumns: '40px 1fr', gap: '1.25rem', alignItems: 'center' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: 'rgba(10,10,10,0.3)' }}>{String(i + 1).padStart(2, '0')}</div>
-                <div>
-                  <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.375rem' }}>{f.label}</div>
-                  <div style={{ fontSize: '1rem', color: '#0A0A0A', fontWeight: 500, lineHeight: 1.45 }}>{f.value}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .lp-wi-grid { grid-template-columns: 1fr !important; } }` }} />
-    </section>
-  );
+  return <section className="gm-understand"><div className="container">
+    <div className="gm-section-label">ENTIENDE TU LESIÓN</div>
+    <div className="gm-understand-grid"><div><h2>{data.whatTitle}<br/><em>{data.whatSub}</em></h2>
+      <DensePassage className="gm-lead" dangerouslySetInnerHTML={{__html:data.whatParas[0]}} />
+      <details className="gm-explainer"><summary>Entender qué ocurre <span aria-hidden="true">＋</span></summary><div>{data.whatParas.slice(1).map((p,i)=><p key={i} dangerouslySetInnerHTML={{__html:p}} />)}</div></details>
+    </div><div className="gm-facts">{data.facts.map((f,i)=><article className="gm-fact" key={i}><span className="gm-fact-number">0{i+1}</span><div><h3>{f.label}</h3><p>{f.value}</p></div></article>)}</div></div>
+  </div></section>;
 }
 
-// SYMPTOMS + RED FLAGS
 function LpSymptoms({ data }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FFFFFF', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <LpSectionHeader kicker="Síntomas · Cómo se manifiesta" title="Cómo" subtitle="se siente." intro={data.symptomsIntro} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '0', border: '1px solid rgba(10,10,10,0.08)' }} className="lp-sym-grid">
-          <div style={{ padding: '2.5rem 2rem', borderRight: '1px solid rgba(10,10,10,0.08)' }} className="lp-sym-list">
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(10,10,10,0.4)', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(10,10,10,0.08)' }}>Síntomas típicos · {data.symptoms.length}</div>
-            {data.symptoms.map((s, i) => (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: '1rem', padding: '1.125rem 0', borderBottom: i < data.symptoms.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none', alignItems: 'flex-start' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: '#C9A55A' }}>{String(i + 1).padStart(2, '0')}</div>
-                <div style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: '#0A0A0A' }}>{s}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ background: '#0A0A0A', color: '#FFFFFF', padding: '2.5rem 2rem', position: 'relative', overflow: 'hidden' }} className="lp-sym-red">
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#DC2626' }} />
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#DC2626', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>⚠ Banderas rojas</div>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.55, color: 'rgba(255,255,255,0.7)', marginBottom: '1.5rem' }}>{data.redFlagsIntro}</p>
-            {data.redFlags.map((f, i) => (
-              <div key={i} style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start', fontSize: '0.9375rem', lineHeight: 1.5, color: 'rgba(255,255,255,0.85)', marginBottom: i < data.redFlags.length - 1 ? '0.875rem' : 0 }}>
-                <div style={{ width: '8px', height: '8px', background: '#DC2626', marginTop: '0.4rem', flexShrink: 0 }} />
-                <span>{f}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .lp-sym-grid { grid-template-columns: 1fr !important; } .lp-sym-list { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); } }` }} />
-    </section>
-  );
+  return <section className="gm-symptoms"><div className="container">
+    <LpSectionHeader kicker="Síntomas · Cómo se manifiesta" title="Cómo" subtitle="se siente." intro={data.symptomsIntro}/>
+    <div className="gm-symptoms-layout"><div><div className="gm-section-label">PATRONES HABITUALES · {data.symptoms.length}</div>
+      <div className="gm-symptom-cards">{data.symptoms.map((s,i)=><article className="gm-symptom" key={i}><span aria-hidden="true" className="gm-symptom-icon">{['◎','↗','◇','≈','✧','⊕'][i%6]}</span><span>{s}</span></article>)}</div>
+    </div><aside className="gm-alert"><div className="gm-alert-label">⚠ Señales de alerta</div><h3>Cuándo consultar</h3><p>{data.redFlagsIntro}</p><ul>{data.redFlags.map((f,i)=><li key={i}>{f}</li>)}</ul><a {...navProps('fisioterapia')}>Consultar valoración <span aria-hidden="true">↗</span></a></aside></div>
+  </div></section>;
 }
 
 // CAUSES
-function LpCauses({ data }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FAFAFA', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <LpSectionHeader kicker="Causas · Por qué aparece" title={data.causesTitle} subtitle={data.causesSub} intro={data.causesIntro} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px', background: 'rgba(10,10,10,0.08)', border: '1px solid rgba(10,10,10,0.08)' }} className="lp-cau-grid">
-          {data.causes.map((c, i) => (
-            <div key={i} style={{ padding: '2.5rem 2rem', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '220px' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
-                <h3 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.05, color: '#0A0A0A' }}>{c.title}.</h3>
-              </div>
-              <p style={{ fontSize: '1rem', lineHeight: 1.55, color: 'rgba(10,10,10,0.7)' }}>{c.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 768px) { .lp-cau-grid { grid-template-columns: 1fr !important; } }` }} />
-    </section>
-  );
+function LpCauses({data}) {
+  return <section className="gm-guide-section gm-guide-soft"><div className="container"><LpSectionHeader kicker="Causas · Por qué aparece" title={data.causesTitle} subtitle={data.causesSub} intro={data.causesIntro}/><div className="gm-cause-cards">{data.causes.map((c,i)=><article key={c.title} className="gm-cause-card"><GuideIcon kind={['load','move','time','focus'][i%4]}/><span className="gm-guide-number" aria-hidden="true">0{i+1}</span><h3>{c.title}</h3><DensePassage>{c.desc}</DensePassage></article>)}</div></div></section>;
 }
 
-// DIFFERENTIAL
-function LpDifferential({ data }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FFFFFF', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <LpSectionHeader kicker="Diagnóstico diferencial" title={data.diffTitle} subtitle={data.diffSub} intro={data.diffIntro} />
-        <div style={{ border: '1px solid rgba(10,10,10,0.08)', overflowX: 'auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.2fr 1.4fr 2fr', background: '#0A0A0A', color: '#FFFFFF', minWidth: '720px' }}>
-            {['Condición', 'Localización', 'Test clínico', 'Hallazgo clave'].map((h, i, arr) => (
-              <div key={h} style={{ padding: '1.25rem 1.5rem', borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-                <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{h}</div>
-              </div>
-            ))}
-          </div>
-          {data.diffRows.map((r, i) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.2fr 1.4fr 2fr', borderTop: '1px solid rgba(10,10,10,0.06)', background: i === 0 ? 'rgba(201,165,90,0.04)' : '#FFFFFF', minWidth: '720px', transition: 'background 0.3s' }}
-              onMouseEnter={(e) => { if (i !== 0) e.currentTarget.style.background = '#FAFAFA'; }}
-              onMouseLeave={(e) => { if (i !== 0) e.currentTarget.style.background = '#FFFFFF'; }}>
-              <div style={{ padding: '1.5rem', borderRight: '1px solid rgba(10,10,10,0.06)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                {i === 0 && <div style={{ width: '6px', height: '20px', background: '#C9A55A', flexShrink: 0 }} />}
-                <div style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'Space Grotesk', letterSpacing: '-0.01em', color: '#0A0A0A' }}>{r.condition}</div>
-              </div>
-              <div style={{ padding: '1.5rem', borderRight: '1px solid rgba(10,10,10,0.06)', fontSize: '0.9375rem', color: 'rgba(10,10,10,0.7)', display: 'flex', alignItems: 'center' }}>{r.location}</div>
-              <div style={{ padding: '1.5rem', borderRight: '1px solid rgba(10,10,10,0.06)', fontSize: '0.9375rem', color: 'rgba(10,10,10,0.7)', fontStyle: 'italic', display: 'flex', alignItems: 'center' }}>{r.test}</div>
-              <div style={{ padding: '1.5rem', fontSize: '0.9375rem', color: '#0A0A0A', display: 'flex', alignItems: 'center' }}>{r.finding}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+function LpDifferential({data}) {
+  return <section className="gm-guide-section"><div className="container"><LpSectionHeader kicker="Diagnóstico diferencial" title={data.diffTitle} subtitle={data.diffSub} intro={data.diffIntro}/><div className="gm-diagnosis-cards">{data.diffRows.map((r,i)=><article key={r.condition} className={'gm-diagnosis-card'+(i===0?' gm-diagnosis-featured':'')}><div className="gm-guide-heading"><GuideIcon kind="focus"/><h3>{r.condition}</h3></div><p className="gm-diagnosis-finding">{r.finding}</p><dl><div><dt>Localización</dt><dd>{r.location}</dd></div><div><dt>Evaluación clínica</dt><dd>{r.test}</dd></div></dl></article>)}</div></div></section>;
 }
 
-// TREATMENT
-function LpTreatment({ data, activePhase, setActivePhase }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FAFAFA', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <LpSectionHeader kicker="Tratamiento · 4 fases" title={data.txTitle} subtitle={data.txSub} intro={data.txIntro} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '4rem', alignItems: 'flex-start' }} className="lp-tx-grid">
-          <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-            {data.phases.map((p, i) => {
-              const isActive = activePhase === i;
-              return (
-                <button key={i} onClick={() => setActivePhase(i)} style={{
-                  display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: '1.25rem', alignItems: 'center',
-                  padding: '1.75rem 0', background: 'none', border: 'none', borderBottom: '1px solid rgba(10,10,10,0.08)',
-                  textAlign: 'left', cursor: 'pointer', color: 'inherit', position: 'relative',
-                  paddingLeft: isActive ? '1rem' : '0', transition: 'padding 0.3s',
-                }}>
-                  {isActive && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: '#C9A55A' }} />}
-                  <div style={{ fontFamily: 'Space Grotesk', fontSize: isActive ? '1rem' : '0.875rem', fontWeight: 700, color: isActive ? '#C9A55A' : 'rgba(10,10,10,0.3)', transition: 'all 0.3s' }}>{String(i + 1).padStart(2, '0')}</div>
-                  <div style={{ fontSize: isActive ? '1.5rem' : '1.25rem', fontWeight: 700, fontFamily: 'Space Grotesk', letterSpacing: '-0.01em', color: isActive ? '#0A0A0A' : 'rgba(10,10,10,0.5)', transition: 'all 0.3s' }}>{p.title}</div>
-                  <div style={{ fontSize: '1.25rem', color: isActive ? '#C9A55A' : 'rgba(10,10,10,0.2)', transform: isActive ? 'translateX(0)' : 'translateX(-8px)', transition: 'all 0.3s' }}>→</div>
-                </button>
-              );
-            })}
-          </div>
-          <div key={activePhase} style={{ background: '#FFFFFF', border: '1px solid rgba(10,10,10,0.08)', padding: '3rem', position: 'relative', minHeight: '380px', animation: 'lpTxFade 0.4s ease-out' }}>
-            <div style={{ position: 'absolute', top: '1rem', right: '2rem', fontFamily: 'Space Grotesk', fontSize: '8rem', fontWeight: 700, color: 'rgba(201,165,90,0.08)', lineHeight: 0.85, letterSpacing: '-0.04em' }}>0{activePhase + 1}</div>
-            <div style={{ fontSize: '0.6875rem', color: '#C9A55A', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1rem', position: 'relative' }}>Fase {String(activePhase + 1).padStart(2, '0')} · {data.phases[activePhase].duration}</div>
-            <h3 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: '#0A0A0A', marginBottom: '1.5rem', position: 'relative' }}>{data.phases[activePhase].title}<span style={{ color: '#C9A55A' }}>.</span></h3>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)', maxWidth: '500px', position: 'relative' }}>{data.phases[activePhase].desc}</p>
-          </div>
-        </div>
-      </div>
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes lpTxFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @media (max-width: 900px) { .lp-tx-grid { grid-template-columns: 1fr !important; } }` }} />
-    </section>
-  );
+function LpTreatment({data,activePhase,setActivePhase}) {
+  const phase=data.phases[activePhase];
+  return <section className="gm-guide-section gm-guide-soft"><div className="container"><LpSectionHeader kicker="Tratamiento · 4 fases" title={data.txTitle} subtitle={data.txSub} intro={data.txIntro}/><div className="gm-treatment-steps" role="group" aria-label="Fases del tratamiento">{data.phases.map((p,i)=><button key={p.title} aria-pressed={activePhase===i} aria-controls="gm-treatment-panel" onClick={()=>setActivePhase(i)}><span className="gm-step-index">0{i+1}</span><div><strong>{p.title}</strong><span>{p.duration}</span></div><span className="gm-step-arrow" aria-hidden="true">↗</span></button>)}</div><div className="gm-treatment-panel" id="gm-treatment-panel" aria-live="polite"><GuideIcon kind={['focus','care','load','move'][activePhase]}/><div><span className="gm-guide-kicker">FASE 0{activePhase+1} · {phase.duration}</span><h3>{phase.title}</h3><p>{phase.desc}</p></div><span className="gm-panel-number" aria-hidden="true">0{activePhase+1}</span></div></div></section>;
 }
 
-// FAQ
 function LpFAQ({ data, openFaq, setOpenFaq }) {
   return (
     <section style={{ padding: '8rem 0', background: '#FFFFFF', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
@@ -13247,7 +12234,7 @@ function LpCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -13263,7 +12250,7 @@ function LpRelated({ data, onNavigate }) {
       <div className="container">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>Relacionado · Ver más</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>Relacionado · Ver más</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'rgba(10,10,10,0.08)', border: '1px solid rgba(10,10,10,0.08)' }} className="lp-rel-grid">
           {data.related.map((r, i) => (
@@ -13274,7 +12261,7 @@ function LpRelated({ data, onNavigate }) {
               <h3 data-rel="name" style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', color: '#0A0A0A', transition: 'color 0.4s', lineHeight: 1.05 }}>{r.name}</h3>
               <div data-rel="zone" style={{ fontSize: '0.875rem', color: 'rgba(10,10,10,0.5)', transition: 'color 0.4s' }}>{r.zone}</div>
               <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>Ver</span>
+                <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>Ver</span>
                 <span data-rel="arrow" style={{ fontSize: '1.5rem', color: 'rgba(10,10,10,0.3)', transition: 'all 0.4s', fontFamily: 'Space Grotesk' }}>→</span>
               </div>
             </a>
@@ -13312,19 +12299,19 @@ const BURSITIS_DATA = {
   name: 'Bursitis', bigWord: 'BURSITIS.', kicker: 'Articular · Bolsa sinovial',
   heroTitle: 'Bursitis', heroSub: 'sin cronificar.',
   heroDesc: 'Inflamación de la bolsa sinovial que amortigua las articulaciones. <strong>Frecuente en hombro, cadera y rodilla.</strong> Se resuelve si se trata la causa, no solo la inflamación.',
-  tldr: 'Inflamación de la bursa —la bolsa que reduce fricción en la articulación— por sobrecarga, presión o roce repetido. Hombro, cadera, rodilla y codo son las zonas típicas.',
-  recovery: '3—6 sem', complexity: 'Media',
+  tldr: 'Inflamación de la bursa, la bolsa que reduce fricción en la articulación,  por sobrecarga, presión o roce repetido. Hombro, cadera, rodilla y codo son las zonas típicas.',
+  recovery: '3 a 6 sem', complexity: 'Media',
   whatTitle: 'No es', whatSub: 'la articulación.',
   whatParas: [
-    'La bursitis es la <strong>inflamación de una bursa</strong> — pequeñas bolsas llenas de líquido que amortiguan el roce entre hueso, tendón y músculo. Cuando se irritan por sobrecarga o presión, se inflaman y duelen.',
-    'No es un problema de la articulación en sí, sino de la estructura que la protege. Por eso el tratamiento no es "reposo y antiinflamatorio" sin más — hay que <strong>identificar qué está irritando la bursa</strong>: un gesto repetido, una presión mantenida, o un desbalance que genera roce anormal.',
+    'La bursitis es la <strong>inflamación de una bursa</strong>, pequeñas bolsas llenas de líquido que amortiguan el roce entre hueso, tendón y músculo. Cuando se irritan por sobrecarga o presión, se inflaman y duelen.',
+    'No es un problema de la articulación en sí, sino de la estructura que la protege. Por eso el tratamiento no es "reposo y antiinflamatorio" sin más, hay que <strong>identificar qué está irritando la bursa</strong>: un gesto repetido, una presión mantenida, o un desbalance que genera roce anormal.',
     'Si solo se desinflama sin corregir la causa, vuelve. La bursitis recurrente casi siempre es una causa biomecánica no resuelta.',
   ],
   facts: [
     { label: 'Estructura', value: 'Bursa · bolsa sinovial de amortiguación' },
     { label: 'Zonas típicas', value: 'Hombro, cadera (trocantérea), rodilla, codo' },
     { label: 'Mecanismo', value: 'Sobrecarga, presión o roce repetido' },
-    { label: 'Recuperación', value: '3—6 semanas con tratamiento de la causa' },
+    { label: 'Recuperación', value: '3 a 6 semanas con tratamiento de la causa' },
   ],
   symptomsIntro: 'La bursitis duele de forma característica: peor con la presión directa y con el movimiento que comprime la bursa.',
   symptoms: [
@@ -13347,7 +12334,7 @@ const BURSITIS_DATA = {
   causesIntro: 'La bursitis tiene causa. Identificar cuál te aplica es lo que evita que se vuelva crónica.',
   causes: [
     { title: 'Sobrecarga repetida', desc: 'Gestos repetitivos que irritan la bursa una y otra vez. Lanzar, levantar overhead, correr. La causa más común en deportistas.' },
-    { title: 'Presión mantenida', desc: 'Apoyo prolongado sobre la zona — codo en escritorio, rodilla al arrodillarse. La presión constante inflama la bursa.' },
+    { title: 'Presión mantenida', desc: 'Apoyo prolongado sobre la zona, codo en escritorio, rodilla al arrodillarse. La presión constante inflama la bursa.' },
     { title: 'Desbalance muscular', desc: 'Glúteo débil que genera roce anormal en la cadera, o desbalance escapular en el hombro. El roce repetido irrita.' },
     { title: 'Traumatismo', desc: 'Un golpe directo sobre la bursa puede inflamarla de forma aguda. Frecuente en deportes de contacto.' },
   ],
@@ -13363,14 +12350,14 @@ const BURSITIS_DATA = {
   txIntro: 'La bursitis se trata en fases: bajar la inflamación primero, corregir la causa después. Sin lo segundo, recae.',
   phases: [
     { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Confirmar bursitis, localizar la bursa afectada, identificar la causa (gesto, presión, desbalance). Descartar infección y otras patologías.' },
-    { title: 'Desinflamar', duration: 'Semanas 1—2', desc: 'Reducir la inflamación: modificar la actividad que la irrita, terapia manual, frío local. Reposo relativo de la zona, no absoluto.' },
-    { title: 'Corregir', duration: 'Semanas 2—5', desc: 'Aquí se evita la recaída. Corregir el desbalance o el gesto que irritó la bursa. Fortalecimiento de la musculatura estabilizadora.' },
-    { title: 'Volver', duration: 'Semanas 4—6', desc: 'Reintroducción progresiva de la actividad, con el patrón corregido. Vuelta al deporte sin que la bursa se vuelva a irritar.' },
+    { title: 'Desinflamar', duration: 'Semanas 1 a 2', desc: 'Reducir la inflamación: modificar la actividad que la irrita, terapia manual, frío local. Reposo relativo de la zona, no absoluto.' },
+    { title: 'Corregir', duration: 'Semanas 2 a 5', desc: 'Aquí se evita la recaída. Corregir el desbalance o el gesto que irritó la bursa. Fortalecimiento de la musculatura estabilizadora.' },
+    { title: 'Volver', duration: 'Semanas 4 a 6', desc: 'Reintroducción progresiva de la actividad, con el patrón corregido. Vuelta al deporte sin que la bursa se vuelva a irritar.' },
   ],
   faqs: [
     { q: '¿La bursitis se cura sola?', a: 'A veces la fase aguda cede sola con reposo, pero si la causa persiste, vuelve. La bursitis recurrente es señal de que hay un problema biomecánico no resuelto. Tratar solo la inflamación sin corregir la causa es la razón #1 de cronificación.' },
     { q: '¿Necesito que me drenen el líquido?', a: 'Rara vez. La aspiración se reserva para bursitis muy inflamadas o con sospecha de infección (donde además se analiza el líquido). La mayoría de bursitis se resuelven con tratamiento conservador sin necesidad de pinchazos.' },
-    { q: '¿Hielo o calor?', a: 'Hielo en la fase aguda inflamatoria (primeras 48—72h) para reducir la inflamación. Una vez controlada, el trabajo de fortalecimiento y corrección de la causa es lo que resuelve. El hielo alivia, no cura.' },
+    { q: '¿Hielo o calor?', a: 'Hielo en la fase aguda inflamatoria (primeras 48 a 72h) para reducir la inflamación. Una vez controlada, el trabajo de fortalecimiento y corrección de la causa es lo que resuelve. El hielo alivia, no cura.' },
     { q: '¿Puedo seguir entrenando con bursitis?', a: 'Depende de la zona y la fase. En fase aguda hay que modificar o evitar el gesto que la irrita, pero rara vez parar todo. Mantenemos el entrenamiento que no comprometa la bursa mientras se desinflama.' },
     { q: '¿Las infiltraciones de cortisona sirven?', a: 'Pueden ayudar en casos muy inflamados a corto plazo, pero no corrigen la causa. Se usan con criterio y nunca como solución única. Si la causa biomecánica sigue, la bursitis volverá tras el efecto de la infiltración.' },
     { q: '¿Cómo evito que vuelva?', a: 'Corrigiendo la causa: el desbalance muscular, el gesto repetitivo o la presión que la irritó. El fortalecimiento de la musculatura estabilizadora y la modificación del gesto problemático son lo que previene la recaída. La inflamación es el síntoma, no el problema.' },
@@ -13389,18 +12376,18 @@ const CONDROMALACIA_DATA = {
   heroTitle: 'Condromalacia', heroSub: 'sin cirugía.',
   heroDesc: 'Reblandecimiento del cartílago detrás de la rótula. <strong>El dolor al bajar escaleras es la pista.</strong> Se trata con fortalecimiento, no con reposo ni quirófano en la mayoría de casos.',
   tldr: 'Deterioro del cartílago de la cara posterior de la rótula. Causa dolor anterior de rodilla, peor al bajar escaleras, sentarse mucho o agacharse. Más común en mujeres jóvenes y corredores.',
-  recovery: '6—12 sem', complexity: 'Media',
+  recovery: '6 a 12 sem', complexity: 'Media',
   whatTitle: 'No es', whatSub: 'desgaste irreversible.',
   whatParas: [
     'La condromalacia rotuliana es el <strong>reblandecimiento y deterioro del cartílago</strong> que recubre la cara posterior de la rótula. Ese cartílago debería deslizar suave sobre el fémur; cuando se daña, el roce genera dolor anterior de rodilla.',
-    'La clave: no es un "desgaste" inevitable ni una sentencia de cirugía. En la mayoría de los casos es un <strong>problema de seguimiento patelar</strong> — la rótula no se desliza por su carril correcto, generando presión y roce anormales. Y eso se corrige.',
-    'El dolor característico aparece al <strong>bajar escaleras, agacharse o tras estar sentado mucho tiempo</strong> (el "signo del cine"). Corregir el balance muscular que descentra la rótula es lo que resuelve — no el reposo.',
+    'La clave: no es un "desgaste" inevitable ni una sentencia de cirugía. En la mayoría de los casos es un <strong>problema de seguimiento patelar</strong>, la rótula no se desliza por su carril correcto, generando presión y roce anormales. Y eso se corrige.',
+    'El dolor característico aparece al <strong>bajar escaleras, agacharse o tras estar sentado mucho tiempo</strong> (el "signo del cine"). Corregir el balance muscular que descentra la rótula es lo que resuelve, no el reposo.',
   ],
   facts: [
     { label: 'Estructura', value: 'Cartílago retropatelar (detrás de la rótula)' },
     { label: 'Señal clave', value: 'Dolor al bajar escaleras y al sentarse' },
     { label: 'Población', value: 'Mujeres jóvenes, corredores, saltadores' },
-    { label: 'Recuperación', value: '6—12 semanas con fortalecimiento dirigido' },
+    { label: 'Recuperación', value: '6 a 12 semanas con fortalecimiento dirigido' },
   ],
   symptomsIntro: 'La condromalacia tiene un patrón muy reconocible: dolor anterior difuso que empeora con la flexión cargada de rodilla.',
   symptoms: [
@@ -13439,17 +12426,17 @@ const CONDROMALACIA_DATA = {
   txIntro: 'La condromalacia se resuelve corrigiendo el seguimiento patelar. El fortalecimiento dirigido es el tratamiento, no el reposo.',
   phases: [
     { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Confirmar condromalacia, evaluar el seguimiento patelar, identificar el desbalance (vasto interno, glúteo medio). Descartar lesión meniscal o tendinosa.' },
-    { title: 'Descargar', duration: 'Semanas 1—3', desc: 'Reducir la actividad que comprime la rótula (escaleras, sentadilla profunda, saltos). Modificar carga sin reposo absoluto. Control del dolor.' },
-    { title: 'Recentrar', duration: 'Semanas 3—8', desc: 'El núcleo del tratamiento. Fortalecer vasto interno y glúteo medio para recentrar la rótula. Corregir el valgo dinámico. Trabajo de control motor.' },
-    { title: 'Volver', duration: 'Semanas 6—12', desc: 'Reintroducción progresiva de impacto y flexión cargada con el patrón corregido. Vuelta al deporte sin que el cartílago se vuelva a irritar.' },
+    { title: 'Descargar', duration: 'Semanas 1 a 3', desc: 'Reducir la actividad que comprime la rótula (escaleras, sentadilla profunda, saltos). Modificar carga sin reposo absoluto. Control del dolor.' },
+    { title: 'Recentrar', duration: 'Semanas 3 a 8', desc: 'El núcleo del tratamiento. Fortalecer vasto interno y glúteo medio para recentrar la rótula. Corregir el valgo dinámico. Trabajo de control motor.' },
+    { title: 'Volver', duration: 'Semanas 6 a 12', desc: 'Reintroducción progresiva de impacto y flexión cargada con el patrón corregido. Vuelta al deporte sin que el cartílago se vuelva a irritar.' },
   ],
   faqs: [
     { q: '¿La condromalacia necesita cirugía?', a: 'En la gran mayoría de casos, no. La condromalacia responde muy bien al tratamiento conservador: fortalecimiento dirigido para recentrar la rótula. La cirugía se reserva para casos severos con daño cartilaginoso avanzado que no responden a meses de tratamiento bien hecho.' },
-    { q: '¿Por qué me duele al bajar escaleras y no al subir?', a: 'Porque bajar escaleras genera más carga excéntrica y compresión sobre la rótula con la rodilla flexionada. Subir es concéntrico y comprime menos. Ese patrón —peor al bajar— es justo lo que distingue la condromalacia de otras lesiones.' },
+    { q: '¿Por qué me duele al bajar escaleras y no al subir?', a: 'Porque bajar escaleras genera más carga excéntrica y compresión sobre la rótula con la rodilla flexionada. Subir es concéntrico y comprime menos. Ese patrón, peor al bajar,  es justo lo que distingue la condromalacia de otras lesiones.' },
     { q: '¿Debo dejar de correr?', a: 'No necesariamente del todo. En fase aguda reducimos el volumen de impacto, pero el objetivo es volver a correr. Mantenemos cardio sin impacto (bici, natación) mientras fortalecemos. Parar del todo atrofia el cuádriceps y empeora el problema.' },
     { q: '¿El cartílago se regenera?', a: 'El cartílago tiene capacidad limitada de regeneración, pero ese no es el punto. El objetivo del tratamiento no es "regenerar cartílago" sino recentrar la rótula para que el cartílago dañado deje de sufrir roce anormal. Sin roce, el dolor desaparece aunque el cartílago no vuelva a ser perfecto.' },
     { q: '¿Las rodilleras ayudan?', a: 'Algunas rodilleras con orificio rotuliano pueden dar alivio sintomático durante la actividad, ayudando al seguimiento patelar. Pero son un apoyo temporal, no la solución. El fortalecimiento es lo que recentra la rótula de forma permanente.' },
-    { q: '¿Cuánto tardo en mejorar?', a: 'Casos leves notan mejora en 4—6 semanas; moderados, 8—12. La clave es la constancia con el fortalecimiento del vasto interno y glúteo medio. No es rápido, pero es muy efectivo cuando se hace bien y de forma sostenida.' },
+    { q: '¿Cuánto tardo en mejorar?', a: 'Casos leves notan mejora en 4 a 6 semanas; moderados, 8 a 12. La clave es la constancia con el fortalecimiento del vasto interno y glúteo medio. No es rápido, pero es muy efectivo cuando se hace bien y de forma sostenida.' },
   ],
   ctaTitle: 'Recentras la rótula.', ctaSub: 'Sin quirófano.',
   ctaDesc: 'Primera sesión: evaluación del seguimiento patelar + diagnóstico + plan de fortalecimiento dirigido. 60 min. La cirugía es el último recurso, no el primero.',
@@ -13465,18 +12452,18 @@ const CONTRACTURA_DATA = {
   heroTitle: 'Contractura', heroSub: 'que no vuelve.',
   heroDesc: 'Contracción involuntaria y sostenida de un músculo. <strong>La lesión más común y la más mal tratada.</strong> Liberar el espasmo es fácil; evitar que vuelva es el verdadero trabajo.',
   tldr: 'Contracción mantenida e involuntaria de fibras musculares que genera dolor, rigidez y limitación. Frecuente en cuello, espalda y piernas. Casi siempre tiene una causa subyacente que la perpetúa.',
-  recovery: '1—3 sem', complexity: 'Baja',
+  recovery: '1 a 3 sem', complexity: 'Baja',
   whatTitle: 'No es', whatSub: 'solo un nudo.',
   whatParas: [
     'La contractura muscular es una <strong>contracción involuntaria y sostenida</strong> de un grupo de fibras musculares. El músculo no se relaja, queda "agarrotado", genera dolor y limita el movimiento. Es la lesión más frecuente que existe.',
-    'El error común: tratarla como si fuera solo un nudo a deshacer. Un masaje la libera temporalmente, pero <strong>vuelve si no se trata la causa</strong> — la sobrecarga, la mala postura, el desbalance o incluso el estrés que la generó.',
+    'El error común: tratarla como si fuera solo un nudo a deshacer. Un masaje la libera temporalmente, pero <strong>vuelve si no se trata la causa</strong>, la sobrecarga, la mala postura, el desbalance o incluso el estrés que la generó.',
     'Las contracturas recurrentes en la misma zona no son mala suerte: son una señal de que algo más profundo no se ha resuelto. Liberar el espasmo es el alivio; corregir la causa es la solución.',
   ],
   facts: [
     { label: 'Qué es', value: 'Contracción sostenida e involuntaria de fibras' },
     { label: 'Zonas típicas', value: 'Cuello, trapecio, lumbar, gemelos, isquios' },
     { label: 'Causa frecuente', value: 'Sobrecarga, postura, desbalance, estrés' },
-    { label: 'Recuperación', value: '1—3 semanas · rápida si se trata la causa' },
+    { label: 'Recuperación', value: '1 a 3 semanas · rápida si se trata la causa' },
   ],
   symptomsIntro: 'La contractura se siente como una zona dura y dolorosa que limita el movimiento normal del músculo.',
   symptoms: [
@@ -13499,7 +12486,7 @@ const CONTRACTURA_DATA = {
   causesIntro: 'Las contracturas tienen causa. Las recurrentes siempre apuntan a algo no resuelto.',
   causes: [
     { title: 'Sobrecarga', desc: 'Esfuerzo que excede la capacidad del músculo. Entrenamiento sin progresión, gesto repetido, fatiga acumulada. La causa más directa.' },
-    { title: 'Postura', desc: 'Posiciones mantenidas que tensan ciertos músculos — horas sentado, mala ergonomía. El trapecio y el cuello son las víctimas clásicas.' },
+    { title: 'Postura', desc: 'Posiciones mantenidas que tensan ciertos músculos, horas sentado, mala ergonomía. El trapecio y el cuello son las víctimas clásicas.' },
     { title: 'Desbalance', desc: 'Un músculo compensa la debilidad de otro y termina sobrecargado. La contractura es el síntoma; el desbalance, la causa.' },
     { title: 'Estrés', desc: 'La tensión emocional se traduce en tensión muscular, sobre todo en cuello y hombros. Una causa real, no menor, de contracturas crónicas.' },
   ],
@@ -13515,8 +12502,8 @@ const CONTRACTURA_DATA = {
   txIntro: 'La contractura se libera rápido. El verdadero trabajo es evitar que vuelva corrigiendo lo que la causó.',
   phases: [
     { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Localizar la contractura, identificar la causa (sobrecarga, postura, desbalance, estrés). Descartar que el dolor sea referido de otra estructura.' },
-    { title: 'Liberar', duration: 'Sesión 1—2', desc: 'Terapia manual, punción seca si hay puntos gatillo, calor, estiramiento dirigido. Liberar el espasmo y restaurar el rango de movimiento.' },
-    { title: 'Corregir', duration: 'Semanas 1—3', desc: 'Lo que evita la recaída. Corregir la postura, el desbalance o el gesto que la generó. Fortalecer la musculatura débil que obligaba a la contractura.' },
+    { title: 'Liberar', duration: 'Sesión 1 a 2', desc: 'Terapia manual, punción seca si hay puntos gatillo, calor, estiramiento dirigido. Liberar el espasmo y restaurar el rango de movimiento.' },
+    { title: 'Corregir', duration: 'Semanas 1 a 3', desc: 'Lo que evita la recaída. Corregir la postura, el desbalance o el gesto que la generó. Fortalecer la musculatura débil que obligaba a la contractura.' },
     { title: 'Prevenir', duration: 'Continuo', desc: 'Pautas de prevención: ergonomía, movilidad, gestión de cargas, manejo del estrés. Para que la contractura no se vuelva un visitante habitual.' },
   ],
   faqs: [
@@ -13525,7 +12512,7 @@ const CONTRACTURA_DATA = {
     { q: '¿Hielo o calor para una contractura?', a: 'Calor, generalmente. El calor relaja la musculatura contracturada y mejora la circulación local, ayudando a liberar el espasmo. El hielo se reserva para lesiones con inflamación aguda (distensiones, golpes), no para contracturas.' },
     { q: '¿Puedo entrenar con una contractura?', a: 'Depende de la intensidad. Una contractura leve puede mejorar con movimiento suave y calor. Una contractura importante requiere reducir la carga de esa zona temporalmente. Forzar el entrenamiento sobre un músculo contracturado puede derivar en una distensión.' },
     { q: '¿El estrés realmente causa contracturas?', a: 'Sí, totalmente. La tensión emocional se traduce en tensión muscular sostenida, especialmente en cuello, trapecio y mandíbula. Muchas contracturas cervicales crónicas tienen un componente de estrés importante. Abordarlo es parte del tratamiento.' },
-    { q: '¿Cuánto tarda en irse?', a: 'Una contractura aguda simple puede ceder en días a 1—2 semanas con tratamiento. Las recurrentes o crónicas tardan más porque requieren corregir la causa de fondo. Lo rápido es liberar el espasmo; lo que lleva tiempo es evitar que vuelva.' },
+    { q: '¿Cuánto tarda en irse?', a: 'Una contractura aguda simple puede ceder en días a 1 a 2 semanas con tratamiento. Las recurrentes o crónicas tardan más porque requieren corregir la causa de fondo. Lo rápido es liberar el espasmo; lo que lleva tiempo es evitar que vuelva.' },
   ],
   ctaTitle: 'Liberas el nudo.', ctaSub: 'Y no vuelve.',
   ctaDesc: 'Primera sesión: liberación de la contractura + identificación de la causa que la genera. 60 min. El masaje alivia; corregir la causa resuelve.',
@@ -13539,20 +12526,20 @@ const CONTRACTURA_DATA = {
 const PERIOSTITIS_DATA = {
   name: 'Periostitis Tibial', bigWord: 'ESPINILLA.', kicker: 'Tibia · Periostio',
   heroTitle: 'Periostitis', heroSub: 'antes de la fractura.',
-  heroDesc: 'Inflamación del periostio de la tibia — el clásico "dolor de espinilla" del corredor. <strong>Si se ignora, precede a la fractura por estrés.</strong> Distinguir una de otra es crítico.',
+  heroDesc: 'Inflamación del periostio de la tibia, el clásico "dolor de espinilla" del corredor. <strong>Si se ignora, precede a la fractura por estrés.</strong> Distinguir una de otra es crítico.',
   tldr: 'Inflamación del periostio (la membrana que recubre la tibia) por sobrecarga repetida de impacto. El "shin splint" del corredor. Dolor en la cara medial de la tibia que, si se ignora, puede progresar a fractura por estrés.',
-  recovery: '2—6 sem', complexity: 'Baja',
+  recovery: '2 a 6 sem', complexity: 'Baja',
   whatTitle: 'No es', whatSub: 'solo cansancio.',
   whatParas: [
-    'La periostitis tibial es la <strong>inflamación del periostio</strong> — la membrana que recubre el hueso de la tibia — por la tracción repetida de los músculos de la pierna durante el impacto. Es el famoso "dolor de espinilla" o shin splint del corredor.',
-    'Lo importante: la periostitis es una <strong>señal de alarma temprana</strong>. Si se ignora y se sigue corriendo sobre el dolor, la sobrecarga puede progresar a una <strong>fractura por estrés</strong> — una lesión mucho más seria que requiere semanas de parón total.',
+    'La periostitis tibial es la <strong>inflamación del periostio</strong>, la membrana que recubre el hueso de la tibia, por la tracción repetida de los músculos de la pierna durante el impacto. Es el famoso "dolor de espinilla" o shin splint del corredor.',
+    'Lo importante: la periostitis es una <strong>señal de alarma temprana</strong>. Si se ignora y se sigue corriendo sobre el dolor, la sobrecarga puede progresar a una <strong>fractura por estrés</strong>, una lesión mucho más seria que requiere semanas de parón total.',
     'Por eso distinguir periostitis de fractura por estrés es crítico. La periostitis duele de forma difusa a lo largo de la tibia; la fractura por estrés duele en un punto concreto. Esa diferencia cambia completamente el manejo.',
   ],
   facts: [
     { label: 'Estructura', value: 'Periostio · membrana que recubre la tibia' },
     { label: 'Localización', value: 'Cara medial (interna) de la tibia' },
     { label: 'Riesgo', value: 'Precede a fractura por estrés si se ignora' },
-    { label: 'Recuperación', value: '2—6 semanas con reposo relativo + corrección' },
+    { label: 'Recuperación', value: '2 a 6 semanas con reposo relativo + corrección' },
   ],
   symptomsIntro: 'La periostitis duele a lo largo de la tibia. El cambio de patrón del dolor es la pista de que puede estar progresando.',
   symptoms: [
@@ -13576,7 +12563,7 @@ const PERIOSTITIS_DATA = {
   causes: [
     { title: 'Volumen de km', desc: 'Aumentar el kilometraje más rápido de lo que el hueso adapta. La regla del 10% existe por esto. La causa #1.' },
     { title: 'Biomecánica de pisada', desc: 'Sobrepronación o impacto excesivo que aumenta la tracción sobre el periostio. La forma de correr importa tanto como el volumen.' },
-    { title: 'Calzado', desc: 'Zapatillas desgastadas o inadecuadas para tu pisada amplifican el impacto sobre la tibia. Cambiar cada 600—800 km.' },
+    { title: 'Calzado', desc: 'Zapatillas desgastadas o inadecuadas para tu pisada amplifican el impacto sobre la tibia. Cambiar cada 600 a 800 km.' },
     { title: 'Superficie', desc: 'Correr siempre sobre superficie dura (asfalto) o cambiar bruscamente de superficie aumenta la carga de impacto.' },
   ],
   diffTitle: 'Periostitis vs', diffSub: 'fractura por estrés.',
@@ -13590,16 +12577,16 @@ const PERIOSTITIS_DATA = {
   txTitle: 'Descargar y', txSub: 'corregir pisada.',
   txIntro: 'La periostitis se trata con reposo relativo + corrección de la causa. Seguir corriendo sobre el dolor es lo que la convierte en fractura.',
   phases: [
-    { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Confirmar periostitis y —crítico— descartar fractura por estrés. Evaluar la pisada, el calzado y los errores de carga. Hop test.' },
-    { title: 'Descargar', duration: 'Semanas 1—2', desc: 'Reposo relativo: reducir o suspender el impacto. Mantener fitness con cardio sin impacto (bici, natación, elíptica). Control del dolor.' },
-    { title: 'Corregir', duration: 'Semanas 2—5', desc: 'Fortalecer pantorrilla y tibial, corregir la pisada, revisar el calzado. Trabajo de cadera y core para mejorar la mecánica de carrera.' },
-    { title: 'Volver', duration: 'Semanas 4—6', desc: 'Retorno progresivo a la carrera (caminar-trotar → continuo → volumen) respetando la regla del 10%. Vuelta sin recaer.' },
+    { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Confirmar periostitis y, crítico,  descartar fractura por estrés. Evaluar la pisada, el calzado y los errores de carga. Hop test.' },
+    { title: 'Descargar', duration: 'Semanas 1 a 2', desc: 'Reposo relativo: reducir o suspender el impacto. Mantener fitness con cardio sin impacto (bici, natación, elíptica). Control del dolor.' },
+    { title: 'Corregir', duration: 'Semanas 2 a 5', desc: 'Fortalecer pantorrilla y tibial, corregir la pisada, revisar el calzado. Trabajo de cadera y core para mejorar la mecánica de carrera.' },
+    { title: 'Volver', duration: 'Semanas 4 a 6', desc: 'Retorno progresivo a la carrera (caminar-trotar → continuo → volumen) respetando la regla del 10%. Vuelta sin recaer.' },
   ],
   faqs: [
-    { q: '¿Cuánto tiempo debo parar de correr?', a: 'Depende de la severidad. Casos leves: reducir volumen 1—2 semanas puede bastar. Casos con dolor durante toda la carrera: suspender el impacto 2—4 semanas, manteniendo cardio sin impacto. Lo importante es no correr sobre el dolor — eso es lo que la cronifica o la convierte en fractura.' },
-    { q: '¿Cómo sé si es periostitis o fractura por estrés?', a: 'La pista clave: la periostitis duele de forma difusa a lo largo de la tibia y suele calmar al calentar. La fractura por estrés duele en un punto concreto, persiste en reposo, y el hop test (saltar sobre una pierna) la dispara. Ante la duda, se evalúa — confundirlas es peligroso.' },
+    { q: '¿Cuánto tiempo debo parar de correr?', a: 'Depende de la severidad. Casos leves: reducir volumen 1 a 2 semanas puede bastar. Casos con dolor durante toda la carrera: suspender el impacto 2 a 4 semanas, manteniendo cardio sin impacto. Lo importante es no correr sobre el dolor, eso es lo que la cronifica o la convierte en fractura.' },
+    { q: '¿Cómo sé si es periostitis o fractura por estrés?', a: 'La pista clave: la periostitis duele de forma difusa a lo largo de la tibia y suele calmar al calentar. La fractura por estrés duele en un punto concreto, persiste en reposo, y el hop test (saltar sobre una pierna) la dispara. Ante la duda, se evalúa, confundirlas es peligroso.' },
     { q: '¿El hielo realmente sirve?', a: 'Ayuda a controlar el dolor y la inflamación local tras correr, pero no cura. Es un alivio sintomático. Lo que resuelve la periostitis es descargar el impacto y corregir la causa (pisada, calzado, volumen). El hielo es complemento, no tratamiento.' },
-    { q: '¿Necesito plantillas?', a: 'A veces. Si hay una alteración biomecánica de la pisada (sobrepronación marcada) que contribuye, las plantillas pueden ayudar. Pero no son automáticas — se valoran según tu caso. Muchas periostitis se resuelven solo con fortalecimiento y corrección del entrenamiento, sin plantillas.' },
+    { q: '¿Necesito plantillas?', a: 'A veces. Si hay una alteración biomecánica de la pisada (sobrepronación marcada) que contribuye, las plantillas pueden ayudar. Pero no son automáticas, se valoran según tu caso. Muchas periostitis se resuelven solo con fortalecimiento y corrección del entrenamiento, sin plantillas.' },
     { q: '¿Puedo hacer cardio sin correr?', a: 'Sí, y es lo ideal durante la descarga. Bici, natación, elíptica o aqua-running mantienen tu fitness cardiovascular sin el impacto que irrita el periostio. Así no pierdes forma mientras la tibia se recupera. Es la mejor forma de no desesperarte durante el parón.' },
     { q: '¿Cómo prevengo que vuelva?', a: 'Tres claves: progresar el volumen respetando el 10% semanal, fortalecer pantorrilla, tibial y cadera, y usar calzado adecuado en buen estado. La mayoría de las recaídas son por volver demasiado rápido al volumen anterior sin haber corregido la causa.' },
   ],
@@ -13615,20 +12602,20 @@ const PERIOSTITIS_DATA = {
 const EPITROCLEITIS_DATA = {
   name: 'Epitrocleítis', bigWord: 'CODO.', kicker: 'Codo · Epicóndilo medial',
   heroTitle: 'Epitrocleítis', heroSub: 'o codo de golfista.',
-  heroDesc: 'Tendinopatía de los flexores en la cara interna del codo. <strong>El "codo de golfista" — pero más común en CrossFit y BJJ.</strong> Como toda tendinopatía, necesita carga, no reposo.',
+  heroDesc: 'Tendinopatía de los flexores en la cara interna del codo. <strong>El "codo de golfista", pero más común en CrossFit y BJJ.</strong> Como toda tendinopatía, necesita carga, no reposo.',
   tldr: 'Tendinopatía de los músculos flexores-pronadores en su inserción en el epicóndilo medial (cara interna del codo). El "codo de golfista". Por sobrecarga de agarre y flexión de muñeca. Se trata con carga excéntrica progresiva.',
-  recovery: '4—8 sem', complexity: 'Media',
+  recovery: '4 a 8 sem', complexity: 'Media',
   whatTitle: 'No es', whatSub: 'inflamación.',
   whatParas: [
-    'La epitrocleítis es la <strong>tendinopatía de los tendones flexores y pronadores</strong> del antebrazo en su inserción en el epicóndilo medial — la prominencia ósea de la cara interna del codo. Se la conoce como "codo de golfista", pero la veo más en CrossFitters y grapplers.',
-    'Como toda tendinopatía, el nombre con "-itis" engaña: <strong>no es inflamación clásica, es degeneración del tendón</strong> por sobrecarga repetida. Por eso el reposo y los antiinflamatorios no la curan — el tendón necesita carga progresiva para remodelarse.',
+    'La epitrocleítis es la <strong>tendinopatía de los tendones flexores y pronadores</strong> del antebrazo en su inserción en el epicóndilo medial, la prominencia ósea de la cara interna del codo. Se la conoce como "codo de golfista", pero la veo más en CrossFitters y grapplers.',
+    'Como toda tendinopatía, el nombre con "-itis" engaña: <strong>no es inflamación clásica, es degeneración del tendón</strong> por sobrecarga repetida. Por eso el reposo y los antiinflamatorios no la curan, el tendón necesita carga progresiva para remodelarse.',
     'Su prima, la epicondilitis ("codo de tenista"), afecta la cara externa. La epitrocleítis es la interna. Distinguirlas importa porque el gesto que las causa y los músculos a trabajar son distintos.',
   ],
   facts: [
     { label: 'Estructura', value: 'Tendón flexor-pronador · epicóndilo medial' },
     { label: 'Cara', value: 'Interna del codo (medial)' },
     { label: 'Deportes', value: 'CrossFit, BJJ, golf, escalada, lanzamiento' },
-    { label: 'Recuperación', value: '4—8 semanas con carga excéntrica' },
+    { label: 'Recuperación', value: '4 a 8 semanas con carga excéntrica' },
   ],
   symptomsIntro: 'La epitrocleítis duele en la cara interna del codo, sobre todo al agarrar y flexionar la muñeca.',
   symptoms: [
@@ -13651,7 +12638,7 @@ const EPITROCLEITIS_DATA = {
   causesIntro: 'La epitrocleítis viene de la sobrecarga del agarre y la flexión de muñeca. Cuatro factores la explican.',
   causes: [
     { title: 'Sobrecarga de agarre', desc: 'Dominadas, escalada, kettlebells, agarre del gi en BJJ. El agarre repetido sobrecarga los flexores. La causa #1 en deportistas.' },
-    { title: 'Flexión de muñeca', desc: 'Gestos repetidos de flexión con carga — el swing de golf, ciertos levantamientos. Tracción repetida sobre el tendón.' },
+    { title: 'Flexión de muñeca', desc: 'Gestos repetidos de flexión con carga, el swing de golf, ciertos levantamientos. Tracción repetida sobre el tendón.' },
     { title: 'Volumen sin progresión', desc: 'Aumentar bruscamente el volumen de trabajo de agarre o tracción sin dar tiempo al tendón a adaptarse.' },
     { title: 'Déficit de antebrazo', desc: 'Musculatura del antebrazo débil que no soporta la demanda. El tendón sobrecargado paga el precio de la falta de fuerza base.' },
   ],
@@ -13667,16 +12654,16 @@ const EPITROCLEITIS_DATA = {
   txIntro: 'Como toda tendinopatía, la epitrocleítis necesita carga excéntrica progresiva para remodelar el tendón. El reposo solo no la cura.',
   phases: [
     { title: 'Diagnóstico', duration: 'Sesión 1', desc: 'Confirmar epitrocleítis (vs epicondilitis vs neuropatía cubital), identificar el gesto sobrecargante, evaluar la fuerza de antebrazo.' },
-    { title: 'Calmar', duration: 'Semanas 1—2', desc: 'Reducir el gesto que sobrecarga (agarre, flexión cargada). Terapia manual, isométricos de muñeca para alivio. Modificar, no parar del todo.' },
-    { title: 'Cargar', duration: 'Semanas 2—6', desc: 'El núcleo del tratamiento. Carga excéntrica progresiva de los flexores de muñeca para remodelar el tendón. Fortalecimiento del antebrazo.' },
-    { title: 'Volver', duration: 'Semanas 4—8', desc: 'Reintroducción progresiva del agarre y la tracción con el tendón fortalecido. Vuelta a dominadas, escalada o gi sin que recaiga.' },
+    { title: 'Calmar', duration: 'Semanas 1 a 2', desc: 'Reducir el gesto que sobrecarga (agarre, flexión cargada). Terapia manual, isométricos de muñeca para alivio. Modificar, no parar del todo.' },
+    { title: 'Cargar', duration: 'Semanas 2 a 6', desc: 'El núcleo del tratamiento. Carga excéntrica progresiva de los flexores de muñeca para remodelar el tendón. Fortalecimiento del antebrazo.' },
+    { title: 'Volver', duration: 'Semanas 4 a 8', desc: 'Reintroducción progresiva del agarre y la tracción con el tendón fortalecido. Vuelta a dominadas, escalada o gi sin que recaiga.' },
   ],
   faqs: [
     { q: '¿El reposo cura la epitrocleítis?', a: 'No del todo. Como toda tendinopatía, el tendón degenerado necesita carga progresiva para remodelarse. El reposo alivia mientras dura, pero al volver al agarre o la tracción, el dolor regresa porque el tendón sigue débil. La carga excéntrica es lo que lo cura.' },
     { q: '¿Es lo mismo que codo de tenista?', a: 'No, son primos pero opuestos. La epitrocleítis ("codo de golfista") afecta la cara INTERNA del codo y los flexores. La epicondilitis ("codo de tenista") afecta la cara EXTERNA y los extensores. Distinto gesto causante, distintos músculos a trabajar. Por eso el diagnóstico preciso importa.' },
-    { q: '¿Puedo seguir entrenando?', a: 'Con modificaciones, casi siempre. Reducimos temporalmente el gesto que sobrecarga (dominadas, escalada, agarre intenso) pero mantenemos el resto del entrenamiento. Parar del todo no es necesario ni recomendable —el tendón necesita carga, solo que controlada.' },
+    { q: '¿Puedo seguir entrenando?', a: 'Con modificaciones, casi siempre. Reducimos temporalmente el gesto que sobrecarga (dominadas, escalada, agarre intenso) pero mantenemos el resto del entrenamiento. Parar del todo no es necesario ni recomendable, el tendón necesita carga, solo que controlada.' },
     { q: '¿Las cinchas o bandas de codo sirven?', a: 'Pueden dar alivio sintomático durante la actividad al modificar la tensión sobre el tendón. Son un apoyo temporal útil, pero no curan. El fortalecimiento del tendón con carga excéntrica es lo que resuelve el problema de fondo.' },
-    { q: '¿Cuánto tarda en mejorar?', a: 'Las primeras 2 semanas con carga excéntrica puede que no notes mucho —incluso algo de molestia por la carga. A partir de la semana 4 empieza el alivio. Entre semana 6—8 normalmente vuelves a tu agarre habitual. La constancia con los excéntricos es clave.' },
+    { q: '¿Cuánto tarda en mejorar?', a: 'Las primeras 2 semanas con carga excéntrica puede que no notes mucho, incluso algo de molestia por la carga. A partir de la semana 4 empieza el alivio. Entre semana 6 a 8 normalmente vuelves a tu agarre habitual. La constancia con los excéntricos es clave.' },
     { q: '¿Por qué me dio si no juego golf?', a: 'Porque el "codo de golfista" es un nombre engañoso. Cualquier sobrecarga de agarre o flexión de muñeca lo causa: dominadas, escalada, kettlebells, el agarre del gi en BJJ, levantamientos. En realidad lo veo mucho más en CrossFitters y grapplers que en golfistas.' },
   ],
   ctaTitle: 'Cargas el tendón.', ctaSub: 'Vuelve el agarre.',
@@ -13688,11 +12675,21 @@ const EPITROCLEITIS_DATA = {
   ],
 };
 
-function BursitisPage({ onNavigate }) { return <LesionPillarPage data={BURSITIS_DATA} onNavigate={onNavigate} />; }
-function CondromalaciaPage({ onNavigate }) { return <LesionPillarPage data={CONDROMALACIA_DATA} onNavigate={onNavigate} />; }
-function ContracturaPage({ onNavigate }) { return <LesionPillarPage data={CONTRACTURA_DATA} onNavigate={onNavigate} />; }
-function PeriostitisPage({ onNavigate }) { return <LesionPillarPage data={PERIOSTITIS_DATA} onNavigate={onNavigate} />; }
-function EpitrocleitisPage({ onNavigate }) { return <LesionPillarPage data={EPITROCLEITIS_DATA} onNavigate={onNavigate} />; }
+function BursitisPage({ onNavigate }) {
+  return <InjuryExperience page="bursitis"/>;
+}
+function CondromalaciaPage({ onNavigate }) {
+  return <InjuryExperience page="condromalacia"/>;
+}
+function ContracturaPage({ onNavigate }) {
+  return <InjuryExperience page="contractura"/>;
+}
+function PeriostitisPage({ onNavigate }) {
+  return <InjuryExperience page="periostitis"/>;
+}
+function EpitrocleitisPage({ onNavigate }) {
+  return <InjuryExperience page="epitrocleitis"/>;
+}
 
 /* ==================== servicio.jsx ==================== */
 // SERVICIO - Componente reutilizable para páginas de servicio técnico
@@ -13707,12 +12704,12 @@ function SvSectionHeader({ kicker, title, subtitle, intro, dark }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
         </div>
         <h2 style={{
           fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 700, lineHeight: 1,
           letterSpacing: '-0.03em', fontFamily: 'Space Grotesk', color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
+        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span></h2>
       </div>
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
@@ -13739,19 +12736,19 @@ function SvHero({ data, onNavigate }) {
         }}>
           <a {...navProps('fisioterapia', onNavigate)} style={{ color: 'rgba(10,10,10,0.5)', cursor: 'pointer', textDecoration: 'none' }}>Servicios</a>
           <span style={{ color: 'rgba(10,10,10,0.25)' }}>/</span>
-          <span style={{ color: '#C9A55A' }}>{data.name}</span>
+          <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>{data.name}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', alignItems: 'flex-end' }} className="sv-hero-grid">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{data.kicker}</div>
             </div>
             <h1 style={{
               fontSize: 'clamp(2.75rem, 6.5vw, 6rem)', fontWeight: 700, lineHeight: 0.9,
               letterSpacing: '-0.04em', fontFamily: 'Space Grotesk', color: '#0A0A0A', marginBottom: '2.5rem',
-            }}>{data.heroTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{data.heroSub}</span></h1>
+            }}>{data.heroTitle}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{data.heroSub}</span></h1>
             <p style={{
               fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)', lineHeight: 1.55,
               color: 'rgba(10,10,10,0.65)', maxWidth: '620px', marginBottom: '2rem',
@@ -13768,10 +12765,10 @@ function SvHero({ data, onNavigate }) {
             </div>
           </div>
 
-          {/* TL;DR — qué es / qué no es */}
+          {/* TL;DR, qué es / qué no es */}
           <div style={{ background: '#0A0A0A', color: '#FFFFFF', padding: '2.5rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#C9A55A' }} />
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '1.5rem' }}>
               En una línea
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
@@ -13799,7 +12796,7 @@ function SvQueEs({ data }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'flex-start' }} className="sv-que-grid">
           <div>
             {data.queParas.map((p, i) => (
-              <p key={i} style={{
+              <DensePassage key={i} style={{
                 fontSize: i === 0 ? '1.125rem' : '1.0625rem', lineHeight: i === 0 ? 1.7 : 1.65,
                 color: i === 0 ? 'rgba(10,10,10,0.75)' : 'rgba(10,10,10,0.65)', marginBottom: '1.5rem',
               }} dangerouslySetInnerHTML={{ __html: p }} />
@@ -13813,7 +12810,7 @@ function SvQueEs({ data }) {
               }}>
                 <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: 'rgba(10,10,10,0.3)' }}>{String(i + 1).padStart(2, '0')}</div>
                 <div>
-                  <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.375rem' }}>{f.label}</div>
+                  <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '0.375rem' }}>{f.label}</div>
                   <div style={{ fontSize: '1rem', color: '#0A0A0A', fontWeight: 500, lineHeight: 1.45 }}>{f.value}</div>
                 </div>
               </div>
@@ -13827,53 +12824,10 @@ function SvQueEs({ data }) {
 }
 
 // COMPARATIVA (vs table)
-function SvComparativa({ data }) {
-  return (
-    <section style={{ padding: '8rem 0', background: '#FFFFFF', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-      <div className="container">
-        <SvSectionHeader kicker={data.compKicker} title={data.compTitle} subtitle={data.compSub} intro={data.compIntro} />
-        <div style={{ border: '1px solid rgba(10,10,10,0.08)', overflowX: 'auto' }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: `1.2fr repeat(${data.compCols.length}, 1fr)`,
-            background: '#0A0A0A', color: '#FFFFFF', minWidth: '640px',
-          }}>
-            <div style={{ padding: '1.25rem 1.5rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>Criterio</div>
-            </div>
-            {data.compCols.map((c, i) => (
-              <div key={i} style={{ padding: '1.25rem 1.5rem', borderRight: i < data.compCols.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none', position: 'relative' }}>
-                {c.highlight && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#C9A55A' }} />}
-                <div style={{ fontSize: '0.625rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: c.highlight ? '#C9A55A' : 'rgba(255,255,255,0.4)' }}>{c.name}</div>
-              </div>
-            ))}
-          </div>
-          {data.compRows.map((r, i) => (
-            <div key={i} style={{
-              display: 'grid', gridTemplateColumns: `1.2fr repeat(${data.compCols.length}, 1fr)`,
-              borderTop: '1px solid rgba(10,10,10,0.06)', minWidth: '640px',
-            }}>
-              <div style={{ padding: '1.5rem', borderRight: '1px solid rgba(10,10,10,0.06)', background: '#FAFAFA', fontSize: '0.9375rem', fontWeight: 700, fontFamily: 'Space Grotesk', color: '#0A0A0A', display: 'flex', alignItems: 'center' }}>{r.criterio}</div>
-              {r.values.map((v, j) => (
-                <div key={j} style={{
-                  padding: '1.5rem', borderRight: j < r.values.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
-                  fontSize: '0.9375rem', lineHeight: 1.45, display: 'flex', alignItems: 'center', gap: '0.625rem',
-                  color: data.compCols[j].highlight ? '#0A0A0A' : 'rgba(10,10,10,0.6)',
-                  fontWeight: data.compCols[j].highlight ? 500 : 400,
-                  background: data.compCols[j].highlight ? 'rgba(201,165,90,0.04)' : '#FFFFFF',
-                }}>
-                  {data.compCols[j].highlight && <div style={{ width: '6px', height: '6px', background: '#C9A55A', flexShrink: 0 }} />}
-                  {v}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+function SvComparativa({data}) {
+  return <section className="gm-guide-section"><div className="container"><SvSectionHeader kicker={data.compKicker} title={data.compTitle} subtitle={data.compSub} intro={data.compIntro}/><div className="gm-service-comparisons">{data.compRows.map((r,i)=><article key={r.criterio} className="gm-service-comparison"><div className="gm-guide-heading"><GuideIcon kind={['focus','care','time','move'][i%4]}/><h3>{r.criterio}</h3></div><dl style={{'--gm-compare-columns':data.compCols.length}}>{r.values.map((value,j)=><div key={data.compCols[j].name} className={data.compCols[j].highlight?'gm-value-featured':''}><dt>{data.compCols[j].name}</dt><dd>{value}</dd></div>)}</dl></article>)}</div></div></section>;
 }
 
-// CUÁNDO SE APLICA (cases)
 function SvCasos({ data }) {
   return (
     <section style={{ padding: '8rem 0', background: '#0A0A0A', color: '#FFFFFF', borderTop: '1px solid rgba(10,10,10,0.08)', position: 'relative', overflow: 'hidden' }}>
@@ -13890,9 +12844,9 @@ function SvCasos({ data }) {
               padding: '2.5rem 2rem', borderRight: i < data.casos.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
               display: 'flex', flexDirection: 'column', gap: '1rem',
             }} className="sv-casos-cell">
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
               <h3 style={{ fontSize: '1.375rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF', lineHeight: 1.1 }}>{c.title}</h3>
-              <p style={{ fontSize: '0.9375rem', lineHeight: 1.55, color: 'rgba(255,255,255,0.7)' }}>{c.desc}</p>
+              <DensePassage style={{ fontSize: '0.9375rem', lineHeight: 1.55, color: 'rgba(255,255,255,0.7)' }}>{c.desc}</DensePassage>
             </div>
           ))}
         </div>
@@ -13978,7 +12932,7 @@ function SvCTA({ data, onNavigate }) {
           </div>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <a {...navProps('fisioterapia')} style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',  background: '#0A0A0A', color: '#FFFFFF', border: 'none', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>Agendar valoración<span>→</span></a>
-            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s' , textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
+            <a href={WHATSAPP_URL} style={{ background: 'transparent', color: '#0A0A0A', border: '1px solid rgba(10,10,10,0.4)', padding: '1.5rem 2rem', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Space Grotesk', transition: 'all 0.3s', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}>WhatsApp</a>
           </div>
         </div>
       </div>
@@ -14009,15 +12963,15 @@ function ServicioPage({ data, onNavigate }) {
 const QUIROPRAXIA_DATA = {
   name: 'Quiropraxia', bigWord: 'AJUSTE.', kicker: 'Ajuste vertebral · Bogotá',
   heroTitle: 'Quiropraxia', heroSub: 'con criterio.',
-  heroDesc: 'Ajuste vertebral preciso dentro de un proceso integral. <strong>No es un servicio único ni sesiones indefinidas</strong> — es una técnica más cuando la evaluación la indica.',
+  heroDesc: 'Ajuste vertebral preciso dentro de un proceso integral. <strong>No es un servicio único ni sesiones indefinidas</strong>, es una técnica más cuando la evaluación la indica.',
   esEs: 'Manipulación articular precisa de la columna, aplicada cuando hay indicación clínica clara dentro del proceso de tratamiento.',
   noEs: 'Un servicio aislado, ni sesiones eternas "de mantenimiento", ni la solución para todo dolor de espalda.',
   queTitle: 'Una técnica,', queSub: 'no un servicio.',
   queIntro: 'La quiropraxia ajusta articulaciones vertebrales con restricción de movimiento. Pero solo es útil dentro de un diagnóstico que la justifique.',
   queParas: [
-    'La quiropraxia es <strong>manipulación articular de alta velocidad y baja amplitud</strong> (HVLA). Restaura movilidad en segmentos vertebrales que perdieron rango — y con ello, alivia dolor y mejora la función.',
+    'La quiropraxia es <strong>manipulación articular de alta velocidad y baja amplitud</strong> (HVLA). Restaura movilidad en segmentos vertebrales que perdieron rango, y con ello, alivia dolor y mejora la función.',
     'Pero aquí está la diferencia: no la aplico como servicio independiente. La uso <strong>cuando la evaluación muestra una restricción articular real</strong> que está contribuyendo a tu problema. No "te trueno la espalda" porque sí.',
-    'El ajuste sin diagnóstico es una apuesta. El ajuste dentro de un proceso —con un porqué claro y un plan de fortalecimiento detrás— es una herramienta poderosa. Esa es la diferencia.',
+    'El ajuste sin diagnóstico es una apuesta. El ajuste dentro de un proceso, con un porqué claro y un plan de fortalecimiento detrás,  es una herramienta poderosa. Esa es la diferencia.',
   ],
   queFacts: [
     { label: 'Técnica', value: 'Manipulación HVLA · alta velocidad, baja amplitud' },
@@ -14055,29 +13009,29 @@ const QUIROPRAXIA_DATA = {
     'Inestabilidad vertebral diagnosticada',
   ],
   faqs: [
-    { q: '¿La quiropraxia es segura?', a: 'Sí, cuando se aplica con diagnóstico previo y técnica adecuada, por un profesional formado. El riesgo aparece cuando se ajusta sin evaluación o en presencia de contraindicaciones. Por eso nunca ajusto sin haber evaluado primero qué necesitas — y qué no.' },
+    { q: '¿La quiropraxia es segura?', a: 'Sí, cuando se aplica con diagnóstico previo y técnica adecuada, por un profesional formado. El riesgo aparece cuando se ajusta sin evaluación o en presencia de contraindicaciones. Por eso nunca ajusto sin haber evaluado primero qué necesitas, y qué no.' },
     { q: '¿Cuántas sesiones se necesitan?', a: 'Pocas. El ajuste no es un tratamiento de "mantenimiento" indefinido. Se usa puntualmente cuando hay restricción articular, dentro de un proceso más amplio de fortalecimiento. Si alguien te dice que necesitas ajustes semanales de por vida, desconfía.' },
     { q: '¿Es lo mismo quiropráctico que quiropraxista?', a: 'Hay diferencias de formación y regulación según el país. Lo importante: yo aplico la manipulación vertebral como fisioterapeuta, dentro de un marco clínico, con diagnóstico previo. La técnica es la misma; el contexto de aplicación es lo que importa.' },
     { q: '¿Puedo agendar solo quiropraxia o necesito valoración previa?', a: 'Necesitas valoración previa, siempre. No aplico ajustes "a ciegas". La primera sesión evalúa si realmente hay indicación de manipulación o si tu caso necesita otra cosa. Ajustar sin diagnóstico es exactamente lo que evito.' },
-    { q: '¿Hace ruido el ajuste? ¿Es normal?', a: 'Sí, el "crack" es normal — es la liberación de gas en el líquido articular (cavitación), no es el hueso. No todos los ajustes suenan, y el sonido no indica que fue "mejor". Lo que importa es la restauración del movimiento, no el ruido.' },
-    { q: '¿Quién no debe recibir quiropraxia?', a: 'Personas con osteoporosis severa, fracturas, hernias con compromiso neurológico agudo, infecciones, tumores, artritis inflamatoria activa o inestabilidad vertebral. Por eso la evaluación previa es obligatoria — para descartar estas situaciones.' },
+    { q: '¿Hace ruido el ajuste? ¿Es normal?', a: 'Sí, el "crack" es normal, es la liberación de gas en el líquido articular (cavitación), no es el hueso. No todos los ajustes suenan, y el sonido no indica que fue "mejor". Lo que importa es la restauración del movimiento, no el ruido.' },
+    { q: '¿Quién no debe recibir quiropraxia?', a: 'Personas con osteoporosis severa, fracturas, hernias con compromiso neurológico agudo, infecciones, tumores, artritis inflamatoria activa o inestabilidad vertebral. Por eso la evaluación previa es obligatoria, para descartar estas situaciones.' },
   ],
   ctaTitle: 'Ajuste con', ctaSub: 'diagnóstico.',
-  ctaDesc: 'Primera sesión: evaluación que determina si la quiropraxia es lo que necesitas — o si tu caso pide otra técnica. 60 min. Sin ajustes a ciegas.',
+  ctaDesc: 'Primera sesión: evaluación que determina si la quiropraxia es lo que necesitas, o si tu caso pide otra técnica. 60 min. Sin ajustes a ciegas.',
 };
 
 const PUNCION_DATA = {
   name: 'Punción Seca', bigWord: 'AGUJA.', kicker: 'Punción seca · Bogotá',
   heroTitle: 'Punción seca', heroSub: 'sin misterios.',
-  heroDesc: 'Técnica con aguja sólida para liberar puntos gatillo miofasciales. <strong>No es acupuntura</strong> — es fisioterapia con base neurológica, aplicada dentro del proceso.',
+  heroDesc: 'Técnica con aguja sólida para liberar puntos gatillo miofasciales. <strong>No es acupuntura</strong>, es fisioterapia con base neurológica, aplicada dentro del proceso.',
   esEs: 'Inserción de una aguja filiforme directamente en el punto gatillo muscular para provocar su liberación y desactivar el dolor referido.',
-  noEs: 'Acupuntura. No sigue meridianos ni energía — sigue anatomía y fisiología muscular concreta.',
+  noEs: 'Acupuntura. No sigue meridianos ni energía, sigue anatomía y fisiología muscular concreta.',
   queTitle: 'Aguja seca,', queSub: 'punto exacto.',
   queIntro: 'Se llama "seca" porque la aguja no inyecta nada. Es la aguja en sí, en el punto preciso, lo que libera la contractura.',
   queParas: [
-    'La punción seca usa una <strong>aguja sólida y fina</strong> (como la de acupuntura, pero ahí termina el parecido) que se inserta directamente en el punto gatillo miofascial — ese nudo doloroso que las manos no alcanzan a liberar.',
+    'La punción seca usa una <strong>aguja sólida y fina</strong> (como la de acupuntura, pero ahí termina el parecido) que se inserta directamente en el punto gatillo miofascial, ese nudo doloroso que las manos no alcanzan a liberar.',
     'El mecanismo es <strong>neurológico, no energético</strong>. La aguja provoca una respuesta de espasmo local que "resetea" la placa motora, reduce la actividad eléctrica anormal del músculo y libera la contractura profunda. Sin medicamentos.',
-    'Se llama "seca" porque no inyecta ninguna sustancia — a diferencia de la punción húmeda (con anestésico o corticoide). Es la aguja en el punto exacto lo que hace el trabajo. Y la aplico dentro del proceso, no como servicio suelto.',
+    'Se llama "seca" porque no inyecta ninguna sustancia, a diferencia de la punción húmeda (con anestésico o corticoide). Es la aguja en el punto exacto lo que hace el trabajo. Y la aplico dentro del proceso, no como servicio suelto.',
   ],
   queFacts: [
     { label: 'Herramienta', value: 'Aguja sólida filiforme, estéril, un solo uso' },
@@ -14115,10 +13069,10 @@ const PUNCION_DATA = {
     'Alergia conocida al níquel (según aguja)',
   ],
   faqs: [
-    { q: '¿Punción seca y acupuntura son lo mismo?', a: 'No. Comparten el uso de una aguja fina, pero nada más. La punción seca se basa en anatomía y neurofisiología — busca puntos gatillo musculares concretos. La acupuntura se basa en la medicina tradicional china y sus meridianos energéticos. Fundamentos completamente distintos.' },
-    { q: '¿Cuánto duele la punción seca?', a: 'Seré honesto: se siente. La inserción de la aguja apenas se nota, pero al llegar al punto gatillo puede haber una respuesta de espasmo local —un "calambre" breve— que es justo lo que buscamos. Es momentáneo. Después suele quedar una sensación de "agujetas" 24—48h. No es un masaje relajante, pero es tolerable y efectivo.' },
-    { q: '¿Cuántas sesiones se necesitan?', a: 'Pocas, y siempre dentro del proceso. La punción no es un tratamiento en sí mismo — es una técnica para liberar contracturas que luego trabajamos con fortalecimiento. Normalmente 2—4 aplicaciones a lo largo del proceso, no sesiones indefinidas.' },
-    { q: '¿Hay efectos secundarios?', a: 'Los más comunes son leves: dolor tipo agujetas 24—48h, pequeños hematomas ocasionales, sensación de cansancio en la zona. Efectos serios son muy raros cuando la aplica un profesional formado con técnica estéril. La evaluación previa descarta los riesgos.' },
+    { q: '¿Punción seca y acupuntura son lo mismo?', a: 'No. Comparten el uso de una aguja fina, pero nada más. La punción seca se basa en anatomía y neurofisiología, busca puntos gatillo musculares concretos. La acupuntura se basa en la medicina tradicional china y sus meridianos energéticos. Fundamentos completamente distintos.' },
+    { q: '¿Cuánto duele la punción seca?', a: 'Seré honesto: se siente. La inserción de la aguja apenas se nota, pero al llegar al punto gatillo puede haber una respuesta de espasmo local, un "calambre" breve,  que es justo lo que buscamos. Es momentáneo. Después suele quedar una sensación de "agujetas" 24 a 48h. No es un masaje relajante, pero es tolerable y efectivo.' },
+    { q: '¿Cuántas sesiones se necesitan?', a: 'Pocas, y siempre dentro del proceso. La punción no es un tratamiento en sí mismo, es una técnica para liberar contracturas que luego trabajamos con fortalecimiento. Normalmente 2 a 4 aplicaciones a lo largo del proceso, no sesiones indefinidas.' },
+    { q: '¿Hay efectos secundarios?', a: 'Los más comunes son leves: dolor tipo agujetas 24 a 48h, pequeños hematomas ocasionales, sensación de cansancio en la zona. Efectos serios son muy raros cuando la aplica un profesional formado con técnica estéril. La evaluación previa descarta los riesgos.' },
     { q: '¿Quién no puede recibir punción seca?', a: 'Personas con trastornos de coagulación o en anticoagulantes, infección en la zona, fobia extrema a agujas, inmunosupresión severa, o en ciertas zonas durante el embarazo. La valoración previa identifica si es seguro para ti.' },
     { q: '¿Cuánto tiempo de reposo después?', a: 'Nada de reposo absoluto. Puedes seguir tu día normal. Se recomienda evitar entrenamiento intenso de esa zona específica las primeras 24h para dejar que el músculo se recupere de la respuesta. Al día siguiente, normalidad.' },
   ],
@@ -14129,14 +13083,14 @@ const PUNCION_DATA = {
 const MASAJES_DATA = {
   name: 'Masaje Deportivo', bigWord: 'MASAJE.', kicker: 'Masaje deportivo · Bogotá',
   heroTitle: 'Masaje deportivo,', heroSub: 'no de spa.',
-  heroDesc: 'Masaje descontracturante y profundo para liberar tensión y mejorar rendimiento. <strong>No es un masaje relajante de spa</strong> — es una técnica terapéutica con objetivo clínico.',
+  heroDesc: 'Masaje descontracturante y profundo para liberar tensión y mejorar rendimiento. <strong>No es un masaje relajante de spa</strong>, es una técnica terapéutica con objetivo clínico.',
   esEs: 'Trabajo manual profundo sobre la musculatura para liberar tensión, mejorar circulación y preparar o recuperar el tejido del esfuerzo deportivo.',
   noEs: 'Un masaje relajante de spa con aromaterapia. El objetivo es funcional, no de relajación, y a veces es intenso.',
   queTitle: 'Profundo y', queSub: 'con propósito.',
-  queIntro: 'El masaje deportivo trabaja el músculo con intención terapéutica. No busca que te duermas — busca que rindas mejor o te recuperes más rápido.',
+  queIntro: 'El masaje deportivo trabaja el músculo con intención terapéutica. No busca que te duermas, busca que rindas mejor o te recuperes más rápido.',
   queParas: [
     'El masaje deportivo es <strong>trabajo manual profundo</strong> dirigido a la musculatura que el deporte sobrecarga. Libera adherencias, mejora la circulación local, reduce tensión y prepara o recupera el tejido del esfuerzo.',
-    'La diferencia con el masaje de spa es el <strong>propósito y la intensidad</strong>. El de spa busca relajación; este busca función. A veces es placentero, a veces es intenso —especialmente sobre una contractura— pero siempre tiene un objetivo clínico claro.',
+    'La diferencia con el masaje de spa es el <strong>propósito y la intensidad</strong>. El de spa busca relajación; este busca función. A veces es placentero, a veces es intenso, especialmente sobre una contractura,  pero siempre tiene un objetivo clínico claro.',
     'Lo aplico según el momento: descontracturante cuando hay tensión acumulada, pre-competencia para activar, post-competencia para recuperar. Y si la contractura no cede con masaje, es señal de que hay algo más que requiere valoración integral.',
   ],
   queFacts: [
@@ -14163,11 +13117,11 @@ const MASAJES_DATA = {
   casos: [
     { title: 'Descarga del crossfitter', desc: 'Tras semanas de volumen alto, la musculatura acumula tensión que limita el rendimiento. El masaje descontracturante libera y permite seguir entrenando sin que derive en lesión.' },
     { title: 'Recuperación del runner', desc: 'Post-tirada larga o competencia, gemelos y cuádriceps quedan cargados. El masaje de recuperación acelera el retorno a la normalidad y reduce las agujetas.' },
-    { title: 'Pre-competencia', desc: 'Antes de una competencia, un masaje de activación prepara el tejido —sin la profundidad del descontracturante— para optimizar el rendimiento sin generar fatiga.' },
+    { title: 'Pre-competencia', desc: 'Antes de una competencia, un masaje de activación prepara el tejido, sin la profundidad del descontracturante,  para optimizar el rendimiento sin generar fatiga.' },
   ],
   contraTitle: 'El masaje deportivo no es recomendable en ciertas situaciones.',
   contra: [
-    'Lesión aguda con inflamación activa (primeras 48—72h)',
+    'Lesión aguda con inflamación activa (primeras 48 a 72h)',
     'Rotura muscular o fibrilar reciente',
     'Trombosis o sospecha de trombo',
     'Infección de la piel o herida en la zona',
@@ -14175,12 +13129,12 @@ const MASAJES_DATA = {
     'Sobre una lesión sin diagnosticar',
   ],
   faqs: [
-    { q: '¿Es lo mismo masaje deportivo que descontracturante?', a: 'El descontracturante es un tipo de masaje deportivo —el más común— enfocado en liberar contracturas y tensión muscular acumulada. "Masaje deportivo" es el término general que incluye también el pre-competencia, el de recuperación y el de activación. Todos comparten el objetivo funcional.' },
-    { q: '¿Cuánto dura una sesión?', a: 'Depende del objetivo y la zona. Un masaje descontracturante focalizado puede ser 30—45 min; uno más global, hasta 60. Lo importante no es la duración sino trabajar bien la musculatura que lo necesita.' },
+    { q: '¿Es lo mismo masaje deportivo que descontracturante?', a: 'El descontracturante es un tipo de masaje deportivo, el más común,  enfocado en liberar contracturas y tensión muscular acumulada. "Masaje deportivo" es el término general que incluye también el pre-competencia, el de recuperación y el de activación. Todos comparten el objetivo funcional.' },
+    { q: '¿Cuánto dura una sesión?', a: 'Depende del objetivo y la zona. Un masaje descontracturante focalizado puede ser 30 a 45 min; uno más global, hasta 60. Lo importante no es la duración sino trabajar bien la musculatura que lo necesita.' },
     { q: '¿Duele el masaje descontracturante?', a: 'Puede ser intenso, sobre todo al trabajar una contractura establecida. No es el dolor del spa relajante. Pero debe ser un "dolor bueno", tolerable, no insoportable. Si duele demasiado, se ajusta la intensidad. El objetivo es liberar, no torturar.' },
-    { q: '¿Cuántas sesiones se necesitan?', a: 'Si es para descarga puntual, una puede bastar. Si la contractura es recurrente, lo importante no es repetir masajes indefinidamente sino entender POR QUÉ vuelve — ahí entra la valoración integral. El masaje alivia; corregir la causa resuelve.' },
+    { q: '¿Cuántas sesiones se necesitan?', a: 'Si es para descarga puntual, una puede bastar. Si la contractura es recurrente, lo importante no es repetir masajes indefinidamente sino entender POR QUÉ vuelve, ahí entra la valoración integral. El masaje alivia; corregir la causa resuelve.' },
     { q: '¿Es lo mismo que un masaje en spa?', a: 'No. El de spa busca relajación con técnicas suaves y aromaterapia. El deportivo busca función: es más profundo, focalizado en la musculatura problemática, con objetivo terapéutico. Distinto propósito, distinta técnica, distinto resultado.' },
-    { q: '¿Cuándo NO es recomendable?', a: 'En lesiones agudas con inflamación (primeras 48—72h), roturas musculares recientes, trombosis, infecciones de piel, fiebre, o sobre una lesión sin diagnosticar. Masajear una zona lesionada sin saber qué tiene puede empeorarla. Por eso evalúo antes.' },
+    { q: '¿Cuándo NO es recomendable?', a: 'En lesiones agudas con inflamación (primeras 48 a 72h), roturas musculares recientes, trombosis, infecciones de piel, fiebre, o sobre una lesión sin diagnosticar. Masajear una zona lesionada sin saber qué tiene puede empeorarla. Por eso evalúo antes.' },
   ],
   ctaTitle: 'Libera la tensión.', ctaSub: 'Mejora el rendimiento.',
   ctaDesc: 'Primera sesión: evaluación + masaje según tu objetivo (descarga, recuperación, activación). 60 min. Si la contractura no cede, valoramos la causa.',
@@ -14189,15 +13143,15 @@ const MASAJES_DATA = {
 const READAPTACION_DATA = {
   name: 'Readaptación', bigWord: 'VOLVER.', kicker: 'Readaptación deportiva · Bogotá',
   heroTitle: 'Vuelve a competir', heroSub: 'más fuerte.',
-  heroDesc: 'La fase final que devuelve al atleta a su nivel pre-lesión. <strong>No es rehabilitación tradicional</strong> — es el puente entre "ya no me duele" y "vuelvo a rendir".',
+  heroDesc: 'La fase final que devuelve al atleta a su nivel pre-lesión. <strong>No es rehabilitación tradicional</strong>, es el puente entre "ya no me duele" y "vuelvo a rendir".',
   esEs: 'La fase final del proceso: readaptación al gesto deportivo específico para volver a competir al nivel previo, sin recaer.',
   noEs: 'Rehabilitación tradicional. La rehab termina cuando el dolor se va; la readaptación termina cuando vuelves a rendir.',
   queTitle: 'La fase que', queSub: 'todos olvidan.',
-  queIntro: 'Entre "ya no te duele" y "vuelves a competir" hay un abismo. La readaptación es el puente — la fase que la mayoría de tratamientos salta, y la razón #1 de recaída.',
+  queIntro: 'Entre "ya no te duele" y "vuelves a competir" hay un abismo. La readaptación es el puente, la fase que la mayoría de tratamientos salta, y la razón #1 de recaída.',
   queParas: [
     'La readaptación deportiva es la <strong>fase final del proceso</strong>: cuando el dolor ya se fue y el tejido sanó, pero el atleta todavía no está listo para volver a su nivel. Readapta el cuerpo al gesto deportivo específico, a la carga real de competición.',
-    'La diferencia con la rehabilitación es crucial. La <strong>rehab te quita el dolor</strong> y te devuelve la función básica. La <strong>readaptación te devuelve el rendimiento</strong> — el sprint, el salto, el levantamiento, la resistencia a la fatiga en competición.',
-    'Saltarse esta fase es por qué tantos atletas "se curan" y recaen a las pocas semanas de volver. Vuelven sin estar readaptados a las demandas reales de su deporte. La readaptación es lo que hace que vuelvas más fuerte que antes — no solo recuperado.',
+    'La diferencia con la rehabilitación es crucial. La <strong>rehab te quita el dolor</strong> y te devuelve la función básica. La <strong>readaptación te devuelve el rendimiento</strong>, el sprint, el salto, el levantamiento, la resistencia a la fatiga en competición.',
+    'Saltarse esta fase es por qué tantos atletas "se curan" y recaen a las pocas semanas de volver. Vuelven sin estar readaptados a las demandas reales de su deporte. La readaptación es lo que hace que vuelvas más fuerte que antes, no solo recuperado.',
   ],
   queFacts: [
     { label: 'Momento', value: 'Fase final · tras tratamiento y fortalecimiento' },
@@ -14219,11 +13173,11 @@ const READAPTACION_DATA = {
     { criterio: 'Criterio de alta', values: ['Tests funcionales objetivos', 'Ausencia de dolor'] },
   ],
   casosWord: 'RETURN.', casosTitle: 'Para', casosSub: 'quién es.',
-  casosIntro: 'Tres perfiles de atleta que necesitan readaptación — y que sin ella recaen.',
+  casosIntro: 'Tres perfiles de atleta que necesitan readaptación, y que sin ella recaen.',
   casos: [
     { title: 'Post-lesión que no rinde', desc: 'El atleta que "se curó" pero ya no salta igual, no corre igual, tiene miedo del gesto que lo lesionó. La readaptación reconstruye la confianza y el rendimiento.' },
     { title: 'Post-cirugía', desc: 'Tras una operación y la rehabilitación inicial, el atleta necesita readaptarse a las demandas reales de su deporte antes de volver a competir. La cirugía repara; la readaptación devuelve.' },
-    { title: 'Lesiones recurrentes', desc: 'El que se lesiona de lo mismo una y otra vez. Casi siempre es porque nunca completó la readaptación — volvió antes de estar listo. Romper ese ciclo es el objetivo.' },
+    { title: 'Lesiones recurrentes', desc: 'El que se lesiona de lo mismo una y otra vez. Casi siempre es porque nunca completó la readaptación, volvió antes de estar listo. Romper ese ciclo es el objetivo.' },
   ],
   contraTitle: 'La readaptación tiene su momento. No se aplica en cualquier punto del proceso.',
   contra: [
@@ -14235,81 +13189,35 @@ const READAPTACION_DATA = {
   ],
   faqs: [
     { q: '¿Cuál es la diferencia entre fisio y readaptación?', a: 'La fisioterapia (tratamiento + fortalecimiento) te quita el dolor y te devuelve la función básica. La readaptación es la fase siguiente: te devuelve el RENDIMIENTO deportivo específico. Es la diferencia entre "puedes caminar y mover el brazo" y "puedes volver a hacer muscle-ups en competición".' },
-    { q: '¿Cuánto dura el proceso?', a: 'La readaptación en sí suele tomar 2—4 semanas, pero depende del deporte y de cuán lejos estés de tu nivel. Es la fase final, así que llega tras el tratamiento y fortalecimiento. El criterio de alta no es el calendario sino pasar los tests funcionales de retorno.' },
-    { q: '¿La readaptación es solo para atletas profesionales?', a: 'No. Cualquier deportista que quiera volver a su nivel real la necesita — el crossfitter recreacional que quiere volver a su PR, el runner de fin de semana que quiere correr su media, la bailarina aficionada que quiere volver al escenario. No necesitas ser profesional, solo querer volver a rendir.' },
+    { q: '¿Cuánto dura el proceso?', a: 'La readaptación en sí suele tomar 2 a 4 semanas, pero depende del deporte y de cuán lejos estés de tu nivel. Es la fase final, así que llega tras el tratamiento y fortalecimiento. El criterio de alta no es el calendario sino pasar los tests funcionales de retorno.' },
+    { q: '¿La readaptación es solo para atletas profesionales?', a: 'No. Cualquier deportista que quiera volver a su nivel real la necesita, el crossfitter recreacional que quiere volver a su PR, el runner de fin de semana que quiere correr su media, la bailarina aficionada que quiere volver al escenario. No necesitas ser profesional, solo querer volver a rendir.' },
     { q: '¿Necesito haber pasado por fisioterapia antes?', a: 'Sí. La readaptación es la fase final, no el inicio. Requiere que el dolor ya esté controlado y el tejido haya sanado. Si llegas con dolor agudo, primero tratamos eso. La readaptación construye sobre una base ya recuperada.' },
-    { q: '¿Qué pasa si no hago readaptación después de una lesión?', a: 'Es la razón #1 de recaída. Vuelves al deporte sin estar readaptado a sus demandas reales, y el cuerpo —que aún no tolera esa carga específica— vuelve a fallar. Por eso tantos atletas "se curan" y recaen a las pocas semanas. La readaptación rompe ese ciclo.' },
+    { q: '¿Qué pasa si no hago readaptación después de una lesión?', a: 'Es la razón #1 de recaída. Vuelves al deporte sin estar readaptado a sus demandas reales, y el cuerpo, que aún no tolera esa carga específica,  vuelve a fallar. Por eso tantos atletas "se curan" y recaen a las pocas semanas. La readaptación rompe ese ciclo.' },
     { q: '¿Trabajan junto a mi entrenador o por separado?', a: 'Idealmente juntos. La readaptación funciona mejor coordinada con tu entrenador o coach, para alinear la vuelta a la carga deportiva con tu planificación. Comparto criterios y progresión para que la transición de mi consultorio a tu box/pista/estudio sea fluida.' },
   ],
   ctaTitle: 'No te cures.', ctaSub: 'Vuelve a rendir.',
   ctaDesc: 'Primera sesión: evaluación de tu nivel actual vs pre-lesión + plan de readaptación con criterios objetivos de retorno. 60 min. La fase que todos olvidan.',
 };
 
-function QuiropraxiaPage({ onNavigate }) { return <ServicioPage data={QUIROPRAXIA_DATA} onNavigate={onNavigate} />; }
-function PuncionSecaPage({ onNavigate }) { return <ServicioPage data={PUNCION_DATA} onNavigate={onNavigate} />; }
-function MasajesPage({ onNavigate }) { return <ServicioPage data={MASAJES_DATA} onNavigate={onNavigate} />; }
-function ReadaptacionPage({ onNavigate }) { return <ServicioPage data={READAPTACION_DATA} onNavigate={onNavigate} />; }
+function QuiropraxiaPage({ onNavigate }) {
+  return <ServiceExperience page="quiropraxia"/>;
+}
+function PuncionSecaPage({ onNavigate }) {
+  return <ServiceExperience page="puncion"/>;
+}
+function MasajesPage({ onNavigate }) {
+  return <ServiceExperience page="masajes"/>;
+}
+function ReadaptacionPage({ onNavigate }) {
+  return <ServiceExperience page="readaptacion"/>;
+}
 
 /* ==================== lesiones.jsx ==================== */
 // LESIONES - Página padre / hub editorial
 // Catálogo completo con filtros (zona, deporte, complejidad), matriz por deporte, y CTA.
 
 function LesionesPage({ onNavigate }) {
-  const [filterZone, setFilterZone] = React.useState('Todas');
-  const [filterSport, setFilterSport] = React.useState('Todos');
-  const [filterComplexity, setFilterComplexity] = React.useState('Todas');
-  const [hoveredIdx, setHoveredIdx] = React.useState(null);
-
-  const lesiones = [
-    { name: 'Pubalgia',             zone: 'Core',          area: 'Ingle / Pelvis',  complexity: 'Alta',  recovery: '4—12 sem',  page: 'pubalgia',   sports: ['CrossFit', 'Weightlifting', 'BJJ'] },
-    { name: 'Ciática',              zone: 'Core',          area: 'Lumbar / Pierna', complexity: 'Media', recovery: '3—8 sem',   page: 'ciatica',    sports: ['Weightlifting', 'BJJ', 'Boxeo'] },
-    { name: 'Tendinitis Rotuliana', zone: 'Tren inferior', area: 'Rodilla',         complexity: 'Media', recovery: '4—10 sem',  page: 'tendinitis', sports: ['CrossFit', 'Weightlifting'] },
-    { name: 'Hombro Congelado',     zone: 'Tren superior', area: 'Hombro',          complexity: 'Alta',  recovery: '8—24 sem',  page: 'hombro',     sports: ['CrossFit', 'BJJ', 'Boxeo'] },
-    { name: 'Contractura Muscular', zone: 'Core',          area: 'Muscular',        complexity: 'Baja',  recovery: '1—3 sem',   page: 'contractura',   sports: ['CrossFit', 'Weightlifting', 'BJJ', 'Boxeo'] },
-    { name: 'Bursitis',             zone: 'Tren superior', area: 'Articular',       complexity: 'Media', recovery: '3—6 sem',   page: 'bursitis',      sports: ['CrossFit'] },
-    { name: 'Condromalacia',        zone: 'Tren inferior', area: 'Rodilla',         complexity: 'Media', recovery: '6—12 sem',  page: 'condromalacia', sports: ['Weightlifting', 'CrossFit'] },
-    { name: 'Periostitis Tibial',   zone: 'Tren inferior', area: 'Tibia',           complexity: 'Baja',  recovery: '2—6 sem',   page: 'periostitis',   sports: ['CrossFit', 'Boxeo'] },
-    { name: 'Epitrocleítis',        zone: 'Tren superior', area: 'Codo',            complexity: 'Media', recovery: '4—8 sem',   page: 'epitrocleitis', sports: ['CrossFit', 'BJJ', 'Boxeo'] },
-  ];
-
-  const zones = ['Todas', 'Tren superior', 'Core', 'Tren inferior'];
-  const sports = ['Todos', 'CrossFit', 'Weightlifting', 'BJJ', 'Boxeo'];
-  const complexities = ['Todas', 'Baja', 'Media', 'Alta'];
-
-  const filtered = lesiones.filter(l => {
-    if (filterZone !== 'Todas' && l.zone !== filterZone) return false;
-    if (filterSport !== 'Todos' && !l.sports.includes(filterSport)) return false;
-    if (filterComplexity !== 'Todas' && l.complexity !== filterComplexity) return false;
-    return true;
-  });
-
-  const complexityColor = (c) => c === 'Alta' ? '#DC2626' : c === 'Media' ? '#C9A55A' : '#16A34A';
-
-  return (
-    <main>
-      <LesionesHero onNavigate={onNavigate} total={lesiones.length} withProtocol={lesiones.filter(l => l.page).length} />
-      <LesionesCatalog
-        lesiones={lesiones}
-        filtered={filtered}
-        zones={zones}
-        sports={sports}
-        complexities={complexities}
-        filterZone={filterZone}
-        filterSport={filterSport}
-        filterComplexity={filterComplexity}
-        setFilterZone={setFilterZone}
-        setFilterSport={setFilterSport}
-        setFilterComplexity={setFilterComplexity}
-        complexityColor={complexityColor}
-        hoveredIdx={hoveredIdx}
-        setHoveredIdx={setHoveredIdx}
-        onNavigate={onNavigate}
-      />
-      <LesionesSportMatrix lesiones={lesiones} sports={sports.slice(1)} onNavigate={onNavigate} />
-      <LesionesMethodStrip onNavigate={onNavigate} />
-      <LesionesCTA onNavigate={onNavigate} />
-    </main>
-  );
+  return <InjuryCatalogExperience/>;
 }
 
 // =====================================================================
@@ -14357,7 +13265,7 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -14376,7 +13284,7 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
             }}>
               Si te lesionaste,
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 tengo el plan.
               </span>
             </h1>
@@ -14481,7 +13389,7 @@ function LesionesHero({ onNavigate, total, withProtocol }) {
                     fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                     fontFamily: 'Space Grotesk',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     lineHeight: 1,
                     letterSpacing: '-0.03em',
                   }}>
@@ -14569,7 +13477,7 @@ function LesionesCatalog({
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -14587,7 +13495,7 @@ function LesionesCatalog({
             }}>
               Filtra
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 por lo tuyo.
               </span>
             </h2>
@@ -14599,7 +13507,7 @@ function LesionesCatalog({
             lineHeight: 1.55,
             maxWidth: '460px',
           }}>
-            Cruza zona corporal, deporte que practicas y complejidad de la lesión. Te muestro lo que aplica a ti — no todo.
+            Cruza zona corporal, deporte que practicas y complejidad de la lesión. Te muestro lo que aplica a ti, no todo.
           </p>
         </div>
 
@@ -14683,7 +13591,7 @@ function LesionesCatalog({
             }}>
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
@@ -14993,7 +13901,7 @@ function LesionesSportMatrix({ lesiones, sports, onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -15010,7 +13918,7 @@ function LesionesSportMatrix({ lesiones, sports, onNavigate }) {
             }}>
               Tu deporte
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 tiene su patrón.
               </span>
             </h2>
@@ -15209,7 +14117,7 @@ function LesionesMethodStrip({ onNavigate }) {
           <div>
             <div style={{
               fontSize: '0.75rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -15228,7 +14136,7 @@ function LesionesMethodStrip({ onNavigate }) {
             }}>
               9 lesiones,
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 un proceso.
               </span>
             </h3>
@@ -15239,7 +14147,7 @@ function LesionesMethodStrip({ onNavigate }) {
               marginBottom: '2rem',
               maxWidth: '420px',
             }}>
-              Sea pubalgia, ciática, tendinitis o cualquier otra — todas pasan por las cuatro fases del Método Indestructible. Sin atajos, sin saltarse pasos.
+              Sea pubalgia, ciática, tendinitis o cualquier otra, todas pasan por las cuatro fases del Método Indestructible. Sin atajos, sin saltarse pasos.
             </p>
             <a
               {...navProps('fisioterapia')}
@@ -15287,7 +14195,7 @@ function LesionesMethodStrip({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                   fontSize: '2.5rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 1,
                   letterSpacing: '-0.03em',
                   marginBottom: '0.75rem',
@@ -15317,7 +14225,7 @@ function LesionesMethodStrip({ onNavigate }) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '0.625rem',
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     zIndex: 2,
                   }}>
                     →
@@ -15379,7 +14287,7 @@ function LesionesCTA({ onNavigate }) {
           <div style={{ position: 'relative' }}>
             <div style={{
               fontSize: '0.75rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -15397,7 +14305,7 @@ function LesionesCTA({ onNavigate }) {
             }}>
               Eso lo
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 resuelvo yo.
               </span>
             </h2>
@@ -15407,7 +14315,7 @@ function LesionesCTA({ onNavigate }) {
               color: 'rgba(255,255,255,0.7)',
               maxWidth: '520px',
             }}>
-              La valoración inicial existe precisamente para eso. Sales con diagnóstico claro, plan escrito y certeza — independiente de qué creas que tienes.
+              La valoración inicial existe precisamente para eso. Sales con diagnóstico claro, plan escrito y certeza, independiente de qué creas que tienes.
             </p>
           </div>
 
@@ -15499,78 +14407,7 @@ function LesionesCTA({ onNavigate }) {
 // Catálogo de deportes que trato, experiencia personal por deporte, CTA.
 
 function DeportesPage({ onNavigate }) {
-  const [hoveredIdx, setHoveredIdx] = React.useState(null);
-  const [activeProcess, setActiveProcess] = React.useState(0);
-
-  const deportes = [
-    {
-      name: 'CrossFit',
-      page: 'crossfit',
-      tagline: 'WODs sin compensaciones',
-      level: 'Atleta · Lo entreno',
-      description: 'Movement screens, técnica en levantamientos olímpicos, gestión de cargas. Conozco el snatch, el muscle-up y el kipping desde adentro porque los hago.',
-      atletas: '120+',
-      partners: { count: '8', label: 'Box partners' },
-      injuries: ['Hombro', 'Rodilla', 'Lumbar', 'Muñeca', 'Pubalgia'],
-      typical: 'Crossfittero que escala mal el volumen antes de la técnica',
-    },
-    {
-      name: 'BJJ',
-      page: 'bjj',
-      tagline: 'Grappling longevidad',
-      level: 'Atleta · Lo entreno',
-      description: 'Cuello, hombro, rodilla. Las lesiones del jiu-jitsu requieren entender la postura, los frames, el escape. No te trato como a un crossfittero.',
-      atletas: '60+',
-      partners: { count: '3', label: 'Academias' },
-      injuries: ['Cuello', 'Hombro', 'Rodilla', 'Codo'],
-      typical: 'Grappler que entrena 4× semana sin descargar',
-    },
-    {
-      name: 'Weightlifting',
-      page: 'weightlifting',
-      tagline: 'La barra sin compensaciones',
-      level: 'Atleta · Lo entreno',
-      description: 'Sentadilla, snatch, clean & jerk. Conozco la recepción profunda, la bisagra de cadera y la posición overhead desde adentro porque las entreno.',
-      atletas: '90+',
-      partners: { count: '6', label: 'Años en la barra' },
-      injuries: ['Lumbar', 'Hombro', 'Muñeca', 'Rodilla', 'Pubalgia'],
-      typical: 'Levantador que sube el 1RM más rápido que su movilidad',
-    },
-    {
-      name: 'Boxeo',
-      page: 'boxeo',
-      tagline: 'El ring sin dolor',
-      level: 'Fisio · Lo trato',
-      description: 'Mano, muñeca, hombro y cuello. El golpeo castiga la cadena del puño de formas específicas. Técnica de puño y vendaje que protegen tanto como pegan.',
-      atletas: '70+',
-      partners: { count: '4', label: 'Gimnasios' },
-      injuries: ['Mano', 'Muñeca', 'Hombro', 'Cervical'],
-      typical: 'Boxeador con técnica de puño que castiga la muñeca',
-    },
-  ];
-
-  const totalAtletas = '450+';
-  const totalPartners = deportes.reduce((s, d) => s + (parseInt(d.partners.count) || 0), 0);
-
-  return (
-    <main>
-      <DeportesHero
-        onNavigate={onNavigate}
-        totalDeportes={deportes.length}
-        withProtocol={deportes.filter(d => d.page).length}
-        totalAtletas={totalAtletas}
-      />
-      <DeportesCatalog
-        deportes={deportes}
-        onNavigate={onNavigate}
-        hoveredIdx={hoveredIdx}
-        setHoveredIdx={setHoveredIdx}
-      />
-      <DeportesExperience deportes={deportes} />
-      <DeportesProcess activeProcess={activeProcess} setActiveProcess={setActiveProcess} onNavigate={onNavigate} />
-      <DeportesCTA onNavigate={onNavigate} />
-    </main>
-  );
+  return <SportCatalogExperience/>;
 }
 
 // =====================================================================
@@ -15632,7 +14469,7 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -15650,7 +14487,7 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
             }}>
               Los entreno.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Los entiendo.
               </span>
             </h1>
@@ -15663,7 +14500,7 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
               marginBottom: '2.5rem',
             }}>
               No trato "atletas" en abstracto. Trato CrossFitters, runners, grapplers y bailarines.
-              <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Cada deporte rompe distinto — y se arregla distinto.</span>
+              <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Cada deporte rompe distinto, y se arregla distinto.</span>
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -15753,7 +14590,7 @@ function DeportesHero({ onNavigate, totalDeportes, withProtocol, totalAtletas })
                     fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                     fontFamily: 'Space Grotesk',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     lineHeight: 1,
                     letterSpacing: '-0.03em',
                   }}>
@@ -15829,7 +14666,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -15847,7 +14684,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
             }}>
               Lo que
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 trato y entreno.
               </span>
             </h2>
@@ -15940,7 +14777,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                   }}>
                     {d.level}
                   </div>
@@ -15991,7 +14828,7 @@ function DeportesCatalog({ deportes, onNavigate, hoveredIdx, setHoveredIdx }) {
                         fontFamily: 'Space Grotesk',
                         fontSize: '2.5rem',
                         fontWeight: 700,
-                        color: '#C9A55A',
+                        color: 'var(--gm-accent-ink, #80622D)',
                         lineHeight: 1,
                         letterSpacing: '-0.03em',
                       }}>
@@ -16193,7 +15030,7 @@ function DeportesExperience({ deportes }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -16211,20 +15048,20 @@ function DeportesExperience({ deportes }) {
             }}>
               Atleta primero.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Fisio después.
               </span>
             </h2>
           </div>
 
-          <p style={{
+          <DensePassage style={{
             fontSize: '1.0625rem',
             color: 'rgba(10,10,10,0.6)',
             lineHeight: 1.55,
             maxWidth: '460px',
           }}>
-            No te explico tu deporte — lo hago. CrossFit y BJJ son parte de mi semana. Running y danza los trato profundamente con atletas de élite. Esa diferencia se nota en el primer minuto.
-          </p>
+            No te explico tu deporte, lo hago. CrossFit y BJJ son parte de mi semana. Running y danza los trato profundamente con atletas de élite. Esa diferencia se nota en el primer minuto.
+          </DensePassage>
         </div>
 
         {/* Pull quote */}
@@ -16235,7 +15072,7 @@ function DeportesExperience({ deportes }) {
           <div style={{
             fontSize: '5rem',
             fontFamily: 'Space Grotesk',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             lineHeight: 0.4,
             marginBottom: '1.5rem',
           }}>
@@ -16251,7 +15088,7 @@ function DeportesExperience({ deportes }) {
             fontStyle: 'italic',
             marginBottom: '1.5rem',
           }}>
-            Si nunca has sentido lo que es no poder cerrar la cadera bajo un snatch al 80% — no entiendes <span style={{ color: '#C9A55A' }}>realmente</span> qué es una pubalgia.
+            Si nunca has sentido lo que es no poder cerrar la cadera bajo un snatch al 80%, no entiendes <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>realmente</span> qué es una pubalgia.
           </p>
           <div style={{
             fontSize: '0.8125rem',
@@ -16259,8 +15096,7 @@ function DeportesExperience({ deportes }) {
             textTransform: 'uppercase',
             color: 'rgba(10,10,10,0.5)',
             fontWeight: 600,
-          }}>
-            — Germán Montenegro
+          }}>, Germán Montenegro
           </div>
         </div>
 
@@ -16283,7 +15119,7 @@ function DeportesExperience({ deportes }) {
                 fontFamily: 'Space Grotesk',
                 fontSize: '2.5rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 lineHeight: 0.85,
                 letterSpacing: '-0.03em',
               }}>
@@ -16303,7 +15139,7 @@ function DeportesExperience({ deportes }) {
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginTop: '0.5rem',
               }}>
                 Paciente tipo
@@ -16342,7 +15178,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
     {
       label: 'Movement screen',
       title: 'Veo cómo te mueves.',
-      description: 'No el movimiento aislado — el gesto específico de tu deporte. Te grabo haciendo overhead squat, sprint, guardia o relevé. Encuentro la compensación.',
+      description: 'No el movimiento aislado, el gesto específico de tu deporte. Te grabo haciendo overhead squat, sprint, guardia o relevé. Encuentro la compensación.',
       duration: 'Sesión 1 · 60 min',
     },
     {
@@ -16355,13 +15191,13 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
       label: 'Cargas',
       title: 'Gestiono tu volumen.',
       description: 'La mayoría de lesiones son errores de carga, no de técnica. Te ayudo a escalar bien: cuántos WODs, cuántos km, cuántos rolls, cuántas clases. Sin perder forma.',
-      duration: 'Semanas 2—6',
+      duration: 'Semanas 2 a 6',
     },
     {
       label: 'Return to play',
       title: 'Vuelves específico.',
       description: 'No "ya puedes entrenar". Vuelves a tu deporte con tests específicos: tu mejor snatch, tu mejor 5K, tu mejor roll, tu mejor variación. Vuelves más fuerte.',
-      duration: 'Última fase · 2—4 sem',
+      duration: 'Última fase · 2 a 4 sem',
     },
   ];
 
@@ -16407,7 +15243,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -16424,7 +15260,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
             }}>
               Mismo método.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Tu deporte específico.
               </span>
             </h2>
@@ -16456,7 +15292,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
             {steps.map((step, i) => {
               const isActive = activeProcess === i;
               return (
-                <button
+                <button aria-pressed={isActive}
                   key={i}
                   onClick={() => setActiveProcess(i)}
                   style={{
@@ -16543,7 +15379,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
 
             <div style={{
               fontSize: '0.6875rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -16563,7 +15399,7 @@ function DeportesProcess({ activeProcess, setActiveProcess, onNavigate }) {
               position: 'relative',
             }}>
               {steps[activeProcess].title.split('.')[0]}
-              <span style={{ color: '#C9A55A' }}>.</span>
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>.</span>
             </h3>
 
             <p style={{
@@ -16781,7 +15617,7 @@ function MetodologiaPage({ onNavigate }) {
   const [activePhase, setActivePhase] = React.useState(0);
 
   return (
-    <main>
+    <main className="mx-page">
       <MetHero onNavigate={onNavigate} />
       <MetManifesto />
       <MetFases activePhase={activePhase} setActivePhase={setActivePhase} />
@@ -16793,223 +15629,20 @@ function MetodologiaPage({ onNavigate }) {
   );
 }
 
-function MetSectionHeader({ kicker, title, subtitle, intro, dark }) {
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '4rem',
-      marginBottom: '4rem',
-      alignItems: 'flex-end',
-    }} className="met-sh-header">
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
-        </div>
-        <h2 style={{
-          fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-          fontWeight: 700,
-          lineHeight: 1,
-          letterSpacing: '-0.03em',
-          fontFamily: 'Space Grotesk',
-          color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
-      </div>
-      {intro && (
-        <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
-      )}
-      <style dangerouslySetInnerHTML={{ __html: `@media (max-width: 900px) { .met-sh-header { grid-template-columns: 1fr !important; } }` }} />
-    </div>
-  );
+function MetSectionHeader({kicker,title,subtitle,intro}) {return <header className="mx-heading"><div><span className="mx-eyebrow">{kicker}</span><h2>{title}<br/><em>{subtitle}</em></h2></div>{intro&&<p>{intro}</p>}</header>;}
+
+function MetHero() {
+  return <section className="mx-section mx-hero"><div className="container"><div className="mx-hero-layout"><div><span className="mx-eyebrow">FISIOTERAPIA DEPORTIVA · EL PROCESO</span><h1>El Método<br/><em>Indestructible.</em></h1><p>Entender la lesión. Recuperar capacidad. Volver a tu deporte con un plan.</p><div className="mx-hero-actions"><a className="mx-button" href="#met-fases">Explorar las cuatro fases <span aria-hidden="true">↓</span></a><a className="mx-text-link" href="#met-caso">Ver el método en un caso ↗</a></div><div className="mx-hero-meta"><span>01 / Diagnóstico primero</span><span>04 / Vuelta al deporte</span></div></div>
+    <div className="mx-route" role="img" aria-label="Un recorrido de cuatro fases: diagnóstico, tratamiento, fortalecimiento y vuelta al deporte"><div className="mx-route-top"><span>UNA RECUPERACIÓN CON DIRECCIÓN</span><span aria-hidden="true">↗</span></div><svg viewBox="0 0 460 350" aria-hidden="true"><defs><linearGradient id="mx-route-gold" x1="0" y1="1" x2="1" y2="0"><stop stopColor="#705a32"/><stop offset="1" stopColor="#efce86"/></linearGradient></defs><path d="M30 300H430M30 240H430M30 180H430M30 120H430M30 60H430" stroke="#ffffff09"/><path d="M65 275C110 275 95 207 167 207S210 135 277 135 330 61 385 61" fill="none" stroke="url(#mx-route-gold)" strokeWidth="3"/>{[[65,275],[167,207],[277,135],[385,61]].map(([x,y],i)=><g key={i}><circle cx={x} cy={y} r="26" fill="#201d17" stroke="#c9a55a"/><text x={x} y={y+5} textAnchor="middle" fill="#edce8f" fontSize="13" fontFamily="Inter">0{i+1}</text></g>)}</svg><div className="mx-route-legend">{['Entender','Tratar','Fortalecer','Volver'].map((t,i)=><span key={t}><b>0{i+1}</b>{t}</span>)}</div><div className="mx-route-note"><span className="mx-dot"/>Cada fase prepara la siguiente.</div></div>
+  </div><nav className="mx-page-nav" aria-label="Contenido de metodología"><a href="#met-por-que">Por qué un proceso</a><a href="#met-fases">Las cuatro fases</a><a href="#met-caso">Un caso completo</a><a href="#met-para-quien">¿Es para mí?</a><a href="#met-preguntas">Preguntas</a></nav></div></section>;
 }
 
-// =====================================================================
-// HERO
-// =====================================================================
-function MetHero({ onNavigate }) {
-  const fases = ['Diagnóstico', 'Tratamiento', 'Fortalecimiento', 'Return to Play'];
-  return (
-    <section style={{
-      padding: '12rem 0 6rem',
-      background: '#0A0A0A',
-      color: '#FFFFFF',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute',
-        right: '-3%',
-        bottom: '-3rem',
-        fontSize: 'clamp(7rem, 16vw, 18rem)',
-        fontFamily: 'Space Grotesk',
-        fontWeight: 700,
-        color: 'rgba(201,165,90,0.06)',
-        lineHeight: 0.85,
-        letterSpacing: '-0.05em',
-        whiteSpace: 'nowrap',
-        pointerEvents: 'none',
-      }}>
-        MÉTODO.
-      </div>
-
-      <div className="container" style={{ position: 'relative' }}>
-        <div style={{ maxWidth: '900px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
-            <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>
-              Cómo trabajo · El proceso completo
-            </div>
-          </div>
-          <h1 style={{
-            fontSize: 'clamp(3rem, 7.5vw, 6.5rem)',
-            fontWeight: 700,
-            lineHeight: 0.9,
-            letterSpacing: '-0.04em',
-            fontFamily: 'Space Grotesk',
-            marginBottom: '2.5rem',
-          }}>
-            El Método
-            <br />
-            <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
-              Indestructible.
-            </span>
-          </h1>
-          <p style={{
-            fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)',
-            lineHeight: 1.55,
-            color: 'rgba(255,255,255,0.65)',
-            maxWidth: '640px',
-            marginBottom: '3rem',
-          }}>
-            No es un servicio suelto. Es un proceso de cuatro fases que devuelve atletas al deporte sin recaer.
-            <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Diagnóstico, tratamiento, fortalecimiento, return to play. Sin atajos.</span>
-          </p>
-
-          {/* Phase chips */}
-          <div style={{ display: 'flex', gap: '0', flexWrap: 'wrap', border: '1px solid rgba(255,255,255,0.1)' }} className="met-hero-chips">
-            {fases.map((f, i) => (
-              <div key={i} style={{
-                flex: 1,
-                minWidth: '140px',
-                padding: '1.5rem 1.25rem',
-                borderRight: i < fases.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                position: 'relative',
-              }} className="met-hero-chip">
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '2rem', fontWeight: 700, color: '#C9A55A', lineHeight: 1, letterSpacing: '-0.03em', marginBottom: '0.625rem' }}>0{i + 1}</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'Space Grotesk', letterSpacing: '-0.01em' }}>{f}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 768px) {
-          .met-hero-chips { flex-direction: column; }
-          .met-hero-chip { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        }
-      ` }} />
-    </section>
-  );
-}
-
-// =====================================================================
-// MANIFESTO
-// =====================================================================
 function MetManifesto() {
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(255,255,255,0.08)',
-    }}>
-      <div className="container">
-        <MetSectionHeader
-          kicker="Por qué un método"
-          title="Técnicas sueltas"
-          subtitle="no curan."
-          intro="Una punción aquí, un masaje allá, un ajuste cuando duele. Así trabaja la mayoría. Y por eso la mayoría recae."
-        />
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '4rem',
-          alignItems: 'flex-start',
-        }} className="met-man-grid">
-          <div>
-            <p style={{ fontSize: '1.125rem', lineHeight: 1.7, color: 'rgba(10,10,10,0.75)', marginBottom: '1.5rem' }}>
-              La punción seca es excelente. La terapia manual funciona. La quiropraxia tiene su lugar. Pero ninguna técnica, por sí sola, <strong style={{ color: '#0A0A0A' }}>resuelve una lesión deportiva</strong>.
-            </p>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)', marginBottom: '1.5rem' }}>
-              Una técnica trata el síntoma del momento. Un método ataca la cadena completa: <strong style={{ color: '#0A0A0A' }}>por qué te lesionaste, cómo reducir el dolor, cómo corregir el desbalance que lo causó, y cómo volver al deporte sin que regrese</strong>.
-            </p>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)' }}>
-              Por eso trabajo con un proceso fijo de cuatro fases. No improviso técnica por técnica. Cada decisión clínica tiene un lugar en la secuencia. Y la secuencia es lo que devuelve atletas — no la técnica aislada.
-            </p>
-          </div>
-
-          <div style={{
-            background: '#0A0A0A',
-            color: '#FFFFFF',
-            padding: '2.5rem',
-          }}>
-            <div style={{ fontSize: '4rem', fontFamily: 'Space Grotesk', color: '#C9A55A', lineHeight: 0.5, marginBottom: '1.5rem' }}>"</div>
-            <p style={{
-              fontSize: 'clamp(1.375rem, 2vw, 1.75rem)',
-              fontFamily: 'Space Grotesk',
-              fontWeight: 400,
-              fontStyle: 'italic',
-              lineHeight: 1.35,
-              letterSpacing: '-0.01em',
-              marginBottom: '2rem',
-            }}>
-              La técnica primero. Antes que la carga, antes que el peso, antes que el atajo. Domina el movimiento y el cuerpo aguanta.
-            </p>
-            <div style={{
-              paddingTop: '1.5rem',
-              borderTop: '1px solid rgba(255,255,255,0.1)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-            }}>
-              <div style={{
-                fontFamily: 'Space Grotesk',
-                fontWeight: 700,
-                fontSize: '1.25rem',
-                letterSpacing: '-0.01em',
-                color: '#C9A55A',
-              }}>
-                #latecnicaprimero
-              </div>
-              <div style={{
-                fontSize: '0.75rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.5)',
-              }}>
-                El movimiento · La comunidad
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 900px) {
-          .met-man-grid { grid-template-columns: 1fr !important; }
-        }
-      ` }} />
-    </section>
-  );
+  const points=[{kind:'focus',title:'Entender qué falló',text:'Identificar la causa y cómo se relaciona con tu entrenamiento.'},{kind:'load',title:'Reconstruir capacidad',text:'Corregir el desbalance, fortalecer y recuperar tolerancia a la carga.'},{kind:'move',title:'Volver con criterio',text:'Reintroducir el gesto deportivo como parte de un proceso.'}];
+  return <section id="met-por-que" className="mx-section"><div className="container"><MetSectionHeader kicker="EL CRITERIO" title="Cada técnica tiene un lugar." subtitle="El proceso les da dirección." intro="La terapia manual, la punción seca y los ajustes se eligen según la evaluación. La recuperación conecta esas decisiones con tu vuelta al deporte."/><div className="mx-principles">{points.map(p=><article key={p.title}><GuideIcon kind={p.kind}/><h3>{p.title}</h3><p>{p.text}</p></article>)}</div><div className="mx-manifesto-bottom"><blockquote>La técnica primero. Antes que la carga, antes que el peso, antes que el atajo.<cite>#latecnicaprimero</cite></blockquote><details className="mx-details"><summary>Por qué trabajo con cuatro fases <span aria-hidden="true">＋</span></summary><p>La punción seca es excelente. La terapia manual funciona. La quiropraxia tiene su lugar. Pero ninguna técnica, por sí sola, resuelve una lesión deportiva.</p><p>Una técnica trata el síntoma del momento. Un método ataca la cadena completa: por qué te lesionaste, cómo reducir el dolor, cómo corregir el desbalance que lo causó, y cómo volver al deporte sin que regrese.</p><p>Por eso trabajo con un proceso fijo de cuatro fases. No improviso técnica por técnica. Cada decisión clínica tiene un lugar en la secuencia. Domina el movimiento y el cuerpo aguanta.</p></details></div></div></section>;
 }
 
-// =====================================================================
-// 4 FASES (expanded)
-// =====================================================================
-function MetFases({ activePhase, setActivePhase }) {
+function MetFases({activePhase,setActivePhase}) {
   const fases = [
     {
       title: 'Diagnóstico',
@@ -17022,15 +15655,15 @@ function MetFases({ activePhase, setActivePhase }) {
     {
       title: 'Tratamiento',
       sub: 'Integrado',
-      duration: '3—8 sesiones',
-      desc: 'Manos, agujas, ajuste vertebral si lo necesitas. Las técnicas se combinan según tu caso específico — no según un protocolo fijo. Cada sesión es una decisión clínica.',
+      duration: '3 a 8 sesiones',
+      desc: 'Manos, agujas, ajuste vertebral si lo necesitas. Las técnicas se combinan según tu caso específico, no según un protocolo fijo. Cada sesión es una decisión clínica.',
       what: ['Terapia manual avanzada', 'Punción seca en puntos gatillo', 'Quiropraxia según indicación', 'IASTM y movilización articular', 'Reducción del dolor sin perder capacidad'],
       output: 'El dolor baja y se prepara el terreno para el fortalecimiento.',
     },
     {
       title: 'Fortalecimiento',
       sub: 'Progresivo',
-      duration: '4—8 semanas',
+      duration: '4 a 8 semanas',
       desc: 'Aquí pasa la magia. Plan personalizado para corregir los desbalances que causaron la lesión. Sin esta fase, vuelves a lesionarte. Punto.',
       what: ['Ejercicios correctivos específicos', 'Carga progresiva controlada', 'Re-educación neuromuscular', 'Trabajo de estabilidad y control', 'Corrección del patrón que falló'],
       output: 'El cuerpo se vuelve resistente a la lesión que tuvo.',
@@ -17038,246 +15671,33 @@ function MetFases({ activePhase, setActivePhase }) {
     {
       title: 'Return to Play',
       sub: '',
-      duration: '2—4 semanas',
-      desc: 'Readaptación al gesto deportivo específico. CrossFit, BJJ, running, danza — cada deporte tiene demandas únicas. Vuelves más fuerte que antes, sin recaídas.',
+      duration: '2 a 4 semanas',
+      desc: 'Readaptación al gesto deportivo específico. CrossFit, BJJ, running, danza, cada deporte tiene demandas únicas. Vuelves más fuerte que antes, sin recaídas.',
       what: ['Readaptación al gesto deportivo', 'Tests funcionales de retorno', 'Vuelta gradual a la carga deportiva', 'Plan de prevención de recaídas', 'Alta cuando ya no me necesitas'],
       output: 'Vuelves a competir, más fuerte que cuando llegaste.',
     },
   ];
 
-  const current = fases[activePhase];
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FAFAFA',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute',
-        right: '-5%',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        fontSize: '40rem',
-        fontFamily: 'Space Grotesk',
-        fontWeight: 700,
-        color: 'rgba(201,165,90,0.04)',
-        lineHeight: 1,
-        pointerEvents: 'none',
-      }}>
-        0{activePhase + 1}
-      </div>
-
-      <div className="container" style={{ position: 'relative' }}>
-        <MetSectionHeader
-          kicker="Las 4 fases"
-          title="No es servicio,"
-          subtitle="es proceso."
-          intro="Cada fase tiene su objetivo, su duración y su criterio de avance. Click en cada una para ver el detalle completo."
-        />
-
-        {/* Phase selector */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '0',
-          border: '1px solid rgba(10,10,10,0.08)',
-          marginBottom: '0',
-        }} className="met-fase-sel">
-          {fases.map((f, i) => {
-            const isActive = activePhase === i;
-            return (
-              <button
-                key={i}
-                onClick={() => setActivePhase(i)}
-                style={{
-                  padding: '2rem 1.5rem',
-                  background: isActive ? '#0A0A0A' : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : '#0A0A0A',
-                  border: 'none',
-                  borderRight: i < fases.length - 1 ? '1px solid rgba(10,10,10,0.08)' : 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontFamily: 'inherit',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.625rem',
-                  transition: 'all 0.4s',
-                  position: 'relative',
-                }}
-              >
-                {isActive && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#C9A55A' }} />}
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.5rem', fontWeight: 700, color: isActive ? '#C9A55A' : 'rgba(10,10,10,0.2)', lineHeight: 1, letterSpacing: '-0.03em', transition: 'color 0.4s' }}>0{i + 1}</div>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.0625rem', fontWeight: 700, letterSpacing: '-0.01em' }}>{f.title}</div>
-                <div style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{f.duration}</div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Detail */}
-        <div key={activePhase} style={{
-          display: 'grid',
-          gridTemplateColumns: '1.3fr 1fr',
-          gap: '0',
-          border: '1px solid rgba(10,10,10,0.08)',
-          borderTop: 'none',
-          background: '#FFFFFF',
-          animation: 'metFade 0.4s ease-out',
-        }} className="met-fase-detail">
-          <div style={{ padding: '3rem', borderRight: '1px solid rgba(10,10,10,0.08)' }} className="met-fase-left">
-            <div style={{ fontSize: '0.6875rem', color: '#C9A55A', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1rem' }}>
-              Fase {String(activePhase + 1).padStart(2, '0')} · {current.duration}
-            </div>
-            <h3 style={{
-              fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
-              fontFamily: 'Space Grotesk',
-              fontWeight: 700,
-              letterSpacing: '-0.03em',
-              lineHeight: 0.95,
-              color: '#0A0A0A',
-              marginBottom: '1.5rem',
-            }}>
-              {current.title}
-              {current.sub && <><br /><span style={{ color: '#C9A55A' }}>{current.sub}.</span></>}
-            </h3>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)', marginBottom: '2rem' }}>{current.desc}</p>
-            <div style={{
-              padding: '1.25rem 1.5rem',
-              background: '#FAFAFA',
-              borderLeft: '3px solid #C9A55A',
-              fontSize: '0.9375rem',
-              lineHeight: 1.55,
-              color: '#0A0A0A',
-            }}>
-              <span style={{ display: 'block', fontSize: '0.625rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.5rem' }}>Resultado de esta fase</span>
-              {current.output}
-            </div>
-          </div>
-
-          <div style={{ padding: '3rem' }}>
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(10,10,10,0.4)', marginBottom: '1.5rem' }}>
-              Qué incluye
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {current.what.map((w, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '1rem',
-                  padding: '1rem 0',
-                  borderBottom: i < current.what.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
-                }}>
-                  <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.8125rem', fontWeight: 700, color: '#C9A55A', marginTop: '0.1rem' }}>{String(i + 1).padStart(2, '0')}</div>
-                  <div style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: '#0A0A0A' }}>{w}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes metFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) {
-          .met-fase-sel { grid-template-columns: repeat(2, 1fr) !important; }
-          .met-fase-sel > button { border-bottom: 1px solid rgba(10,10,10,0.08); }
-          .met-fase-detail { grid-template-columns: 1fr !important; }
-          .met-fase-left { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
-        }
-      ` }} />
-    </section>
-  );
+  const kinds=['focus','care','load','move'];
+  function moveTab(e,i){const next=e.key==='ArrowRight'?(i+1)%4:e.key==='ArrowLeft'?(i+3)%4:e.key==='Home'?0:e.key==='End'?3:null;if(next!==null){e.preventDefault();setActivePhase(next);e.currentTarget.parentElement.children[next].focus();}}
+  return <section id="met-fases" className="mx-section mx-soft"><div className="container"><MetSectionHeader kicker="EL RECORRIDO" title="Cuatro fases." subtitle="Un objetivo en cada paso." intro="Selecciona una fase para ver qué trabajamos, qué incluye y con qué resultado avanzas."/><div className="mx-phase-layout"><div className="mx-phase-tabs" role="tablist" aria-label="Fases del método">{fases.map((f,i)=><button key={f.title} id={'mx-tab-'+i} role="tab" aria-selected={activePhase===i} aria-controls={'mx-panel-'+i} tabIndex={activePhase===i?0:-1} onKeyDown={e=>moveTab(e,i)} onClick={()=>setActivePhase(i)}><GuideIcon kind={kinds[i]}/><div><span className="mx-phase-caption">FASE 0{i+1}</span><strong>{i===3?'Vuelta al deporte':f.title}</strong><small>{f.duration}</small></div><span aria-hidden="true">↗</span></button>)}</div><div>{fases.map((f,i)=><article key={f.title} hidden={activePhase!==i} role="tabpanel" id={'mx-panel-'+i} aria-labelledby={'mx-tab-'+i} tabIndex="0" className="mx-phase-panel"><div className="mx-phase-panel-head"><span className="mx-eyebrow">{f.duration}</span><span aria-hidden="true">0{i+1} / 04</span></div><h3>{f.title}<em>{f.sub}</em></h3><p className="mx-phase-description">{f.desc}</p><div className="mx-output"><span aria-hidden="true">↗</span><div><span>EL RESULTADO QUE BUSCAMOS</span><p>{f.output}</p></div></div><div className="mx-includes"><h4>Qué trabajamos</h4><ul>{f.what.map((w,j)=><li key={w}><span aria-hidden="true">{String(j+1).padStart(2,'0')}</span>{w}</li>)}</ul></div><div className="mx-phase-footer"><span>Los tiempos se ajustan a la evaluación y al progreso.</span>{i<3&&<button onClick={()=>{setActivePhase(i+1);document.getElementById('mx-tab-'+(i+1))?.focus();}}>Explorar siguiente fase →</button>}</div></article>)}</div></div></div></section>;
 }
 
-// =====================================================================
-// CASO EJEMPLO
-// =====================================================================
 function MetCaso() {
   const pasos = [
-    { week: 'Semana 0', phase: 'Diagnóstico', text: 'Crossfittero de 32 años con dolor de hombro hace 3 meses. Evaluación revela: déficit de control escapular + exceso de kipping sin progresión. No es el manguito — es el patrón.' },
-    { week: 'Semana 1—3', phase: 'Tratamiento', text: 'Terapia manual + punción seca en trapecio y manguito. Reducir el dolor para poder trabajar. Se elimina temporalmente el kipping, se mantiene el resto del entrenamiento.' },
-    { week: 'Semana 3—7', phase: 'Fortalecimiento', text: 'Control escapular, fortalecimiento del manguito, re-educación del patrón de tracción. Aquí se corrige la causa real — el déficit que permitió la lesión.' },
-    { week: 'Semana 7—10', phase: 'Return to Play', text: 'Reintroducción progresiva del kipping con técnica corregida. Tests de retorno. Vuelve al box haciendo muscle-ups sin dolor — y con mejor mecánica que antes.' },
+    { week: 'Semana 0', phase: 'Diagnóstico', text: 'Crossfittero de 32 años con dolor de hombro hace 3 meses. Evaluación revela: déficit de control escapular + exceso de kipping sin progresión. No es el manguito, es el patrón.' },
+    { week: 'Semana 1 a 3', phase: 'Tratamiento', text: 'Terapia manual + punción seca en trapecio y manguito. Reducir el dolor para poder trabajar. Se elimina temporalmente el kipping, se mantiene el resto del entrenamiento.' },
+    { week: 'Semana 3 a 7', phase: 'Fortalecimiento', text: 'Control escapular, fortalecimiento del manguito, re-educación del patrón de tracción. Aquí se corrige la causa real, el déficit que permitió la lesión.' },
+    { week: 'Semana 7 a 10', phase: 'Return to Play', text: 'Reintroducción progresiva del kipping con técnica corregida. Tests de retorno. Vuelve al box haciendo muscle-ups sin dolor, y con mejor mecánica que antes.' },
   ];
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#0A0A0A',
-      color: '#FFFFFF',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute',
-        left: '-3%',
-        bottom: '-3rem',
-        fontSize: 'clamp(8rem, 18vw, 18rem)',
-        fontFamily: 'Space Grotesk',
-        fontWeight: 700,
-        color: 'rgba(201,165,90,0.05)',
-        lineHeight: 0.85,
-        letterSpacing: '-0.05em',
-        whiteSpace: 'nowrap',
-        pointerEvents: 'none',
-      }}>
-        UN CASO.
-      </div>
 
-      <div className="container" style={{ position: 'relative' }}>
-        <MetSectionHeader
-          dark
-          kicker="Un caso completo"
-          title="De principio"
-          subtitle="a fin."
-          intro="Así se ve el método aplicado a un caso real: un hombro de CrossFit, de la primera consulta al muscle-up sin dolor."
-        />
-
-        <div style={{ position: 'relative', paddingLeft: '3rem' }}>
-          <div style={{
-            position: 'absolute',
-            left: '9px',
-            top: '12px',
-            bottom: '12px',
-            width: '2px',
-            background: 'linear-gradient(180deg, #C9A55A 0%, rgba(201,165,90,0.2) 100%)',
-          }} />
-          {pasos.map((p, i) => (
-            <div key={i} style={{
-              position: 'relative',
-              marginBottom: i < pasos.length - 1 ? '3rem' : 0,
-            }}>
-              <div style={{
-                position: 'absolute',
-                left: '-3rem',
-                top: '2px',
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                background: '#0A0A0A',
-                border: '3px solid #C9A55A',
-                boxShadow: i === 0 ? '0 0 0 4px rgba(201,165,90,0.15)' : 'none',
-              }} />
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: 'Space Grotesk', fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{p.week}</span>
-                <span style={{ fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '0.375rem 0.75rem' }}>{p.phase}</span>
-              </div>
-              <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(255,255,255,0.75)', maxWidth: '720px' }}>{p.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  const titles=['Encontrar el patrón','Bajar el dolor sin parar todo','Reconstruir el control','Volver al muscle-up'];
+  const concise=['Déficit de control escapular y exceso de kipping sin progresión.','Se modifica el kipping y se mantiene el resto del entrenamiento.','Control escapular, manguito y patrón de tracción.','Kipping progresivo, técnica corregida y tests de retorno.'];
+  return <section id="met-caso" className="mx-section mx-case"><div className="container"><MetSectionHeader kicker="DEL MÉTODO A LA PRÁCTICA" title="Un hombro de CrossFit." subtitle="Un regreso paso a paso." intro="Así se aplicó el proceso en este caso. El recorrido muestra qué cambió en cada etapa, desde la consulta hasta volver al box."/><div className="mx-case-profile"><div><span className="mx-eyebrow">PUNTO DE PARTIDA</span><strong>Dolor de hombro al entrenar</strong></div><dl><div><dt>Atleta</dt><dd>32 años</dd></div><div><dt>Disciplina</dt><dd>CrossFit</dd></div><div><dt>Con dolor</dt><dd>3 meses</dd></div></dl></div><div className="mx-case-path">{pasos.map((p,i)=><article key={p.phase}><div className="mx-case-top"><GuideIcon kind={['focus','care','load','move'][i]}/><span>{p.week}</span></div><span className="mx-case-phase">0{i+1} / {p.phase}</span><h3>{titles[i]}</h3><p>{concise[i]}</p><details className="mx-details"><summary>Ver esta etapa <span aria-hidden="true">＋</span></summary><p>{p.text}</p></details></article>)}</div><div className="mx-case-finish"><span aria-hidden="true">↗</span><div><span>RESULTADO DE ESTE CASO</span><p>Vuelta al box y muscle-ups sin dolor, con mejor mecánica.</p></div></div></div></section>;
 }
 
-// =====================================================================
-// PARA QUIÉN APLICA / NO
-// =====================================================================
 function MetParaQuien() {
   const aplica = [
     'Atletas que quieren entender por qué se lesionaron',
@@ -17295,266 +15715,31 @@ function MetParaQuien() {
     'Quien busca una solución mágica de una sesión',
   ];
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-    }}>
-      <div className="container">
-        <MetSectionHeader
-          kicker="Para quién es"
-          title="No es"
-          subtitle="para todos."
-          intro="Ser honesto sobre para quién funciona el método es parte del método. Si no eres el atleta indicado, te lo digo en la primera consulta."
-        />
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '0',
-          border: '1px solid rgba(10,10,10,0.08)',
-        }} className="met-pq-grid">
-          {/* Aplica */}
-          <div style={{ padding: '2.5rem 2rem', borderRight: '1px solid rgba(10,10,10,0.08)' }} className="met-pq-yes">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.75rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(10,10,10,0.08)' }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#16A34A' }} />
-              <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#16A34A' }}>Sí aplica</div>
-            </div>
-            {aplica.map((a, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'flex-start',
-                padding: '1rem 0',
-                borderBottom: i < aplica.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
-              }}>
-                <div style={{ color: '#16A34A', fontSize: '1rem', fontWeight: 700, marginTop: '0.1rem' }}>✓</div>
-                <div style={{ fontSize: '1rem', lineHeight: 1.5, color: '#0A0A0A' }}>{a}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* No aplica */}
-          <div style={{ padding: '2.5rem 2rem', background: '#FAFAFA' }} className="met-pq-no">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.75rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(10,10,10,0.08)' }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#DC2626' }} />
-              <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#DC2626' }}>No aplica</div>
-            </div>
-            {noAplica.map((a, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'flex-start',
-                padding: '1rem 0',
-                borderBottom: i < noAplica.length - 1 ? '1px solid rgba(10,10,10,0.06)' : 'none',
-              }}>
-                <div style={{ color: '#DC2626', fontSize: '1rem', fontWeight: 700, marginTop: '0.1rem' }}>✕</div>
-                <div style={{ fontSize: '1rem', lineHeight: 1.5, color: 'rgba(10,10,10,0.65)' }}>{a}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 768px) {
-          .met-pq-grid { grid-template-columns: 1fr !important; }
-          .met-pq-yes { border-right: none !important; border-bottom: 1px solid rgba(10,10,10,0.08); }
-        }
-      ` }} />
-    </section>
-  );
+  const labels=['Entender tu lesión','Volver a tu deporte','Fortalecer entre sesiones','Tener un objetivo claro','Entrenar en serio'];
+  return <section id="met-para-quien" className="mx-section"><div className="container"><MetSectionHeader kicker="¿ES PARA TI?" title="Un proceso compartido." subtitle="Tu participación cuenta." intro="La valoración ayuda a decidir si este enfoque encaja con tu caso y con lo que buscas."/><div className="mx-fit-layout"><div className="mx-fit-positive"><div className="mx-fit-title"><GuideIcon kind="move"/><div><span className="mx-eyebrow">BUEN PUNTO DE PARTIDA</span><h3>Quieres volver con un plan.</h3></div></div><div className="mx-fit-items">{aplica.map((a,i)=><article key={a}><span className="mx-fit-num" aria-hidden="true">0{i+1}</span><div><h4>{labels[i]}</h4><p>{a}</p></div></article>)}</div></div><div className="mx-fit-alternative"><span className="mx-eyebrow">OTRAS EXPECTATIVAS</span><h3>Puede que busques otro tipo de atención.</h3><p>Este método requiere continuidad y trabajo entre sesiones.</p><ul>{noAplica.filter((a,i)=>i!==3).map(a=><li key={a}>{a}</li>)}</ul><aside className="mx-fit-urgent"><span aria-hidden="true">⚠</span><div><strong>Las urgencias requieren otra atención</strong><p>{noAplica[3]}</p></div></aside></div></div></div></section>;
 }
 
-// =====================================================================
-// FAQ
-// =====================================================================
-function MetFAQ({ openFaq, setOpenFaq }) {
+function MetFAQ() {
   const faqs = [
-    { q: '¿Cuánto dura el proceso completo?', a: 'Depende de la lesión, pero el promedio es de 6—10 sesiones distribuidas en 8—12 semanas. Lesiones leves pueden resolverse en menos; casos crónicos pueden requerir más. La primera valoración te da una estimación realista.' },
+    { q: '¿Cuánto dura el proceso completo?', a: 'Depende de la lesión, pero el promedio es de 6 a 10 sesiones distribuidas en 8 a 12 semanas. Lesiones leves pueden resolverse en menos; casos crónicos pueden requerir más. La primera valoración te da una estimación realista.' },
     { q: '¿Tengo que pasar por las 4 fases siempre?', a: 'Sí, ese es el punto del método. Saltarse el fortalecimiento es la razón #1 de recaída. Algunos llegan ya en fase avanzada y se acortan las primeras fases, pero ninguna se omite por completo. El proceso es lo que garantiza que no recaigas.' },
-    { q: '¿Puedo seguir entrenando durante el proceso?', a: 'Casi siempre sí, con modificaciones. Rara vez mando reposo total — eso atrofia. Lo normal es reducir o modificar ciertos gestos mientras mantenemos el resto del entrenamiento. El objetivo es que pierdas lo mínimo de fitness.' },
-    { q: '¿Qué pasa si no mejoro?', a: 'Reevaluamos. Si tras las primeras sesiones no hay progreso esperado, el diagnóstico se revisa — quizás había algo más. Si tu caso requiere imagen (RM) o derivación a otro especialista, te lo digo claramente. No alargo procesos que no funcionan.' },
-    { q: '¿Por qué no solo me das ejercicios por WhatsApp?', a: 'Porque sin diagnóstico presencial, los ejercicios son adivinanza. El mismo dolor de rodilla puede ser tendinopatía, condromalacia o referido de cadera — y cada uno necesita ejercicios opuestos. El método empieza con diagnóstico, no con ejercicios genéricos.' },
-    { q: '¿El método sirve para mi deporte específico?', a: 'El método es el mismo, la aplicación se adapta. Las 4 fases aplican a cualquier lesión deportiva. Lo que cambia es el análisis del gesto y la readaptación final — específicos para CrossFit, running, BJJ, danza o tu disciplina.' },
+    { q: '¿Puedo seguir entrenando durante el proceso?', a: 'Casi siempre sí, con modificaciones. Rara vez mando reposo total, eso atrofia. Lo normal es reducir o modificar ciertos gestos mientras mantenemos el resto del entrenamiento. El objetivo es que pierdas lo mínimo de fitness.' },
+    { q: '¿Qué pasa si no mejoro?', a: 'Reevaluamos. Si tras las primeras sesiones no hay progreso esperado, el diagnóstico se revisa, quizás había algo más. Si tu caso requiere imagen (RM) o derivación a otro especialista, te lo digo claramente. No alargo procesos que no funcionan.' },
+    { q: '¿Por qué no solo me das ejercicios por WhatsApp?', a: 'Porque sin diagnóstico presencial, los ejercicios son adivinanza. El mismo dolor de rodilla puede ser tendinopatía, condromalacia o referido de cadera, y cada uno necesita ejercicios opuestos. El método empieza con diagnóstico, no con ejercicios genéricos.' },
+    { q: '¿El método sirve para mi deporte específico?', a: 'El método es el mismo, la aplicación se adapta. Las 4 fases aplican a cualquier lesión deportiva. Lo que cambia es el análisis del gesto y la readaptación final, específicos para CrossFit, running, BJJ, danza o tu disciplina.' },
   ];
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FAFAFA',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-    }}>
-      <div className="container">
-        <MetSectionHeader
-          kicker="Preguntas frecuentes"
-          title="Sobre"
-          subtitle="el método."
-          intro="Las dudas más comunes sobre cómo trabajo. Si no encuentras la tuya, WhatsApp directo."
-        />
 
-        <div style={{ maxWidth: '900px', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
-          {faqs.map((faq, i) => {
-            const isOpen = openFaq === i;
-            return (
-              <div key={i} style={{ borderBottom: '1px solid rgba(10,10,10,0.08)' }}>
-                <button
-                  onClick={() => setOpenFaq(isOpen ? -1 : i)}
-                  style={{
-                    width: '100%',
-                    padding: '1.75rem 0',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    display: 'grid',
-                    gridTemplateColumns: '60px 1fr 40px',
-                    alignItems: 'center',
-                    gap: '1.5rem',
-                  }}
-                >
-                  <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.875rem', fontWeight: 700, color: isOpen ? '#C9A55A' : 'rgba(10,10,10,0.3)', transition: 'color 0.3s' }}>{String(i + 1).padStart(2, '0')}</div>
-                  <div style={{ fontSize: 'clamp(1.0625rem, 1.4vw, 1.25rem)', fontWeight: 600, fontFamily: 'Space Grotesk', letterSpacing: '-0.01em', lineHeight: 1.3, color: '#0A0A0A' }}>{faq.q}</div>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    border: `1px solid ${isOpen ? '#C9A55A' : 'rgba(10,10,10,0.15)'}`,
-                    background: isOpen ? '#C9A55A' : 'transparent',
-                    color: isOpen ? '#0A0A0A' : 'rgba(10,10,10,0.4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.125rem',
-                    fontWeight: 300,
-                    transition: 'all 0.4s',
-                    transform: isOpen ? 'rotate(45deg)' : 'rotate(0)',
-                    justifySelf: 'end',
-                  }}>+</div>
-                </button>
-                <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-                  <div style={{ overflow: 'hidden' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 40px', gap: '1.5rem', paddingBottom: '1.75rem' }}>
-                      <div></div>
-                      <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'rgba(10,10,10,0.7)', maxWidth: '700px' }}>{faq.a}</p>
-                      <div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
+  return <section id="met-preguntas" className="mx-section mx-soft"><div className="container"><div className="mx-faq-layout"><div><span className="mx-eyebrow">ANTES DE EMPEZAR</span><h2>Resolvamos<br/><em>tus dudas.</em></h2><p>Duración, entrenamiento y decisiones durante el proceso.</p><a className="mx-text-link" href={WHATSAPP_URL}>Tengo otra pregunta ↗</a></div><div className="mx-faq-list">{faqs.map(f=><details key={f.q} className="mx-details"><summary>{f.q}<span aria-hidden="true">＋</span></summary><p>{f.a}</p></details>)}</div></div></div></section>;
 }
 
-// =====================================================================
-// CTA
-// =====================================================================
-function MetCTA({ onNavigate }) {
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div className="container" style={{ position: 'relative' }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #C9A55A 0%, #B8943F 100%)',
-          color: '#0A0A0A',
-          padding: 'clamp(3rem, 6vw, 5rem)',
-          display: 'grid',
-          gridTemplateColumns: '1.4fr 1fr',
-          gap: '4rem',
-          alignItems: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }} className="met-cta-grid">
-          <div style={{ position: 'absolute', top: '-20%', right: '-20%', width: '60%', height: '140%', background: 'linear-gradient(135deg, transparent 50%, rgba(10,10,10,0.05) 50%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'relative' }}>
-            <div style={{ fontSize: '0.6875rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1.5rem' }}>Empieza por la fase 01</div>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 700, lineHeight: 0.9, letterSpacing: '-0.03em', fontFamily: 'Space Grotesk', marginBottom: '1.5rem' }}>El proceso<br /><span style={{ fontStyle: 'italic', fontWeight: 400 }}>empieza aquí.</span></h2>
-            <p style={{ fontSize: '1.125rem', lineHeight: 1.55, opacity: 0.85, maxWidth: '520px' }}>
-              Primera sesión: diagnóstico preciso + plan de las 4 fases adaptado a tu caso. 60 minutos. El primer paso del método indestructible.
-            </p>
-          </div>
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <a
-              {...navProps('fisioterapia')}
-              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
-                background: '#0A0A0A',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '1.5rem 2rem',
-                fontSize: '0.875rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                fontFamily: 'Space Grotesk',
-                transition: 'all 0.3s',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '0.75rem',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >Agendar valoración<span>→</span></a>
-            <a
-              {...navProps('sobre')}
-              style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center',
-                background: 'transparent',
-                color: '#0A0A0A',
-                border: '1px solid rgba(10,10,10,0.4)',
-                padding: '1.5rem 2rem',
-                fontSize: '0.875rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                fontFamily: 'Space Grotesk',
-                transition: 'all 0.3s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#0A0A0A'; e.currentTarget.style.color = '#C9A55A'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A'; }}
-            >Conocer a Germán</a>
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 900px) {
-          .met-cta-grid { grid-template-columns: 1fr !important; }
-        }
-      ` }} />
-    </section>
-  );
+function MetCTA() {
+  return <section className="mx-section mx-close"><div className="container"><div className="mx-close-layout"><div><span className="mx-eyebrow">EMPIEZA POR ENTENDER QUÉ PASA</span><h2>Tu regreso empieza<br/><em>con una valoración.</em></h2><p>60 minutos para evaluar tu caso y construir el plan de recuperación.</p></div><div className="mx-close-actions"><a className="mx-button" href={WHATSAPP_URL}>Agendar mi valoración <span aria-hidden="true">↗</span></a><a className="mx-text-link" {...navProps('sobre')}>Conocer a Germán →</a><span>Diagnóstico + plan adaptado a tu caso</span></div></div></div></section>;
 }
-
-/* ==================== sobre-german.jsx ==================== */
-// SOBRE GERMÁN - Página de autoridad E-E-A-T
-// Historia · Credenciales · Práctica deportiva · Mis lesiones · Filosofía · Comparativa · Testimonios · CTA
 
 function SobreGermanPage({ onNavigate }) {
-  return (
-    <main>
-      <SobreHero onNavigate={onNavigate} />
-      <SobreHistoria />
-      <SobreCredenciales />
-      <SobrePractica />
-      <SobreMisLesiones />
-      <SobreFilosofia />
-      <SobreComparativa />
-      <SobreTestimonios />
-      <SobreCTA onNavigate={onNavigate} />
-    </main>
-  );
+  return <AboutExperience history={<SobreHistoria/>} comparison={<SobreComparativa onNavigate={onNavigate}/>}/>;
 }
 
 // SHARED HEADER
@@ -17570,7 +15755,7 @@ function SgSectionHeader({ kicker, title, subtitle, intro, dark }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
-          <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>{kicker}</div>
         </div>
         <h2 style={{
           fontSize: 'clamp(2.5rem, 5vw, 4rem)',
@@ -17579,7 +15764,7 @@ function SgSectionHeader({ kicker, title, subtitle, intro, dark }) {
           letterSpacing: '-0.03em',
           fontFamily: 'Space Grotesk',
           color: dark ? '#FFFFFF' : '#0A0A0A',
-        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>{subtitle}</span></h2>
+        }}>{title}<br /><span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>{subtitle}</span></h2>
       </div>
       {intro && (
         <p style={{ fontSize: '1.0625rem', color: dark ? 'rgba(255,255,255,0.65)' : 'rgba(10,10,10,0.6)', lineHeight: 1.55, maxWidth: '460px' }}>{intro}</p>
@@ -17638,7 +15823,7 @@ function SobreHero({ onNavigate }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ width: '60px', height: '1px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600 }}>
                 Fisioterapeuta deportivo · Atleta
               </div>
             </div>
@@ -17652,7 +15837,7 @@ function SobreHero({ onNavigate }) {
             }}>
               Soy fisio.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Pero entreno como tú.
               </span>
             </h1>
@@ -17664,7 +15849,7 @@ function SobreHero({ onNavigate }) {
               marginBottom: '2.5rem',
             }}>
               Germán Montenegro. CrossFit, weightlifting, BJJ y boxeo son parte de mi semana, no de mis libros.
-              <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Por eso entiendo tu lesión desde adentro — la he vivido.</span>
+              <span style={{ color: '#FFFFFF', fontWeight: 500 }}> Por eso entiendo tu lesión desde adentro, la he vivido.</span>
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <a
@@ -17737,7 +15922,7 @@ function SobreHero({ onNavigate }) {
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '1rem',
               }}>
                 [ Foto profesional ]
@@ -17772,89 +15957,21 @@ function SobreHero({ onNavigate }) {
 // HISTORIA
 // =====================================================================
 function SobreHistoria() {
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(255,255,255,0.08)',
-    }}>
-      <div className="container">
-        <SgSectionHeader
-          kicker="Mi historia"
-          title="Empecé"
-          subtitle="lesionado."
-          intro="No llegué a la fisioterapia por vocación abstracta. Llegué porque me lesioné entrenando y nadie supo devolverme al deporte de verdad."
-        />
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '4rem',
-          alignItems: 'flex-start',
-        }} className="sg-hist-grid">
-          <div>
-            <p style={{ fontSize: '1.125rem', lineHeight: 1.7, color: 'rgba(10,10,10,0.75)', marginBottom: '1.5rem' }}>
-              La primera vez que me lesioné en serio entrenando, fui a fisioterapia como cualquiera. Me dieron <strong style={{ color: '#0A0A0A' }}>masajes, ultrasonido y reposo</strong>. El dolor bajaba. Volvía a entrenar. El dolor regresaba.
-            </p>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)', marginBottom: '1.5rem' }}>
-              Nadie me explicó <strong style={{ color: '#0A0A0A' }}>por qué</strong> me había lesionado. Nadie miró mi técnica de levantamiento. Nadie me preguntó cuántos WODs hacía por semana. Me trataban el síntoma, no la causa.
-            </p>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.65, color: 'rgba(10,10,10,0.65)' }}>
-              Ahí decidí estudiar fisioterapia — pero hacerla distinto. Entender el deporte desde adentro, diagnosticar la causa real, y construir un proceso que devuelva al atleta más fuerte de lo que llegó. No parches. Proceso.
-            </p>
-          </div>
-
-          <div style={{
-            background: '#0A0A0A',
-            color: '#FFFFFF',
-            padding: '2.5rem',
-            position: 'relative',
-          }}>
-            <div style={{
-              fontSize: '4rem',
-              fontFamily: 'Space Grotesk',
-              color: '#C9A55A',
-              lineHeight: 0.5,
-              marginBottom: '1.5rem',
-            }}>"</div>
-            <p style={{
-              fontSize: 'clamp(1.375rem, 2vw, 1.75rem)',
-              fontFamily: 'Space Grotesk',
-              fontWeight: 400,
-              fontStyle: 'italic',
-              lineHeight: 1.35,
-              letterSpacing: '-0.01em',
-              marginBottom: '2rem',
-            }}>
-              El fisio que me trataba nunca había sentido lo que es no poder cerrar la cadera bajo una barra. Yo sí.
-            </p>
-            <div style={{
-              paddingTop: '1.5rem',
-              borderTop: '1px solid rgba(255,255,255,0.1)',
-              fontSize: '0.75rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              fontWeight: 700,
-              color: '#C9A55A',
-            }}>
-              Germán Montenegro
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 900px) {
-          .sg-hist-grid { grid-template-columns: 1fr !important; }
-        }
-      ` }} />
-    </section>
-  );
+  const moments = [
+    {step:'01',label:'La lesión',title:'El dolor regresaba.',summary:'Aliviar el dolor no resolvía lo que lo causaba.',text:<>La primera vez que me lesioné en serio entrenando, fui a fisioterapia como cualquiera. Me dieron <strong>masajes, ultrasonido y reposo</strong>. El dolor bajaba. Volvía a entrenar. El dolor regresaba.</>},
+    {step:'02',label:'La pregunta',title:'Faltaba entender el porqué.',summary:'Mi entrenamiento también debía ser parte de la evaluación.',text:<>Nadie me explicó <strong>por qué</strong> me había lesionado. Nadie miró mi técnica de levantamiento. Nadie me preguntó cuántos WODs hacía por semana. Me trataban el síntoma, no la causa.</>},
+    {step:'03',label:'El cambio',title:'Volver con un proceso.',summary:'Esa experiencia cambió la forma en que decidí tratar a otros atletas.',text:<>Ahí decidí estudiar fisioterapia, pero hacerla distinto. Entender el deporte desde adentro, diagnosticar la causa real, y construir un proceso que devuelva al atleta más fuerte de lo que llegó. No parches. Proceso.</>},
+  ];
+  return <section className="gm-story"><div className="container">
+    <SgSectionHeader kicker="Mi historia" title="Empecé" subtitle="lesionado." intro="Primero fui el atleta que no lograba volver. Después decidí cambiar la forma de acompañar esa recuperación."/>
+    <div className="gm-story-moments">{moments.map((m,i)=><article key={m.step} className={"gm-story-moment gm-story-stage-"+i}><div className="gm-story-watermark" aria-hidden="true">{m.step}</div><div className="gm-story-meta"><span>{m.step}</span>{m.label}</div><h3>{m.title}</h3>
+      <div className="gm-story-visual">{i===0?<ol className="gm-story-loop"><li><span>01</span>Me trataban</li><li><span>02</span>Volvía a entrenar</li><li className="gm-loop-end"><span>03</span>Volvía el dolor <b aria-hidden="true">↺</b></li></ol>:i===1?<ul className="gm-story-questions"><li>¿Cómo levantaba?</li><li>¿Cuánto entrenaba?</li><li>¿Qué estaba fallando?</li></ul>:<div className="gm-story-process"><span>Entender la causa</span><span aria-hidden="true">↓</span><span>Construir la recuperación</span><span aria-hidden="true">↓</span><strong>Volver al deporte</strong></div>}</div>
+      <p className="gm-story-summary">{m.summary}</p><details className="gm-story-full"><summary>Leer esta parte de mi historia <span aria-hidden="true">＋</span></summary><p>{m.text}</p></details>
+    </article>)}</div>
+    <figure className="gm-story-quote"><span aria-hidden="true">“</span><div><blockquote>El fisio que me trataba nunca había sentido lo que es no poder cerrar la cadera bajo una barra. Yo sí.</blockquote><figcaption>Germán Montenegro · Fisioterapeuta y atleta</figcaption></div></figure>
+  </div></section>;
 }
 
-// =====================================================================
-// CREDENCIALES
-// =====================================================================
 function SobreCredenciales() {
   const creds = [
     { value: '2017', label: 'Ejerciendo desde', desc: '8 años de práctica clínica' },
@@ -17883,7 +16000,7 @@ function SobreCredenciales() {
           kicker="Formación · Credenciales"
           title="Lo que"
           subtitle="me respalda."
-          intro="Formación clínica seria + experiencia deportiva real. Las dos cosas importan — una sin la otra no devuelve atletas al deporte."
+          intro="Formación clínica seria + experiencia deportiva real. Las dos cosas importan, una sin la otra no devuelve atletas al deporte."
         />
 
         {/* Stats */}
@@ -17904,7 +16021,7 @@ function SobreCredenciales() {
                 fontFamily: 'Space Grotesk',
                 fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 lineHeight: 1,
                 letterSpacing: '-0.03em',
                 marginBottom: '0.75rem',
@@ -17948,7 +16065,7 @@ function SobreCredenciales() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '0.8125rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                 }}>{String(i + 1).padStart(2, '0')}</div>
                 <div style={{ fontSize: '1rem', color: '#0A0A0A', fontWeight: 500 }}>{f}</div>
               </div>
@@ -17979,8 +16096,8 @@ function SobrePractica() {
     { name: 'CrossFit', level: 'Atleta activo', years: '15 años', desc: 'WODs, levantamientos olímpicos, gimnásticos. Conozco el snatch, el muscle-up y el kipping desde adentro porque los entreno cada semana.', detail: 'Sé lo que es fallar un clean al 90%, el dolor de hombro tras 100 kipping pull-ups, la tirantez de cadera después de 150 wall balls. Esa experiencia cambia cómo trato a un crossfittero.' },
     { name: 'BJJ', level: 'Cinturón azul · 2× campeón nacional', years: '1 año', desc: 'Grappling, guardia, sumisiones. El jiu-jitsu castiga cuello, hombro y rodilla de formas muy específicas que solo entiendes si ruedas.', detail: 'Conozco la tensión de defender una llave de rodilla, el latigazo cervical de un mal mata-león, la sobrecarga de hombro de postear mil veces. Trato grapplers como grappler.' },
     { name: 'Boxeo', level: 'Practicante', years: '2 años', desc: 'Golpeo, guardia y trabajo de saco. El boxeo castiga mano, muñeca, hombro y cuello con un patrón propio que no se parece a ningún otro deporte.', detail: 'Conozco el cierre del puño al impacto, la rotación del hombro en el cross y la tensión cervical de la defensa. Cuando un boxeador me describe el dolor, sé qué parte del golpeo lo provoca.' },
-    { name: 'Weightlifting', level: 'Atleta', years: '10 años', desc: 'Sentadilla, peso muerto, levantamientos olímpicos. La barra exige técnica perfecta — y castiga el error con lesión.', detail: 'Entiendo la bisagra de cadera, la recepción profunda del clean, la posición overhead del jerk. Cuando un levantador me describe su dolor, sé exactamente qué gesto lo provoca.' },
-    { name: 'Otros', level: 'Trato profundamente', years: '8 años', desc: 'Running, danza y otros deportes que no practico pero trato a fondo con atletas de élite — análisis de pisada, demandas del ballet, gestión de cargas.', detail: 'No corro maratones ni bailo, pero he tratado a suficientes runners y bailarinas para entender sus gestos críticos. Cuando no vivo el deporte, lo estudio obsesivamente.' },
+    { name: 'Weightlifting', level: 'Atleta', years: '10 años', desc: 'Sentadilla, peso muerto, levantamientos olímpicos. La barra exige técnica perfecta, y castiga el error con lesión.', detail: 'Entiendo la bisagra de cadera, la recepción profunda del clean, la posición overhead del jerk. Cuando un levantador me describe su dolor, sé exactamente qué gesto lo provoca.' },
+    { name: 'Otros', level: 'Trato profundamente', years: '8 años', desc: 'Running, danza y otros deportes que no practico pero trato a fondo con atletas de élite, análisis de pisada, demandas del ballet, gestión de cargas.', detail: 'No corro maratones ni bailo, pero he tratado a suficientes runners y bailarinas para entender sus gestos críticos. Cuando no vivo el deporte, lo estudio obsesivamente.' },
   ];
 
   const current = deportes[active];
@@ -18071,7 +16188,7 @@ function SobrePractica() {
               backgroundSize: '32px 32px',
             }} />
             <div style={{ textAlign: 'center', position: 'relative' }}>
-              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A', marginBottom: '0.75rem' }}>[ Foto ]</div>
+              <div style={{ fontSize: '0.625rem', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', marginBottom: '0.75rem' }}>[ Foto ]</div>
               <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: 'rgba(10,10,10,0.35)', letterSpacing: '-0.02em' }}>Germán entrenando<br />{current.name}</div>
             </div>
           </div>
@@ -18084,7 +16201,7 @@ function SobrePractica() {
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 background: 'rgba(201,165,90,0.1)',
                 padding: '0.5rem 0.875rem',
               }}>{current.level}</span>
@@ -18107,7 +16224,7 @@ function SobrePractica() {
               color: '#0A0A0A',
               marginBottom: '1.5rem',
             }}>{current.name}.</h3>
-            <p style={{ fontSize: '1.0625rem', lineHeight: 1.6, color: 'rgba(10,10,10,0.7)', marginBottom: '1.5rem' }}>{current.desc}</p>
+            <DensePassage style={{ fontSize: '1.0625rem', lineHeight: 1.6, color: 'rgba(10,10,10,0.7)', marginBottom: '1.5rem' }}>{current.desc}</DensePassage>
             <div style={{
               padding: '1.25rem 1.5rem',
               background: '#FAFAFA',
@@ -18192,9 +16309,9 @@ function SobreMisLesiones() {
               flexDirection: 'column',
               gap: '1rem',
             }} className="sg-les-cell">
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.5rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.5rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
               <h3 style={{ fontSize: '1.5rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF', lineHeight: 1.05 }}>{l.name}.</h3>
-              <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: '#C9A55A' }}>{l.context}</div>
+              <div style={{ fontSize: '0.6875rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)' }}>{l.context}</div>
               <div style={{
                 marginTop: 'auto',
                 paddingTop: '1.25rem',
@@ -18229,7 +16346,7 @@ function SobreFilosofia() {
     { title: 'Diagnóstico antes que tratamiento', desc: 'No toco a nadie sin entender primero qué falló y por qué. El diagnóstico diferencial es la base.' },
     { title: 'Causa, no síntoma', desc: 'El dolor es la señal, no el problema. Trato el desbalance que lo produjo para que no regrese.' },
     { title: 'Proceso, no sesiones sueltas', desc: 'Cuatro fases: diagnóstico, tratamiento, fortalecimiento, return to play. Saltarse una garantiza recaída.' },
-    { title: 'Que no me necesites más', desc: 'El éxito no es que vuelvas cada semana. Es que vuelvas a tu deporte y no me necesites. 6—10 sesiones promedio.' },
+    { title: 'Que no me necesites más', desc: 'El éxito no es que vuelvas cada semana. Es que vuelvas a tu deporte y no me necesites. 6 a 10 sesiones promedio.' },
   ];
 
   return (
@@ -18263,10 +16380,10 @@ function SobreFilosofia() {
               minHeight: '220px',
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
-                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: '#C9A55A', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
+                <div style={{ fontFamily: 'Space Grotesk', fontSize: '3rem', fontWeight: 700, color: 'var(--gm-accent-ink, #80622D)', lineHeight: 0.85, letterSpacing: '-0.03em' }}>0{i + 1}</div>
                 <h3 style={{ fontSize: '1.375rem', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: '#0A0A0A' }}>{p.title}</h3>
               </div>
-              <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'rgba(10,10,10,0.65)' }}>{p.desc}</p>
+              <DensePassage style={{ fontSize: '1rem', lineHeight: 1.6, color: 'rgba(10,10,10,0.65)' }}>{p.desc}</DensePassage>
             </div>
           ))}
         </div>
@@ -18290,97 +16407,17 @@ function SobreComparativa() {
     { axis: 'Enfoque', trad: 'Trata el síntoma', ger: 'Diagnostica la causa' },
     { axis: 'Estructura', trad: 'Sesiones sueltas', ger: 'Proceso de 4 fases' },
     { axis: 'Objetivo', trad: 'Que baje el dolor', ger: 'Volver a competir más fuerte' },
-    { axis: 'Duración', trad: 'Indefinida', ger: '6—10 sesiones, fin claro' },
+    { axis: 'Duración', trad: 'Indefinida', ger: '6 a 10 sesiones, fin claro' },
   ];
 
-  return (
-    <section style={{
-      padding: '8rem 0',
-      background: '#FAFAFA',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-    }}>
-      <div className="container">
-        <SgSectionHeader
-          kicker="Por qué soy distinto"
-          title="Atleta-fisio"
-          subtitle="vs. fisio tradicional."
-          intro="La diferencia no es ego. Es que haber vivido la lesión cambia cómo la diagnosticas y cómo devuelves al atleta al deporte."
-        />
-
-        <div style={{ border: '1px solid rgba(10,10,10,0.08)', background: '#FFFFFF' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1.4fr 1.4fr',
-            background: '#0A0A0A',
-            color: '#FFFFFF',
-          }} className="sg-comp-row">
-            <div style={{ padding: '1.5rem 2rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600 }}>Eje</div>
-            </div>
-            <div style={{ padding: '1.5rem 2rem', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.5rem' }}>Fisio tradicional</div>
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.125rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>El estándar</div>
-            </div>
-            <div style={{ padding: '1.5rem 2rem', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: '#C9A55A' }} />
-              <div style={{ fontSize: '0.6875rem', color: '#C9A55A', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.5rem' }}>Germán Montenegro</div>
-              <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.125rem', fontWeight: 700, color: '#FFFFFF' }}>Atleta + Fisio</div>
-            </div>
-          </div>
-
-          {rows.map((r, i) => (
-            <div key={i} style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1.4fr 1.4fr',
-              borderTop: '1px solid rgba(10,10,10,0.06)',
-            }} className="sg-comp-row">
-              <div style={{ padding: '1.75rem 2rem', borderRight: '1px solid rgba(10,10,10,0.06)', background: '#FAFAFA' }}>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(10,10,10,0.4)', fontFamily: 'Space Grotesk', fontWeight: 600, marginBottom: '0.375rem' }}>{String(i + 1).padStart(2, '0')}</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.01em' }}>{r.axis}</div>
-              </div>
-              <div style={{
-                padding: '1.75rem 2rem',
-                borderRight: '1px solid rgba(10,10,10,0.06)',
-                color: 'rgba(10,10,10,0.45)',
-                fontSize: '1rem',
-                lineHeight: 1.5,
-                textDecoration: 'line-through',
-                textDecorationColor: 'rgba(10,10,10,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-              }}>{r.trad}</div>
-              <div style={{
-                padding: '1.75rem 2rem',
-                fontSize: '1rem',
-                lineHeight: 1.5,
-                color: '#0A0A0A',
-                fontWeight: 500,
-                background: 'rgba(201,165,90,0.04)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.875rem',
-              }}>
-                <div style={{ width: '6px', height: '6px', background: '#C9A55A', flexShrink: 0 }} />
-                {r.ger}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 768px) {
-          .sg-comp-row { grid-template-columns: 1fr !important; }
-          .sg-comp-row > div { border-right: none !important; }
-        }
-      ` }} />
-    </section>
-  );
+  const icons = ['M4 12h4l3-7 4 14 3-7h6','M12 3v4m0 10v4M3 12h4m10 0h4M7 7l3 3m4 4 3 3M7 17l3-3m4-4 3-3','M5 5h5v5H5zm9 0h5v5h-5zM5 14h5v5H5zm9 0h5v5h-5z','M4 19 10 13l4 3 6-11M14 5h6v6','M12 8v5l3 2M20 12a8 8 0 1 1-8-8'];
+  return <section className="gm-comparison"><div className="container">
+    <SgSectionHeader kicker="Por qué soy distinto" title="Atleta + fisio." subtitle="Una perspectiva distinta." intro="Haber vivido la lesión cambia cómo la diagnosticas y cómo acompañas al atleta de vuelta al deporte."/>
+    <div className="gm-comparison-layout"><aside className="gm-comparison-feature"><span className="gm-comparison-eyebrow">GERMÁN MONTENEGRO</span><div className="gm-comparison-mark" role="img" aria-label="Atleta y fisioterapeuta"><span><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="32" cy="22" r="5"/><path d="M25 34 32 30 39 34M25 34 19 22M39 34 45 22M32 30v14M32 44 23 54M32 44 41 54M13 16h38M13 11v10M18 9v14M46 9v14M51 11v10"/></svg></span><b aria-hidden="true">＋</b><span><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M29 12v13l7 7-7 9v12M35 12v11l9 9-9 12v9"/><circle cx="36" cy="32" r="3"/><path d="M10 42 17 33q2-3 5-1l6 5M10 42l7 8 10-7M54 22 47 31q-2 3-5 1l-6-5M54 22l-7-8-10 7"/><path d="M17 33v8l5 3M47 31v-8l-5-3"/></svg></span></div><h3>Conozco el esfuerzo.<br/><em>También el regreso.</em></h3><p>Mi experiencia entrenando forma parte de cómo evalúo, trato y acompaño la recuperación.</p><a {...navProps('metodologia')}>Conoce el proceso <span aria-hidden="true">↗</span></a></aside>
+    <div className="gm-comparison-cards">{rows.map((row,i)=><article key={row.axis} className="gm-comparison-card"><div className="gm-comparison-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={icons[i]}/></svg></div><div className="gm-comparison-copy"><h3>{row.axis}</h3><div className="gm-comparison-values"><div><span>Enfoque tradicional</span><p>{row.trad}</p></div><span className="gm-comparison-arrow" aria-hidden="true">→</span><div><span>Mi enfoque</span><p>{row.ger}</p></div></div></div><span className="gm-comparison-number" aria-hidden="true">0{i+1}</span></article>)}</div></div>
+  </div></section>;
 }
 
-// =====================================================================
-// TESTIMONIOS
-// =====================================================================
 function SobreTestimonios() {
   const testimonios = [
     { quote: 'Llevaba 8 meses con pubalgia y tres fisios distintos. Germán fue el primero que me explicó por qué me pasó. Volví a competir en 10 semanas.', author: 'Andrés M.', sport: 'CrossFit · 34 años' },
@@ -18418,7 +16455,7 @@ function SobreTestimonios() {
             }}>
               <div style={{ display: 'flex', gap: '0.25rem' }}>
                 {[1,2,3,4,5].map(s => (
-                  <span key={s} style={{ color: '#C9A55A', fontSize: '1rem' }}>★</span>
+                  <span key={s} style={{ color: 'var(--gm-accent-ink, #80622D)', fontSize: '1rem' }}>★</span>
                 ))}
               </div>
               <p style={{
@@ -18437,7 +16474,7 @@ function SobreTestimonios() {
                 borderTop: '1px solid rgba(10,10,10,0.08)',
               }}>
                 <div style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'Space Grotesk', color: '#0A0A0A', letterSpacing: '-0.01em' }}>{t.author}</div>
-                <div style={{ fontSize: '0.8125rem', color: '#C9A55A', fontWeight: 600, letterSpacing: '0.02em', marginTop: '0.25rem' }}>{t.sport}</div>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--gm-accent-ink, #80622D)', fontWeight: 600, letterSpacing: '0.02em', marginTop: '0.25rem' }}>{t.sport}</div>
               </div>
             </div>
           ))}
@@ -18490,7 +16527,7 @@ function SobreCTA({ onNavigate }) {
             pointerEvents: 'none',
           }} />
           <div style={{ position: 'relative' }}>
-            <div style={{ fontSize: '0.75rem', color: '#C9A55A', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '1.5rem' }}>
               Trabajemos juntos
             </div>
             <h2 style={{
@@ -18503,7 +16540,7 @@ function SobreCTA({ onNavigate }) {
             }}>
               ¿Listo para
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>volver?</span>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>volver?</span>
             </h2>
             <p style={{ fontSize: '1.125rem', lineHeight: 1.55, color: 'rgba(255,255,255,0.7)', maxWidth: '520px' }}>
               Primera sesión: evaluación completa + diagnóstico preciso + plan personalizado. 60 minutos con un fisio que entiende tu deporte porque lo practica.
@@ -18645,6 +16682,7 @@ function Nav({ currentPage, onNavigate }) {
   // Arranca igual que en el servidor; el valor real se aplica en el efecto.
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef(null);
   const lastYRef = useRef(0);
 
   useEffect(() => {
@@ -18680,8 +16718,7 @@ function Nav({ currentPage, onNavigate }) {
   const logoColor = lightText ? '#FFFFFF' : '#0A0A0A';
 
   return (
-    <nav style={{
-      position: 'fixed',
+    <nav className="gm-nav" onKeyDown={e=>{if(e.key==='Escape' && menuOpen){setMenuOpen(false);menuButtonRef.current?.focus();}}} aria-label="Navegación principal" style={{ position: 'fixed',
       top: 0,
       left: 0,
       right: 0,
@@ -18712,7 +16749,7 @@ function Nav({ currentPage, onNavigate }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, transition: 'border-color 0.4s',
           }}>
-            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9375rem', color: '#C9A55A', letterSpacing: '-0.03em' }}>GM</span>
+            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9375rem', color: 'var(--gm-accent-ink, #80622D)', letterSpacing: '-0.03em' }}>GM</span>
           </div>
           <div style={{ lineHeight: 1 }}>
             <div style={{
@@ -18723,7 +16760,7 @@ function Nav({ currentPage, onNavigate }) {
             </div>
             <div style={{
               fontSize: '0.5625rem', letterSpacing: '0.25em', textTransform: 'uppercase',
-              fontWeight: 600, color: '#C9A55A', marginTop: '0.1875rem',
+              fontWeight: 600, color: 'var(--gm-accent-ink, #80622D)', marginTop: '0.1875rem',
             }}>
               Fisioterapia Deportiva
             </div>
@@ -18764,7 +16801,10 @@ function Nav({ currentPage, onNavigate }) {
           <ThemeToggle lightText={lightText} />
           <button
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="Menú"
+            ref={menuButtonRef}
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            aria-controls="gm-mobile-menu"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               display: 'flex', flexDirection: 'column', gap: '5px', padding: '0.5rem',
@@ -18784,7 +16824,7 @@ function Nav({ currentPage, onNavigate }) {
       </div>
 
       {/* Mobile menu panel */}
-      <div className="nav-mobile-panel" style={{
+      <div id="gm-mobile-menu" inert={menuOpen ? undefined : ''} aria-hidden={!menuOpen} className="nav-mobile-panel" style={{
         display: 'none',
         maxHeight: menuOpen ? '420px' : '0',
         overflow: 'hidden',
@@ -18805,7 +16845,7 @@ function Nav({ currentPage, onNavigate }) {
               }}
             >
               {l.label}
-              <span style={{ color: '#C9A55A', fontSize: '1rem' }}>→</span>
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)', fontSize: '1rem' }}>→</span>
             </a>
           ))}
           <button
@@ -18905,17 +16945,7 @@ function ThemeToggle({ lightText }) {
 
 // HOME PAGE
 function HomePage({ onNavigate }) {
-  return (
-    <main>
-      <HeroSection onNavigate={onNavigate} />
-      <TrustNumbers />
-      <MethodologySection />
-      <BodyMapSection onNavigate={onNavigate} />
-      <InjuriesSection onNavigate={onNavigate} />
-      <SportsSection onNavigate={onNavigate} />
-      <ContactSection />
-    </main>
-  );
+  return <HomeExperience bodyMap={<BodyMapSection onNavigate={onNavigate}/>}/>;
 }
 
 function HeroSection({ onNavigate }) {
@@ -18988,7 +17018,7 @@ function HeroSection({ onNavigate }) {
         fontFamily: 'Space Grotesk',
         fontWeight: 500,
       }}>
-        EST. 2017 — BOGOTÁ
+        EST. 2017, BOGOTÁ
       </div>
       
       {/* Floating numbers */}
@@ -19028,7 +17058,7 @@ function HeroSection({ onNavigate }) {
               fontWeight: 600,
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
             }}>
               Germán Montenegro · Fisioterapeuta Deportivo
             </div>
@@ -19048,7 +17078,7 @@ function HeroSection({ onNavigate }) {
             <span style={{
               fontStyle: 'italic',
               fontWeight: 400,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
             }}>
               más fuerte.
             </span>
@@ -19090,7 +17120,7 @@ function HeroSection({ onNavigate }) {
             <span style={{ width: '7px', height: '7px', background: '#C9A55A', flexShrink: 0 }} />
             <span style={{
               fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1.0625rem',
-              letterSpacing: '-0.01em', color: '#C9A55A',
+              letterSpacing: '-0.01em', color: 'var(--gm-accent-ink, #80622D)',
             }}>#latecnicaprimero</span>
             <span style={{
               fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase',
@@ -19175,7 +17205,7 @@ function HeroSection({ onNavigate }) {
             }}>
               <div style={{ display: 'flex', gap: '0.125rem' }}>
                 {[1,2,3,4,5].map(i => (
-                  <span key={i} style={{ color: '#C9A55A', fontSize: '1rem' }}>★</span>
+                  <span key={i} style={{ color: 'var(--gm-accent-ink, #80622D)', fontSize: '1rem' }}>★</span>
                 ))}
               </div>
               <div>
@@ -19298,7 +17328,7 @@ function TrustNumbers() {
                     fontFamily: 'Space Grotesk',
                     fontWeight: 700,
                     lineHeight: 1,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     letterSpacing: '-0.03em',
                   }}>
                     {item.value}
@@ -19414,7 +17444,7 @@ function MethodologySection() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -19431,7 +17461,7 @@ function MethodologySection() {
             }}>
               No es servicio,
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>es proceso.</span>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>es proceso.</span>
             </h2>
           </div>
           
@@ -19474,7 +17504,7 @@ function MethodologySection() {
           <div>
             <div style={{
               fontSize: '0.75rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -19492,7 +17522,7 @@ function MethodologySection() {
             }}>
               {phases[activePhase].title}
               <br />
-              <span style={{ color: '#C9A55A' }}>{phases[activePhase].subtitle}.</span>
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>{phases[activePhase].subtitle}.</span>
             </h3>
             <p style={{
               fontSize: '1.25rem',
@@ -19538,7 +17568,7 @@ function MethodologySection() {
                     flexShrink: 0,
                     fontSize: '0.75rem',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                   }}>
                     {j + 1}
                   </div>
@@ -19605,7 +17635,7 @@ function InjuriesSection({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -19622,7 +17652,7 @@ function InjuriesSection({ onNavigate }) {
             }}>
               Si te lesionaste,
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 tengo el plan.
               </span>
             </h2>
@@ -19643,7 +17673,7 @@ function InjuriesSection({ onNavigate }) {
               fontSize: '0.875rem',
               color: 'rgba(10,10,10,0.5)',
             }}>
-              <span style={{ color: '#C9A55A', fontWeight: 700 }}>9</span> lesiones · <span style={{ color: '#C9A55A', fontWeight: 700 }}>500+</span> casos resueltos
+              <span style={{ color: 'var(--gm-accent-ink, #80622D)', fontWeight: 700 }}>9</span> lesiones · <span style={{ color: 'var(--gm-accent-ink, #80622D)', fontWeight: 700 }}>500+</span> casos resueltos
             </div>
           </div>
         </div>
@@ -19799,7 +17829,7 @@ function SportsSection({ onNavigate }) {
       name: 'Weightlifting', 
       page: 'weightlifting',
       tagline: 'La barra sin compensaciones',
-      description: 'Sentadilla, snatch, clean & jerk. Recepción profunda, bisagra de cadera y posición overhead — desde adentro porque las entreno.',
+      description: 'Sentadilla, snatch, clean & jerk. Recepción profunda, bisagra de cadera y posición overhead, desde adentro porque las entreno.',
       stats: [
         { value: '90+', label: 'Levantadores' },
         { value: '10 años', label: 'En la barra' },
@@ -19879,7 +17909,7 @@ function SportsSection({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -19896,7 +17926,7 @@ function SportsSection({ onNavigate }) {
             }}>
               Los entreno.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Los entiendo.
               </span>
             </h2>
@@ -19939,7 +17969,7 @@ function SportsSection({ onNavigate }) {
           <div>
             <div style={{
               fontSize: '0.75rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -19959,7 +17989,7 @@ function SportsSection({ onNavigate }) {
               {current.name}.
             </h3>
             
-            <p style={{
+            <DensePassage style={{
               fontSize: '1.25rem',
               lineHeight: 1.6,
               color: 'rgba(255,255,255,0.7)',
@@ -19967,7 +17997,7 @@ function SportsSection({ onNavigate }) {
               marginBottom: '3rem',
             }}>
               {current.description}
-            </p>
+            </DensePassage>
             
             {/* Stats */}
             <div style={{
@@ -19981,7 +18011,7 @@ function SportsSection({ onNavigate }) {
                     fontSize: '2.5rem',
                     fontFamily: 'Space Grotesk',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     lineHeight: 1,
                     marginBottom: '0.5rem',
                   }}>
@@ -20033,7 +18063,7 @@ function SportsSection({ onNavigate }) {
           }}>
             <div style={{
               fontSize: '0.6875rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -20165,7 +18195,7 @@ function ContactSection() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -20187,7 +18217,7 @@ function ContactSection() {
               <span style={{ 
                 fontStyle: 'italic', 
                 fontWeight: 400,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
               }}>
                 volver?
               </span>
@@ -20280,7 +18310,7 @@ function ContactSection() {
                     fontSize: '1.75rem',
                     fontFamily: 'Space Grotesk',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     lineHeight: 1,
                     marginBottom: '0.5rem',
                   }}>
@@ -20432,21 +18462,7 @@ function ContactSection() {
 
 // PLACEHOLDER PAGES
 function FisioterapiaPage({ onNavigate }) {
-  const [openFaq, setOpenFaq] = useState(0);
-  
-  return (
-    <main>
-      <FisioHero onNavigate={onNavigate} />
-      <FisioAQuienAyudo onNavigate={onNavigate} />
-      <FisioMetodo />
-      <FisioTecnicas onNavigate={onNavigate} />
-      <FisioPorQueDiferente />
-      <FisioLesiones onNavigate={onNavigate} />
-      <FisioUbicacion />
-      <FisioAgendar onNavigate={onNavigate} />
-      <FisioFAQ openFaq={openFaq} setOpenFaq={setOpenFaq} />
-    </main>
-  );
+  return <PhysioExperience/>;
 }
 
 // FISIOTERAPIA - HERO
@@ -20533,7 +18549,7 @@ function FisioHero({ onNavigate }) {
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#C9A55A' }} />
             <div style={{
               fontSize: '0.8125rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -20649,7 +18665,7 @@ function FisioHero({ onNavigate }) {
                   fontSize: '2.5rem',
                   fontFamily: 'Space Grotesk',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 1,
                   marginBottom: '0.75rem',
                   letterSpacing: '-0.02em',
@@ -20772,7 +18788,7 @@ function FisioAQuienAyudo({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -20897,7 +18913,7 @@ function FisioAQuienAyudo({ onNavigate }) {
               }}>
                 <span style={{
                   fontSize: '0.75rem',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   fontWeight: 700,
                   letterSpacing: '0.05em',
                   textTransform: 'uppercase',
@@ -20970,7 +18986,7 @@ function FisioMetodo() {
       number: '04',
       title: 'Return to Play',
       duration: '2-4 semanas',
-      desc: 'Readaptación al gesto deportivo específico. CrossFit, BJJ, running, danza — cada deporte tiene demandas únicas. Vuelves más fuerte que antes, sin recaídas.',
+      desc: 'Readaptación al gesto deportivo específico. CrossFit, BJJ, running, danza, cada deporte tiene demandas únicas. Vuelves más fuerte que antes, sin recaídas.',
       points: ['Readaptación al gesto', 'Test funcional', 'Vuelves más fuerte', 'Cero recaídas'],
     },
   ];
@@ -21027,7 +19043,7 @@ function FisioMetodo() {
             <div>
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 marginBottom: '2rem',
@@ -21046,7 +19062,7 @@ function FisioMetodo() {
               }}>
                 No es servicio suelto.
                 <br />
-                <span style={{ color: '#C9A55A', fontStyle: 'italic', fontWeight: 400 }}>
+                <span style={{ color: 'var(--gm-accent-ink, #80622D)', fontStyle: 'italic', fontWeight: 400 }}>
                   Es proceso.
                 </span>
               </h2>
@@ -21110,7 +19126,7 @@ function FisioMetodo() {
                   fontFamily: 'Space Grotesk',
                   fontSize: '8rem',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 0.9,
                   letterSpacing: '-0.04em',
                   marginBottom: '1rem',
@@ -21131,7 +19147,7 @@ function FisioMetodo() {
                 
                 <div style={{
                   fontSize: '0.875rem',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   marginBottom: '2rem',
                   fontWeight: 600,
                   letterSpacing: '0.05em',
@@ -21273,7 +19289,7 @@ function FisioTecnicas({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -21290,7 +19306,7 @@ function FisioTecnicas({ onNavigate }) {
             }}>
               Seis técnicas.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Un solo proceso.
               </span>
             </h2>
@@ -21393,7 +19409,7 @@ function FisioTecnicas({ onNavigate }) {
                 fontFamily: 'Space Grotesk',
                 fontSize: '6rem',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 lineHeight: 0.9,
                 letterSpacing: '-0.04em',
                 marginBottom: '1.5rem',
@@ -21418,7 +19434,7 @@ function FisioTecnicas({ onNavigate }) {
               
               <p style={{
                 fontSize: '1rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '2rem',
                 fontStyle: 'italic',
                 fontWeight: 500,
@@ -21519,7 +19535,7 @@ function FisioPorQueDiferente() {
     {
       axis: 'Cuánto dura',
       tradicional: '20+ sesiones, eternizado',
-      indestructible: '6—10 sesiones, objetivo claro',
+      indestructible: '6 a 10 sesiones, objetivo claro',
     },
     {
       axis: 'Qué buscas',
@@ -21577,7 +19593,7 @@ function FisioPorQueDiferente() {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -21595,7 +19611,7 @@ function FisioPorQueDiferente() {
             }}>
               No vengas si
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 buscas un masaje.
               </span>
             </h2>
@@ -21665,7 +19681,7 @@ function FisioPorQueDiferente() {
               }} />
               <div style={{
                 fontSize: '0.6875rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
@@ -21760,7 +19776,7 @@ function FisioPorQueDiferente() {
           <div style={{
             fontSize: '4rem',
             fontFamily: 'Space Grotesk',
-            color: '#C9A55A',
+            color: 'var(--gm-accent-ink, #80622D)',
             lineHeight: 0.5,
             marginBottom: '1rem',
           }}>
@@ -21776,7 +19792,7 @@ function FisioPorQueDiferente() {
             fontStyle: 'italic',
             marginBottom: '1.5rem',
           }}>
-            Si nunca te has lesionado entrenando, no entiendes lo que <span style={{ color: '#C9A55A' }}>realmente</span> significa volver.
+            Si nunca te has lesionado entrenando, no entiendes lo que <span style={{ color: 'var(--gm-accent-ink, #80622D)' }}>realmente</span> significa volver.
           </p>
           <div style={{
             fontSize: '0.8125rem',
@@ -21784,8 +19800,7 @@ function FisioPorQueDiferente() {
             textTransform: 'uppercase',
             color: 'rgba(10,10,10,0.5)',
             fontWeight: 600,
-          }}>
-            — Germán Montenegro
+          }}>, Germán Montenegro
           </div>
         </div>
       </div>
@@ -21806,15 +19821,15 @@ function FisioLesiones({ onNavigate }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   
   const lesiones = [
-    { name: 'Pubalgia', zone: 'Ingle / Pelvis', complexity: 'Alta', recovery: '4–12 sem', page: 'pubalgia', active: true },
-    { name: 'Ciática', zone: 'Lumbar / Pierna', complexity: 'Media', recovery: '3–8 sem', page: 'ciatica', active: true },
-    { name: 'Tendinitis Rotuliana', zone: 'Rodilla', complexity: 'Media', recovery: '4–10 sem', page: 'tendinitis', active: true },
-    { name: 'Hombro Congelado', zone: 'Hombro', complexity: 'Alta', recovery: '8–24 sem', page: 'hombro', active: true },
-    { name: 'Contractura Muscular', zone: 'Muscular', complexity: 'Baja', recovery: '1–3 sem', page: 'contractura' },
-    { name: 'Bursitis', zone: 'Articular', complexity: 'Media', recovery: '3–6 sem', page: 'bursitis' },
-    { name: 'Condromalacia', zone: 'Rodilla', complexity: 'Media', recovery: '6–12 sem', page: 'condromalacia' },
-    { name: 'Periostitis Tibial', zone: 'Tibia', complexity: 'Baja', recovery: '2–6 sem', page: 'periostitis' },
-    { name: 'Epitrocleítis', zone: 'Codo', complexity: 'Media', recovery: '4–8 sem', page: 'epitrocleitis' },
+    { name: 'Pubalgia', zone: 'Ingle / Pelvis', complexity: 'Alta', recovery: '4 a 12 sem', page: 'pubalgia', active: true },
+    { name: 'Ciática', zone: 'Lumbar / Pierna', complexity: 'Media', recovery: '3 a 8 sem', page: 'ciatica', active: true },
+    { name: 'Tendinitis Rotuliana', zone: 'Rodilla', complexity: 'Media', recovery: '4 a 10 sem', page: 'tendinitis', active: true },
+    { name: 'Hombro Congelado', zone: 'Hombro', complexity: 'Alta', recovery: '8 a 24 sem', page: 'hombro', active: true },
+    { name: 'Contractura Muscular', zone: 'Muscular', complexity: 'Baja', recovery: '1 a 3 sem', page: 'contractura' },
+    { name: 'Bursitis', zone: 'Articular', complexity: 'Media', recovery: '3 a 6 sem', page: 'bursitis' },
+    { name: 'Condromalacia', zone: 'Rodilla', complexity: 'Media', recovery: '6 a 12 sem', page: 'condromalacia' },
+    { name: 'Periostitis Tibial', zone: 'Tibia', complexity: 'Baja', recovery: '2 a 6 sem', page: 'periostitis' },
+    { name: 'Epitrocleítis', zone: 'Codo', complexity: 'Media', recovery: '4 a 8 sem', page: 'epitrocleitis' },
   ];
   
   const complexityColor = (c) => c === 'Alta' ? '#DC2626' : c === 'Media' ? '#C9A55A' : '#16A34A';
@@ -21846,7 +19861,7 @@ function FisioLesiones({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -21864,7 +19879,7 @@ function FisioLesiones({ onNavigate }) {
             }}>
               Lo que trato.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Lo que resuelvo.
               </span>
             </h2>
@@ -22049,7 +20064,7 @@ function FisioLesiones({ onNavigate }) {
           color: 'rgba(10,10,10,0.5)',
           maxWidth: '600px',
         }}>
-          ¿No ves tu lesión? Significa que aún no escribí su protocolo público — pero la trato igual. Agenda una valoración y la evaluamos.
+          ¿No ves tu lesión? Significa que aún no escribí su protocolo público, pero la trato igual. Agenda una valoración y la evaluamos.
         </div>
       </div>
       
@@ -22083,8 +20098,8 @@ function FisioUbicacion() {
     },
     {
       label: 'Horarios',
-      lines: ['Lun—Vie · 7:00 a 19:00', 'Sáb · 8:00 a 14:00'],
-      meta: 'Citas de 45–60 min',
+      lines: ['Lun, Vie · 7:00 a 19:00', 'Sáb · 8:00 a 14:00'],
+      meta: 'Citas de 45 a 60 min',
     },
     {
       label: 'Logística',
@@ -22116,7 +20131,7 @@ function FisioUbicacion() {
             <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
             <div style={{
               fontSize: '0.75rem',
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               fontWeight: 600,
@@ -22134,7 +20149,7 @@ function FisioUbicacion() {
           }}>
             Dónde
             <br />
-            <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+            <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
               me encuentras.
             </span>
           </h2>
@@ -22148,7 +20163,7 @@ function FisioUbicacion() {
           border: '1px solid rgba(10,10,10,0.08)',
           background: '#FFFFFF',
         }} className="ubic-grid">
-          {/* Map placeholder — abstract grid */}
+          {/* Map placeholder, abstract grid */}
           <div style={{
             position: 'relative',
             minHeight: '520px',
@@ -22311,7 +20326,7 @@ function FisioUbicacion() {
                   <div style={{
                     fontSize: '0.6875rem',
                     fontWeight: 700,
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                     letterSpacing: '0.25em',
                     textTransform: 'uppercase',
                   }}>
@@ -22373,7 +20388,7 @@ function FisioAgendar({ onNavigate }) {
     {
       label: 'Paso 03',
       title: 'Vuelves',
-      description: '6—10 sesiones promedio. Vuelves a entrenar más fuerte que cuando llegaste.',
+      description: '6 a 10 sesiones promedio. Vuelves a entrenar más fuerte que cuando llegaste.',
     },
   ];
   
@@ -22443,7 +20458,7 @@ function FisioAgendar({ onNavigate }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -22460,7 +20475,7 @@ function FisioAgendar({ onNavigate }) {
             }}>
               Tres pasos.
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 Cero atajos.
               </span>
             </h2>
@@ -22500,7 +20515,7 @@ function FisioAgendar({ onNavigate }) {
                   fontFamily: 'Space Grotesk',
                   fontSize: 'clamp(4rem, 6vw, 6rem)',
                   fontWeight: 700,
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   lineHeight: 0.85,
                   letterSpacing: '-0.04em',
                   marginBottom: '0.5rem',
@@ -22529,13 +20544,13 @@ function FisioAgendar({ onNavigate }) {
                 }}>
                   {step.title}.
                 </h3>
-                <p style={{
+                <DensePassage style={{
                   fontSize: '1rem',
                   lineHeight: 1.55,
                   color: 'rgba(255,255,255,0.65)',
                 }}>
                   {step.description}
-                </p>
+                </DensePassage>
               </div>
               
               {/* Connecting arrow */}
@@ -22553,7 +20568,7 @@ function FisioAgendar({ onNavigate }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '0.875rem',
-                  color: '#C9A55A',
+                  color: 'var(--gm-accent-ink, #80622D)',
                   zIndex: 2,
                 }} className="ag-arrow">
                   →
@@ -22700,7 +20715,7 @@ function FisioAgendar({ onNavigate }) {
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               fontWeight: 700,
-              color: '#C9A55A',
+              color: 'var(--gm-accent-ink, #80622D)',
               marginBottom: '2rem',
             }}>
               Qué incluye la primera sesión
@@ -22737,7 +20752,7 @@ function FisioAgendar({ onNavigate }) {
                   </div>
                   <div style={{
                     fontSize: '0.875rem',
-                    color: '#C9A55A',
+                    color: 'var(--gm-accent-ink, #80622D)',
                   }}>
                     ✓
                   </div>
@@ -22754,7 +20769,7 @@ function FisioAgendar({ onNavigate }) {
               lineHeight: 1.55,
               color: 'rgba(255,255,255,0.7)',
             }}>
-              <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>Sin compromiso.</strong> Si en los primeros diez minutos veo que no soy la persona indicada para tu caso, te lo digo y te derivo. No es venta — es proceso.
+              <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>Sin compromiso.</strong> Si en los primeros diez minutos veo que no soy la persona indicada para tu caso, te lo digo y te derivo. No es venta, es proceso.
             </div>
           </div>
         </div>
@@ -22786,7 +20801,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
     {
       category: 'Proceso',
       q: '¿Cuántas sesiones se necesitan en promedio?',
-      a: 'Promedio: 6—10 sesiones distribuidas en 8—12 semanas. Depende de la severidad de la lesión y adherencia al plan de fortalecimiento. El objetivo es que no me necesites más.',
+      a: 'Promedio: 6 a 10 sesiones distribuidas en 8 a 12 semanas. Depende de la severidad de la lesión y adherencia al plan de fortalecimiento. El objetivo es que no me necesites más.',
     },
     {
       category: 'Logística',
@@ -22867,7 +20882,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
               <div style={{ width: '40px', height: '1px', background: '#C9A55A' }} />
               <div style={{
                 fontSize: '0.75rem',
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
@@ -22885,7 +20900,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
             }}>
               Lo que
               <br />
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#C9A55A' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--gm-accent-ink, #80622D)' }}>
                 me preguntan.
               </span>
             </h2>
@@ -22934,7 +20949,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
                 const count = cat === 'Todo' ? faqs.length : faqs.filter(f => f.category === cat).length;
                 const isActive = activeCategory === cat;
                 return (
-                  <button
+                  <button aria-pressed={isActive}
                     key={cat}
                     onClick={() => { setActiveCategory(cat); setOpenFaq(0); }}
                     style={{
@@ -23005,7 +21020,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: '#C9A55A',
+                color: 'var(--gm-accent-ink, #80622D)',
                 marginBottom: '0.5rem',
               }}>
                 ¿No la ves?
@@ -23083,7 +21098,7 @@ function FisioFAQ({ openFaq, setOpenFaq }) {
                         letterSpacing: '0.25em',
                         textTransform: 'uppercase',
                         fontWeight: 600,
-                        color: '#C9A55A',
+                        color: 'var(--gm-accent-ink, #80622D)',
                         marginBottom: '0.5rem',
                       }}>
                         {faq.category}
