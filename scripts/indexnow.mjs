@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
 const HOST = "germanmontenegro.fit";
 const CLAVE = "c8ef2bc0d1248ba8bb499175c8225f83";
-const ENDPOINT = "https://api.indexnow.org/IndexNow";
+const ENDPOINT = "https://api.indexnow.org/indexnow";
 
 // Unica fuente de verdad de las rutas: lib/routes.js. Se lee como texto porque
 // ese archivo es ESM y el proyecto no declara "type": "module".

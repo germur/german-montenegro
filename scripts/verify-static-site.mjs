@@ -30,6 +30,7 @@ for (const [page, path] of routes) {
   assert.ok(!html.includes('/_next/') && !html.includes('__next_f'), `${path}: no Next runtime`);
   assert.ok(!html.includes('client="only"'), `${path}: must prerender content`);
   for (const match of html.matchAll(/href="(\/[^"#?]*)"/g)) {
+    if (match[1].startsWith('/_astro/')) continue; // Assets are checked for existence below.
     assert.ok(Object.values(PAGE_TO_PATH).includes(match[1]), `${path}: broken internal route ${match[1]}`);
     if (page === 'home') homeLinks.add(match[1]);
   }

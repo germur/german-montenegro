@@ -24,6 +24,7 @@ npm start
 - `lib/seo.js`: títulos y descripciones de las páginas, conservados en la migración.
 - `components/ClientApp.jsx`: componente React prerenderizado por Astro y posteriormente hidratado para las funciones interactivas.
 - `components/prototype/bundle.jsx`: componentes del diseño original. Los enlaces cargan documentos estáticos con sus propios metadatos.
+- `components/site/Experience.jsx` y `lib/experience-content.json`: plantillas y contenidos de la experiencia publicada, con sus estilos en `src/styles/experience.css`.
 - `scripts/gen-seo-files.mjs`: genera `sitemap.xml`, `sitemap-1.xml`, `sitemap.txt` y `robots.txt` en `public/`, que Astro copia a `dist/`.
 - `src/pages/404.astro`: página de error sin indexación.
 
@@ -31,6 +32,8 @@ Las URLs y el dominio canónico `https://germanmontenegro.fit` se conservan. `ww
 
 ## Despliegue
 
-Netlify usa `npm run build && npm test`, Node 24 y la carpeta `dist`. `NETLIFY_NEXT_PLUGIN_SKIP=true` desactiva la ejecución del runtime de Next heredado de la configuración del proyecto en Netlify. Astro no necesita un adaptador de servidor. Las pruebas de navegación y diseño en escritorio y móvil complementan las comprobaciones del build.
+Netlify usa `npm run build && npm test && npm run indexnow`, Node 24 y la carpeta `dist`. `NETLIFY_NEXT_PLUGIN_SKIP=true` desactiva la ejecución del runtime de Next heredado de la configuración del proyecto en Netlify. Astro no necesita un adaptador de servidor. Las pruebas de navegación y diseño en escritorio y móvil complementan las comprobaciones del build.
+
+`npm run indexnow` notifica las 23 URLs al endpoint compartido de IndexNow solo con `CONTEXT=production`, después de superar las pruebas. En local y en previews omite el envío; `npm run indexnow -- --dry-run` muestra el lote sin enviarlo. La clave de verificación se publica desde `public/`. La recepción HTTP 200 o 202 no garantiza indexación. Los despliegues manuales que omitan el build no ejecutan esta notificación.
 
 La migración cambia la infraestructura de entrega. La lectura del sitemap en Search Console debe comprobarse después de publicar; un build correcto no demuestra que Google haya aceptado el sitemap.

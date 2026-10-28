@@ -1,5 +1,6 @@
 ---
 import '../styles/globals.css';
+import '../styles/experience.css';
 import { SITE_URL, HOME_TITLE, DEFAULT_DESCRIPTION } from '../../lib/seo.js';
 
 const { title = HOME_TITLE, description = DEFAULT_DESCRIPTION, path = '/', noindex = false } = Astro.props;
@@ -47,3 +48,4 @@ const canonical = path === '/' ? SITE_URL : new URL(path, SITE_URL).href;
     </script>
   </body>
 </html>
+
