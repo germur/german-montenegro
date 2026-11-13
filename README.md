@@ -43,3 +43,7 @@ Los sitemaps conservan las 23 URLs y sus direcciones públicas. Se omite `lastmo
 ## Medición de contactos
 
 Analytics se activa solo en el dominio de producción. Los clics en los enlaces actuales de WhatsApp y teléfono generan `contact_click`, con `contact_method`, `contact_placement` y la dirección de la página sin parámetros ni fragmento. No se envían el texto del botón ni el mensaje de WhatsApp. El evento mide intención de contacto, no una conversación iniciada ni una cita confirmada. La recepción en GA4 y su configuración como evento clave deben verificarse por separado con acceso a la propiedad; las previews y la revisión local no generan esos datos.
+
+## Identidad y enlaces publicados
+
+`lib/structured-data.js` genera un grafo JSON-LD con `Person`, `WebSite`, `WebPage` y rutas de navegación; la biografía usa `ProfilePage`. Solo se declaran la identidad y el teléfono ya visibles. La dirección exacta, certificaciones, perfiles sociales y valoraciones necesitan confirmación antes de incorporarse. El pie contiene destinos reales de contacto y metodología; las antiguas etiquetas de privacidad, términos y redes no tenían enlaces. Esas páginas y perfiles quedan pendientes de contenido o destinos confirmados.

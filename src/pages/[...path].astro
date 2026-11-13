@@ -16,6 +16,6 @@ const seo = PAGE_SEO[page];
 const title = pageTitle(page);
 const description = seo.description || DEFAULT_DESCRIPTION;
 ---
-<SiteLayout title={title} description={description} path={path}>
+<SiteLayout title={title} description={description} path={path} page={page}>
   <SiteApp page={page} client:load />
 </SiteLayout>

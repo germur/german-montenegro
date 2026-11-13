@@ -2,9 +2,12 @@
 import '../styles/globals.css';
 import '../styles/experience.css';
 import { SITE_URL, HOME_TITLE, DEFAULT_DESCRIPTION } from '../../lib/seo.js';
+import { structuredData } from '../../lib/structured-data.js';
 
-const { title = HOME_TITLE, description = DEFAULT_DESCRIPTION, path = '/', noindex = false } = Astro.props;
+const { title = HOME_TITLE, description = DEFAULT_DESCRIPTION, path = '/', page = 'home', noindex = false } = Astro.props;
 const canonical = path === '/' ? SITE_URL : new URL(path, SITE_URL).href;
+const schema = structuredData({ page, path, description });
+const schemaJson = JSON.stringify(schema).replaceAll('<', '\\u003c');
 ---
 <!doctype html>
 <html lang="es">
@@ -17,6 +20,7 @@ const canonical = path === '/' ? SITE_URL : new URL(path, SITE_URL).href;
     <meta name="author" content="Germán Montenegro" />
     <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
     {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && <script type="application/ld+json" set:html={schemaJson} />}
     <meta name="google-site-verification" content="xyptqAjEss_aO6dTu81bKRRgfubvYQDeBGPj0cSrLM4" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CO" />

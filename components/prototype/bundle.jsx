@@ -5,6 +5,7 @@ import { HomeExperience, AboutExperience, PhysioExperience, InjuryCatalogExperie
 import * as THREE from "three";
 import { pageToPath } from "@/lib/routes";
 import { PHONE_DISPLAY, PHONE_HREF, WHATSAPP_URL } from "@/lib/contact";
+import { FOOTER_CONTACTS } from "@/lib/structured-data";
 
 
 // Keep complete explanations in static HTML while foregrounding their main point.
@@ -1714,11 +1715,11 @@ function SiteFooter({ onNavigate }) {
             © 2026 Germán Montenegro · Todos los derechos reservados
           </div>
           <div style={{ display: 'flex', gap: '1.75rem', alignItems: 'center' }}>
-            {['Privacidad', 'Términos', 'Instagram', 'YouTube'].map(l => (
-              <a key={l} style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'none', transition: 'color 0.25s' }}
+            {FOOTER_CONTACTS.map(link => (
+              <a key={link.label} href={link.href} style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'none', transition: 'color 0.25s' }}
                  onMouseEnter={(e) => e.currentTarget.style.color = '#C9A55A'}
                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}>
-                {l}
+                {link.label}
               </a>
             ))}
           </div>
