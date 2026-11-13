@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { PAGE_TO_PATH } from '../lib/routes.js';
-import { PAGE_SEO, SITE_URL, HOME_TITLE, DEFAULT_DESCRIPTION } from '../lib/seo.js';
+import { PAGE_SEO, SITE_URL, DEFAULT_DESCRIPTION, pageTitle } from '../lib/seo.js';
 
 const root = new URL('../dist/', import.meta.url);
 const read = (path) => readFile(new URL(path, root), 'utf8');
@@ -14,12 +14,33 @@ for (const [page, path] of routes) {
   const html = await read(path === '/' ? 'index.html' : `${path.slice(1)}.html`);
   assert.ok(!html.includes('\u0000') && !html.includes('\uFFFD'), `${path}: intact UTF-8 content`);
   const seo = PAGE_SEO[page];
-  const title = seo.title ? `${seo.title} | Germán Montenegro Fisioterapia Deportiva` : HOME_TITLE;
-  assert.ok(html.includes(`<title>${escape(title)}</title>`), `${path}: original title`);
+  const title = pageTitle(page);
+  assert.ok(html.includes(`<title>${escape(title)}</title>`), `${path}: intended page title`);
   assert.ok(html.includes(`name="description" content="${escape(seo.description || DEFAULT_DESCRIPTION)}"`), `${path}: description`);
   assert.equal((html.match(/rel="canonical"/g) || []).length, 1, `${path}: one canonical`);
   const canonical = path === '/' ? SITE_URL : `${SITE_URL}${path}`;
   assert.ok(html.includes(`rel="canonical" href="${canonical}"`), `${path}: correct canonical`);
+  const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+  assert.equal(jsonLd.length, 1, `${path}: one structured data graph`);
+  const schema = JSON.parse(jsonLd[0][1]);
+  assert.equal(schema['@context'], 'https://schema.org');
+  const graph = schema['@graph'];
+  const pageNode = graph.find(node => ['WebPage', 'ProfilePage'].includes(node['@type']));
+  assert.equal(pageNode.url, canonical, `${path}: structured page matches canonical`);
+  assert.equal(pageNode.name, title, `${path}: structured page matches title`);
+  const ids = new Set(graph.map(node => node['@id']));
+  for (const ref of JSON.stringify(graph).matchAll(/"@id":"([^"]+)"/g)) {
+    assert.ok(ids.has(ref[1]), `${path}: structured reference resolves`);
+  }
+  assert.equal(graph.some(node => node['@type'] === 'ProfilePage'), page === 'sobre');
+  const breadcrumb = graph.find(node => node['@type'] === 'BreadcrumbList');
+  if (path !== '/') {
+    assert.equal(breadcrumb.itemListElement.at(-1).item, canonical, `${path}: breadcrumb destination`);
+    assert.deepEqual(breadcrumb.itemListElement.map(item => item.position), breadcrumb.itemListElement.map((_, i) => i + 1));
+  }
+  for (const anchor of html.matchAll(/<a\b([^>]*)>/g)) {
+    assert.ok(/\bhref="[^"]+"/.test(anchor[1]), `${path}: every rendered link has a destination`);
+  }
   assert.ok(html.includes('name="robots" content="index, follow"'), `${path}: indexable`);
   assert.ok(html.includes('lang="es"'), `${path}: language`);
   assert.ok(html.includes('xyptqAjEss_aO6dTu81bKRRgfubvYQDeBGPj0cSrLM4'), `${path}: Search Console verification`);
@@ -45,6 +66,7 @@ const sitemap = await read('sitemap.xml');
 assert.ok(sitemap.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'));
 assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]), expectedUrls);
 assert.equal(await read('sitemap-1.xml'), sitemap, 'Keep the submitted sitemap alias');
+assert.ok(!sitemap.includes('<lastmod>'), 'Do not claim build time as a content update');
 assert.deepEqual((await read('sitemap.txt')).trim().split('\n'), expectedUrls);
 const robots = await read('robots.txt');
 assert.ok(robots.includes('User-agent: *\nAllow: /'));

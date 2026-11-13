@@ -21,7 +21,7 @@ npm start
 - `src/pages/[...path].astro`: genera las 23 rutas de `lib/routes.js`.
 - `src/layouts/SiteLayout.astro`: documento HTML, canonical, metadatos sociales, verificación de Search Console, Analytics y fuentes.
 - `src/styles/globals.css`: estilos globales y tema oscuro.
-- `lib/seo.js`: títulos y descripciones de las páginas, conservados en la migración.
+- `lib/seo.js`: títulos y descripciones de las páginas, alineados con el alcance de cada guía y servicio local.
 - `components/ClientApp.jsx`: componente React prerenderizado por Astro y posteriormente hidratado para las funciones interactivas.
 - `components/prototype/bundle.jsx`: componentes del diseño original. Los enlaces cargan documentos estáticos con sus propios metadatos.
 - `components/site/Experience.jsx` y `lib/experience-content.json`: plantillas y contenidos de la experiencia publicada, con sus estilos en `src/styles/experience.css`.
@@ -37,3 +37,13 @@ Netlify usa `npm run build && npm test && npm run indexnow`, Node 24 y la carpet
 `npm run indexnow` notifica las 23 URLs al endpoint compartido de IndexNow solo con `CONTEXT=production`, después de superar las pruebas. En local y en previews omite el envío; `npm run indexnow -- --dry-run` muestra el lote sin enviarlo. La clave de verificación se publica desde `public/`. La recepción HTTP 200 o 202 no garantiza indexación. Los despliegues manuales que omitan el build no ejecutan esta notificación.
 
 La migración cambia la infraestructura de entrega. La lectura del sitemap en Search Console debe comprobarse después de publicar; un build correcto no demuestra que Google haya aceptado el sitemap.
+
+Los sitemaps conservan las 23 URLs y sus direcciones públicas. Se omite `lastmod` mientras no existan fechas editoriales fiables por página; un nuevo build no se presenta como una modificación de todo el contenido.
+
+## Medición de contactos
+
+Analytics se activa solo en el dominio de producción. Los clics en los enlaces actuales de WhatsApp y teléfono generan `contact_click`, con `contact_method`, `contact_placement` y la dirección de la página sin parámetros ni fragmento. No se envían el texto del botón ni el mensaje de WhatsApp. El evento mide intención de contacto, no una conversación iniciada ni una cita confirmada. La recepción en GA4 y su configuración como evento clave deben verificarse por separado con acceso a la propiedad; las previews y la revisión local no generan esos datos.
+
+## Identidad y enlaces publicados
+
+`lib/structured-data.js` genera un grafo JSON-LD con `Person`, `WebSite`, `WebPage` y rutas de navegación; la biografía usa `ProfilePage`. Solo se declaran la identidad y el teléfono ya visibles. La dirección exacta, certificaciones, perfiles sociales y valoraciones necesitan confirmación antes de incorporarse. El pie contiene destinos reales de contacto y metodología; las antiguas etiquetas de privacidad, términos y redes no tenían enlaces. Esas páginas y perfiles quedan pendientes de contenido o destinos confirmados.
