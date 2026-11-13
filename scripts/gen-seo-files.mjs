@@ -26,7 +26,8 @@ if (!paths.length) {
   throw new Error("gen-seo-files: no se encontro ninguna ruta en lib/routes.js");
 }
 
-const lastmod = new Date().toISOString();
+// Omit lastmod until there is a reliable editorial update date for each URL.
+// Rebuilding unchanged content is not a page modification.
 
 const urls = paths
   .map((p) => {
@@ -35,7 +36,6 @@ const urls = paths
     return [
       "  <url>",
       `    <loc>${escapar(loc)}</loc>`,
-      `    <lastmod>${lastmod}</lastmod>`,
       `    <changefreq>${home ? "weekly" : "monthly"}</changefreq>`,
       `    <priority>${home ? "1.0" : "0.7"}</priority>`,
       "  </url>",

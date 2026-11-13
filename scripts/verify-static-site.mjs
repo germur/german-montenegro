@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { PAGE_TO_PATH } from '../lib/routes.js';
-import { PAGE_SEO, SITE_URL, HOME_TITLE, DEFAULT_DESCRIPTION } from '../lib/seo.js';
+import { PAGE_SEO, SITE_URL, DEFAULT_DESCRIPTION, pageTitle } from '../lib/seo.js';
 
 const root = new URL('../dist/', import.meta.url);
 const read = (path) => readFile(new URL(path, root), 'utf8');
@@ -14,8 +14,8 @@ for (const [page, path] of routes) {
   const html = await read(path === '/' ? 'index.html' : `${path.slice(1)}.html`);
   assert.ok(!html.includes('\u0000') && !html.includes('\uFFFD'), `${path}: intact UTF-8 content`);
   const seo = PAGE_SEO[page];
-  const title = seo.title ? `${seo.title} | Germán Montenegro Fisioterapia Deportiva` : HOME_TITLE;
-  assert.ok(html.includes(`<title>${escape(title)}</title>`), `${path}: original title`);
+  const title = pageTitle(page);
+  assert.ok(html.includes(`<title>${escape(title)}</title>`), `${path}: intended page title`);
   assert.ok(html.includes(`name="description" content="${escape(seo.description || DEFAULT_DESCRIPTION)}"`), `${path}: description`);
   assert.equal((html.match(/rel="canonical"/g) || []).length, 1, `${path}: one canonical`);
   const canonical = path === '/' ? SITE_URL : `${SITE_URL}${path}`;

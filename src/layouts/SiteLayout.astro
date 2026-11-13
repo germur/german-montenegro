@@ -39,12 +39,34 @@ const canonical = path === '/' ? SITE_URL : new URL(path, SITE_URL).href;
   </head>
   <body>
     <main><slot /></main>
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-E0CL52FNCX"></script>
     <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', 'G-E0CL52FNCX');
+      // Keep local reviews and deploy previews out of production reporting.
+      if (['germanmontenegro.fit', 'www.germanmontenegro.fit'].includes(window.location.hostname)) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date());
+        window.gtag('config', 'G-E0CL52FNCX');
+        const tag = document.createElement('script');
+        tag.async = true;
+        tag.src = 'https://www.googletagmanager.com/gtag/js?id=G-E0CL52FNCX';
+        document.head.appendChild(tag);
+
+        // A contact click expresses interest; it does not confirm a booking.
+        document.addEventListener('click', function (event) {
+          const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+          if (!link) return;
+          const url = new URL(link.href, window.location.href);
+          const method = url.hostname === 'wa.me' && url.pathname === '/573045721535'
+            ? 'whatsapp'
+            : url.protocol === 'tel:' && url.pathname === '+573045721535' ? 'phone' : null;
+          if (!method) return;
+          window.gtag('event', 'contact_click', {
+            contact_method: method,
+            contact_placement: link.closest('footer') ? 'footer' : link.closest('header') ? 'header' : 'content',
+            page_location: window.location.origin + window.location.pathname,
+          });
+        }, { capture: true });
+      }
     </script>
   </body>
 </html>
